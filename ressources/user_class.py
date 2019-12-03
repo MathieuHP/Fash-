@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import os
 
+DB_PATH = "./DB/user_ratings_unified_3001x1000.csv"
+
 class User:
     def __init__(self, user_id):
         self.user_id = user_id
@@ -26,3 +28,14 @@ class User:
             print(f" rating of  {rating} / 2 for {picture} pushed to DB")
         else:
             print("image already rated")
+
+
+def new_user_id():
+    df = pd.read_csv(DB_PATH)
+    user_id = df.user_id.max()
+    user_id += 1
+    user = User(user_id)
+
+    return user
+
+
