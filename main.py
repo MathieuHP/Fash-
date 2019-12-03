@@ -1,6 +1,6 @@
-from user_class import User
-from model_embeddings import image_to_embedding
-from model_collaborative_recommander import predict_ratings, get_recommanded_picture
+from ressources.user_class import User
+from ressources.model_embeddings import image_to_embedding
+from ressources.model_collaborative_recommander import predict_ratings, get_recommanded_picture
 import time
 
 loop = True
@@ -20,28 +20,26 @@ while loop == True:
 		continue
 
 
-	if user_input == 1:
+	elif user_input == 1:
 		img_path =  input("enter complete image path")
 		emb = image_to_embedding(img_path)
 		print(emb)
 		continue
 
-	if user_input == 2:
+	elif user_input == 2:
 		predict_ratings()
 		print("prediction complete")
 
-	if user_input == 3:
+	elif user_input == 3:
 		user_id = int(input("enter user ID"))
 		results = get_recommanded_picture(user_id)
 		for i in results:
 			print(i)
-
-
-
-
 
 	print(" -=- -=- -=- -=- -=- ")
 	print(f"operation effectued in {time.time()-start} sec")
 	print(" -=- -=- -=- -=- -=- ")
 
 	# test github
+
+	# C:\Users\mathi\Desktop\Cronos\DATASETS\deep_fashion_2\fake_dataset\images\00d8ff3896fb7afe8d8bcef057d0820a.jpg
