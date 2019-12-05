@@ -1,6 +1,7 @@
 from ressources.user_class import User
 from ressources.model_embeddings import image_to_embedding
-from ressources.model_collaborative_recommander import predict_ratings, get_recommanded_picture
+from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture, create_recommended_pictures_list
+
 import time
 
 loop = True
@@ -12,6 +13,7 @@ while loop == True:
 		1 => from image returns embeddings \n
 		2 => predict ratings \n
 		3 => get recommended picture for specified user_id \n
+		4 => get recommended picture list for specified user_id \n
 		"""))
 	start = time.time()
 
@@ -32,10 +34,16 @@ while loop == True:
 
 	elif user_input == 3:
 		user_id = int(input("enter user ID"))
-		results = get_recommanded_picture(user_id)
+		results = get_collaborative_recommanded_picture(user_id)
 		for i in results:
 			print(i)
 
+	elif user_input == 4:
+		user_id = int(input("enter user ID"))
+		recomended_pictures = create_recommended_pictures_list(user_id)
+		for i in recomended_pictures:
+			print(i)
+			
 	print(" -=- -=- -=- -=- -=- ")
 	print(f"operation effectued in {time.time()-start} sec")
 	print(" -=- -=- -=- -=- -=- ")
