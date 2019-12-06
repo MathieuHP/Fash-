@@ -25,8 +25,23 @@ def get_embeddings():
     parallel = True  # use multicore processing
 
     # Make paths
-    dataTrainDir = os.path.join(os.getcwd(), "data", "train")
-    dataAlreadyTrainDir = os.path.join(os.getcwd(), "data", "already_trained")
+    if os.path.isdir(os.getcwd() + '/data'):
+        if os.path.isdir(os.getcwd() + '/data/train'):
+            if not os.path.isdir(os.getcwd() + '/data/already_trained'):
+                os.mkdir(os.getcwd() + '/data/already_trained')
+                print("already_trained directory has been created")
+            dataTrainDir = os.path.join(os.getcwd(), "data", "train")    
+            dataAlreadyTrainDir = os.path.join(os.getcwd(), "data", "already_trained")
+        else:
+            os.mkdir(os.getcwd() + '/data/train')
+            print("Train directory has been created")
+            return None
+    else:
+        os.mkdir(os.getcwd() + '/data')
+        os.mkdir(os.getcwd() + '/data/train')
+        os.mkdir(os.getcwd() + '/data/already_trained')
+        print("Data, train, already_trained directories have been created")
+        return None
     
     # Read images
     extensions = [".jpg", ".jpeg", ".png"]
@@ -70,6 +85,9 @@ def get_embeddings():
     print(" -> E_train.shape = {}".format(E_train.shape))
     print(" -> E_train_flatten.shape = {}".format(E_train_flatten.shape))
     
+    if not os.path.isdir(os.getcwd() + '/outfile'):
+        os.mkdir(os.getcwd() + '/outfile')
+    
     if os.path.isfile('outfile/filenames.npy') and os.path.isfile('outfile/embs.npy'):
         print("Outfiles already exist")
         
@@ -82,14 +100,13 @@ def get_embeddings():
         np.save('outfile/embs.npy', train_embs_append)
         np.save('outfile/filenames.npy', train_filenames_append)
     else:
-        print("Creating outfiles...")
-        
+        print("Creating outfiles...") 
         np.save('outfile/embs.npy', E_train_flatten)
         np.save('outfile/filenames.npy', filenames_train)
 
     files = os.listdir(dataTrainDir)
     for f in files:
-        if f == dataTrainDir + "/" + ".DS_Store" :
-            os.remove(dataTrainDir + "/" + ".DS_Store")
+        if f == dataTrainDir + "/.DS_Store" :
+            os.remove(dataTrainDir + "/.DS_Store")
         else :    
             shutil.move(dataTrainDir + "/" + f, dataAlreadyTrainDir)

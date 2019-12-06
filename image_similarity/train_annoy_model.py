@@ -17,4 +17,6 @@ def train_annoy_model():
         v = [z for z in train_embs[i]]
         saving_annoy_model.add_item(i, v)
     saving_annoy_model.build(10)
+    if not os.path.isdir(os.getcwd() + '/models'):
+        os.mkdir(os.getcwd() + '/models')
     saving_annoy_model.save('models/annoy_model.annoy')
