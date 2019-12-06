@@ -8,7 +8,7 @@ import pandas as pd
 from ressources.user_class import User, new_user_id
 from ressources.model_embeddings import image_to_embedding
 from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture, create_recommended_pictures_list
-
+from ressources.picture_list_creation import get_reco_picture_list
 
 # init app
 app = Flask(__name__)
@@ -60,24 +60,16 @@ def load_image_for_rating():
     user_id = 5
     # DATABASE_CONNECTION()
     # ------------- get picture list for the user ------------- *
-    # LIST_PATH = r"DB\reco_list.csv"
-    # df = pd.read_csv(LIST_PATH)
-
-    # if user_id in df.user_id:
-    #     pictures_list = df.iloc[user_id,1]
-    # else:
-    #     pictures_list = FIRST_PICTURES_LIST
-    pictures_list = create_recommended_pictures_list(user_id)
+    pictures_list = get_reco_picture_list(user_id)
 
 
     backend.clear_session()
     image = pictures_list.pop(0)
-    image = image[1]
 
 
     # ------------- send list back to DB and create new one if ------------- *
-    if len(pictures_list) < 10:  # MULTITHREADING !!!!
-        create_recommended_pictures_list(user_id)
+    # if len(pictures_list) < 10:  # MULTITHREADING !!!!
+    #     create_recommended_pictures_list(user_id)
 
     img_folder_path = r"C:\Users\mathi\Desktop\Cronos\Fash!\Images"
     image_path =  img_folder_path +r"\\" + image
@@ -90,7 +82,7 @@ def load_image_for_rating():
 def rate_image():
     json_data = request.get_json()
     print(json_data)
-    
+
     # DATABASE_CONNECTION()
     # ------------- push to db : rating x image x user => to DB ------------- *
 
