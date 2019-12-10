@@ -67,7 +67,7 @@ def load_image_for_rating():
     image = pictures_list.pop(0)
 
 
-    # ------------- send list back to DB and create new one if ------------- *
+    # ------------- send updated list back to DB and create new one  ------------- *
     # if len(pictures_list) < 10:  # MULTITHREADING !!!!
     #     create_recommended_pictures_list(user_id)
 

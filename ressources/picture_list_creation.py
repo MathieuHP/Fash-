@@ -46,7 +46,7 @@ def get_reco_picture_list(user_id):
     return pictures_list
 
 
-def less_rated_pictures_selection()
+def less_rated_pictures_selection():
     path_ratings = r"C:\Users\mathi\Desktop\Cronos\Fash!\DB\user_ratings_unified_3001x1000.csv"
     df = pd.read_csv(path_ratings)
     pics_count = df.picture.value_counts()
