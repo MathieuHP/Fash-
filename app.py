@@ -8,7 +8,7 @@ import pandas as pd
 from ressources.user_class import User, new_user_id
 from ressources.model_embeddings import image_to_embedding
 from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture, create_recommended_pictures_list
-from ressources.picture_list_creation import get_reco_picture_list
+from ressources.picture_list_creation import get_recomended_picture_list
 
 # init app
 app = Flask(__name__)
@@ -60,7 +60,7 @@ def load_image_for_rating():
     user_id = 5
     # DATABASE_CONNECTION()
     # ------------- get picture list for the user ------------- *
-    pictures_list = get_reco_picture_list(user_id)
+    pictures_list = get_recomended_picture_list(user_id)
 
 
     backend.clear_session()
