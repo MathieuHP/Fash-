@@ -40,7 +40,6 @@ def get_already_rated_pictures(user_id):
     try:
         collection = db["user_ratings"]
     except:
-        print("connecting to db")
         db = db_connect()
         collection = db["user_ratings"]
 
@@ -58,7 +57,6 @@ def predict_ratings():
     try:
         collection = db["user_ratings"]
     except:
-        print("connecting to db")
         db = db_connect()
         collection = db["user_ratings"]
 
@@ -94,7 +92,7 @@ def predict_ratings():
         "estimation":pred[3]} for pred in predictions])
 
 
-def get_collaborative_recommanded_picture(user_id=int):
+def get_collaborative_recommended_picture(user_id=int):
 
     """ get 10 best estimated pictures for an user_id from 
     Surprise predictions """
@@ -102,7 +100,6 @@ def get_collaborative_recommanded_picture(user_id=int):
     try:
         collection = db["predicted_ratings_collab"]
     except:
-        print("connecting to db")
         db = db_connect()
         collection = db["predicted_ratings_collab"]
 
