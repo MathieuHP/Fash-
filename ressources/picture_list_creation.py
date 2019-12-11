@@ -56,22 +56,14 @@ def get_recommended_picture_list(user_id):
         db = db_connect()
         collection = db["list_images"]
 
-    df = pd.read_csv(list(collection.find_many({})))
-
-    if user_id in df.user_id:
-        x = df.iloc[user_id,1]
-        cars = ["[","]","'"]
-                for i in cars:
-            x = x.replace(i, "")
-
-        x = x.split(",")
-        pictures_list = x
+    if list(collection.find({"user_id":user_id})):
+        result = list(collection.find({"user_id":user_id}))
+        pictures_list = result[0]["list_image"]
 
     else:
         pictures_list = less_rated_pictures_selection()
 
-    df.loc[user_id,"recommended_picture"] ,df.loc[user_id,"user_id"] = pictures_list, user_id #DB
-    df.to_csv(LIST_PATH, index = False)
+    collection.update_one({"user_id":user_id},{"$set"{"list_image":pictures_list}})
 
     return pictures_list
 
