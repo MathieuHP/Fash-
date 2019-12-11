@@ -34,6 +34,12 @@ def upload_image():
     UPLOAD_FOLDER = './image_similarity/data/train/'
     ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg']
     image_file = request.files["imageFile"]
+    typeCloth = request.form["typeCloth"]
+    materialCloth = request.form["materialCloth"]
+    productionMethod = request.form["productionMethod"]
+    price = request.form["price"]
+    sex = request.form["sex"]
+    description = request.form["description"]
     extension = os.path.splitext(image_file.filename)[1]
     if not extension in ALLOWED_EXTENSIONS :
         return 'Invalid extension'
@@ -46,9 +52,6 @@ def upload_image():
 
     destination = UPLOAD_FOLDER + filename
     image_file.save(destination)
-    coll = db["image_info"]
-    coll.insert_one({"name":filename, "path": destination})
-
     while not os.path.exists(destination):
         print('waiting')
         time.sleep(1)
@@ -56,6 +59,17 @@ def upload_image():
     if os.path.isfile(UPLOAD_FOLDER + filename):
         get_embeddings()
         train_annoy_model()
+        coll = db["image_info"]
+        coll.insert_one({
+            "name":filename,
+            "path": destination,
+            "typeCloth": typeCloth,
+            "materialCloth": materialCloth,
+            "productionMethod": productionMethod,
+            "price": price,
+            "sex": sex,
+            "description": description
+        })
     
     return 'All good'
 
