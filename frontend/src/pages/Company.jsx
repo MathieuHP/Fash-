@@ -24,12 +24,27 @@ function Company() {
         }
     }
 
-    const sendValue = () => {
-        console.log(image)
+    const sendValue = async () => {
+        console.log(image[0])
         console.log(typeCLoth)
         console.log(materialCloth)
         console.log(productionMethod)
         console.log("Send values to backend");
+
+        // TODO SEND ALL DATA TO FORMDATA
+
+        const formData = new FormData();
+        formData.append('imageFile', image[0]);
+        const options = {
+            method: 'POST',
+            body: formData,
+        };
+        fetch(`http://127.0.0.1:5000/upload_image`, options)
+        .then((response) => {
+            response.text().then(function (text) {
+                console.log(text)
+            });
+        })
     }
 
     return (
@@ -45,7 +60,7 @@ function Company() {
                 </h3>
                 <div>
                     <label htmlFor="uploadImage">Cloth image : </label>
-                    <input type="file" name="uploadImage" onChange={(e) => setImage(e.target.value)}/>
+                    <input type="file" id="uploadImage" name="uploadImage" onChange={(e) => setImage(e.target.files)}/>
                 </div>
                 <div>
                     <label htmlFor="typeCloth">Type of cloth : </label>

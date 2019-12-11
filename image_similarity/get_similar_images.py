@@ -16,7 +16,7 @@ def get_similar_images():
     dataTrainDir = os.path.join(os.getcwd(), "data", "train")
     
     # index_image = 997
-    index_image = train_filenames.index(dataTrainDir + "/000130.jpg")
+    index_image = train_filenames.index("IMG_1.jpg")
 
     load_annoy_model = annoy.AnnoyIndex(embeddings_size, metric='angular')
     load_annoy_model.load('models/annoy_model.annoy')

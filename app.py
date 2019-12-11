@@ -3,6 +3,9 @@ from tensorflow.keras import backend
 import os
 import cv2
 import pandas as pd
+import numpy as np
+import time
+from flask_cors import CORS, cross_origin
 
 #custom modules
 from ressources.user_class import User, new_user_id
@@ -10,46 +13,55 @@ from ressources.model_embeddings import image_to_embedding
 from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture, create_recommended_pictures_list
 from ressources.picture_list_creation import get_reco_picture_list
 
+from image_similarity.get_embeddings import get_embeddings
+from image_similarity.train_annoy_model import train_annoy_model
+
+
+from werkzeug.utils import secure_filename
+
 # init app
 app = Flask(__name__)
-
-
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
+@app.route("/", methods= ["POST"])
+@cross_origin(supports_credentials=True)
+def home():
+    print("Backend is on")
+    return 'All good !'
 
-# # * ---------- DATABASE CONFIG --------- *
-# DATABASE_USER = os.environ['DATABASE_USER']
-# DATABASE_PASSWORD = os.environ['DATABASE_PASSWORD']
-# DATABASE_HOST = os.environ['DATABASE_HOST']
-# DATABASE_PORT = os.environ['DATABASE_PORT']
-# DATABASE_NAME = os.environ['DATABASE_NAME']
+@app.route("/upload_image", methods= ["POST"])
+@cross_origin(supports_credentials=True)
+def upload_image():
+    UPLOAD_FOLDER = './image_similarity/data/train/'
+    ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg']
+    image_file = request.files["imageFile"]
+    extension = os.path.splitext(image_file.filename)[1]
+    if not extension in ALLOWED_EXTENSIONS :
+        return 'Invalid extension'
+    
+    if os.path.isfile('./image_similarity/outfile/nbrFiles.npy'):
+        nbrFiles = np.load('./image_similarity/outfile/nbrFiles.npy').astype(int)
+        filename = "IMG_" + str(nbrFiles +1) + extension
+    else:
+        filename = "IMG_1" + extension
 
-# def DATABASE_CONNECTION():
-#     return psycopg2.connect(user=DATABASE_USER,
-#                               password=DATABASE_PASSWORD,
-#                               host=DATABASE_HOST,
-#                               port=DATABASE_PORT,
-#                               database=DATABASE_NAME)
+    destination = UPLOAD_FOLDER + filename
+    image_file.save(destination)
 
+    while not os.path.exists(destination):
+        print('waiting')
+        time.sleep(1)
 
-
-# def routes
-
-@app.route("/", methods= ["GET", "POST"])
-def index():
-    return'''-> /new_user :  create a new user <br /> 
-    -> /recommended_picture :  get recommended pictures list <br /> 
-    -> /ratings_update :  give a rating and push it to DB <br /> 
-    -> /user/<username> :  go to user page  <br /> 
-    '''
-
+    if os.path.isfile(UPLOAD_FOLDER + filename):
+        get_embeddings()
+        train_annoy_model()
+    
+    return 'All good'
 
 @app.route("/new_user", methods=["POST"])
 def new_user():
     user = User(new_user_id())
-
     #push data to DB
-
     return "user created"
 
 

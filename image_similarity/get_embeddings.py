@@ -4,12 +4,12 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.neighbors import NearestNeighbors
-from src_get_embeddings.CV_IO_utils import read_imgs_dir
-from src_get_embeddings.CV_transform_utils import apply_transformer, resize_img, normalize_img
+from .src_get_embeddings.CV_IO_utils import read_imgs_dir
+from .src_get_embeddings.CV_transform_utils import apply_transformer, resize_img, normalize_img
 import annoy
 
 # Apply transformations to all images
-class ImageTransformer(object):
+class ImageTransformer:
 
     def __init__(self, shape_resize):
         self.shape_resize = shape_resize
@@ -23,23 +23,27 @@ def get_embeddings():
     
     modelName = "vgg19"  # try: "simpleAE", "convAE", "vgg19"
     parallel = True  # use multicore processing
+    
+    mainDir = os.getcwd()
+    mainDir = os.getcwd() + "/image_similarity"
 
     # Make paths
-    if os.path.isdir(os.getcwd() + '/data'):
-        if os.path.isdir(os.getcwd() + '/data/train'):
-            if not os.path.isdir(os.getcwd() + '/data/already_trained'):
-                os.mkdir(os.getcwd() + '/data/already_trained')
+    print(os.getcwd())
+    if os.path.isdir(mainDir + '/data'):
+        if os.path.isdir(mainDir + '/data/train'):
+            if not os.path.isdir(mainDir + '/data/already_trained'):
+                os.mkdir(mainDir + '/data/already_trained')
                 print("already_trained directory has been created")
-            dataTrainDir = os.path.join(os.getcwd(), "data", "train")    
-            dataAlreadyTrainDir = os.path.join(os.getcwd(), "data", "already_trained")
+            dataTrainDir = os.path.join(mainDir, "data", "train")    
+            dataAlreadyTrainDir = os.path.join(mainDir, "data", "already_trained")
         else:
-            os.mkdir(os.getcwd() + '/data/train')
+            os.mkdir(mainDir + '/data/train')
             print("Train directory has been created")
             return None
     else:
-        os.mkdir(os.getcwd() + '/data')
-        os.mkdir(os.getcwd() + '/data/train')
-        os.mkdir(os.getcwd() + '/data/already_trained')
+        os.mkdir(mainDir + '/data')
+        os.mkdir(mainDir + '/data/train')
+        os.mkdir(mainDir + '/data/already_trained')
         print("Data, train, already_trained directories have been created")
         return None
     
@@ -85,24 +89,26 @@ def get_embeddings():
     print(" -> E_train.shape = {}".format(E_train.shape))
     print(" -> E_train_flatten.shape = {}".format(E_train_flatten.shape))
     
-    if not os.path.isdir(os.getcwd() + '/outfile'):
-        os.mkdir(os.getcwd() + '/outfile')
+    if not os.path.isdir(mainDir + '/outfile'):
+        os.mkdir(mainDir + '/outfile')
     
-    if os.path.isfile('outfile/filenames.npy') and os.path.isfile('outfile/embs.npy'):
+    if os.path.isfile(mainDir + '/outfile/filenames.npy') and os.path.isfile(mainDir + '/outfile/embs.npy'):
         print("Outfiles already exist")
         
-        train_filenames = np.load('outfile/filenames.npy')
-        train_embs = np.load('outfile/embs.npy')
+        train_filenames = np.load(mainDir + '/outfile/filenames.npy')
+        train_embs = np.load(mainDir + '/outfile/embs.npy')
         
         train_filenames_append = np.append(train_filenames, filenames_train, axis=0)
         train_embs_append = np.append(train_embs, E_train_flatten, axis=0)
         
-        np.save('outfile/embs.npy', train_embs_append)
-        np.save('outfile/filenames.npy', train_filenames_append)
+        np.save(mainDir + '/outfile/embs.npy', train_embs_append)
+        np.save(mainDir + '/outfile/filenames.npy', train_filenames_append)
+        np.save(mainDir + '/outfile/nbrFiles.npy', train_filenames_append.size)
     else:
         print("Creating outfiles...") 
-        np.save('outfile/embs.npy', E_train_flatten)
-        np.save('outfile/filenames.npy', filenames_train)
+        np.save(mainDir + '/outfile/embs.npy', E_train_flatten)
+        np.save(mainDir + '/outfile/filenames.npy', filenames_train)
+        np.save(mainDir + '/outfile/nbrFiles.npy', filenames_train.size)
 
     files = os.listdir(dataTrainDir)
     for f in files:
@@ -110,3 +116,4 @@ def get_embeddings():
             os.remove(dataTrainDir + "/.DS_Store")
         else :    
             shutil.move(dataTrainDir + "/" + f, dataAlreadyTrainDir)
+    
