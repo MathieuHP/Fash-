@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from random  import randrange
 
-from ressources.config import db
+from ressources.config import db, db_connect
 from ressources.model_collab_recommender import predict_ratings, get_collaborative_recommended_picture, get_already_rated_pictures
 
 
@@ -37,7 +37,7 @@ def less_rated_pictures_selection():
         db = db_connect()
         collection = db["user_ratings"]
     
-    df = pd.read_csv(list(collection["user_ratings"].find_many({})))
+    df = pd.read_csv(list(collection["user_ratings"].find({})))
     pics_count = df.picture.value_counts()
     ind = pics_count.index
     bag_pic = ind[-100:]

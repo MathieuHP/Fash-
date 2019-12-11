@@ -24,14 +24,23 @@ function Client() {
     
     // FUNCTIONS
     const fetchData = async () => {
-        const result = await axios(
-          'https://picsum.photos/v2/list',
-        );
-        let newImageList = imageList.concat(result.data)
-        setImageList(newImageList);
-        if (image === '') {
-            setImage(newImageList[0].download_url)
-        }
+        // const result = await axios(
+        //   'load_image_for_rating',
+        // );
+        // let newImageList = imageList.concat(result.data)
+        // setImageList(newImageList);
+        // if (image === '') {
+        //     setImage(newImageList[0].download_url)
+        // }
+        const options = {
+            method: 'GET',
+        };
+        fetch(`http://127.0.0.1:5000/load_image_for_rating`, options)
+        .then((response) => {
+            response.text().then(function (text) {
+                console.log(text)
+            });
+        })
     };
 
     const rateImage = (value) => {
