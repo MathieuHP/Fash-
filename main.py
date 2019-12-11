@@ -1,31 +1,45 @@
 from ressources.user_class import User
-from ressources.model_embeddings import image_to_embedding
-from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture, create_recommended_pictures_list
+from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture
+from ressources.picture_list_creation import create_recommended_pictures_list
+from ressources.config import db
 
 import time
+from pymongo import MongoClient
+
+
+settings.init()
 
 loop = True
 
+user_id = 1
+
 while loop == True:
 
-	user_input =  int(input(""" \n
-		0 => Exit \n  
-		1 => from image returns embeddings \n
+	user_input =  int(input(f""" \n
+		0 => Exit \n 
+		99 = > change user_id (current = {user_id}) \n
+		1 => get_collaborative_recommanded_picture \n
 		2 => predict ratings \n
-		3 => get recommended picture for specified user_id \n
-		4 => get recommended picture list for specified user_id \n
-		"""))
+		3 => create_recommended_pictures_list \n """))
+
 	start = time.time()
 
-	if user_input == 0 :
+	if user_input == "0" :
 		loop = False
+		continue
+
+	elif user_input == "99":
+		inp = int(input("set new user_id"))
+		user_id = inp
 		continue
 
 
 	elif user_input == 1:
-		img_path =  input("enter complete image path")
-		emb = image_to_embedding(img_path)
-		print(emb)
+
+		results = get_collaborative_recommanded_picture(user_id)
+		for i in results:
+			print(i)
+
 		continue
 
 	elif user_input == 2:
@@ -33,17 +47,11 @@ while loop == True:
 		print("prediction complete")
 
 	elif user_input == 3:
-		user_id = int(input("enter user ID"))
-		results = get_collaborative_recommanded_picture(user_id)
-		for i in results:
-			print(i)
-
-	elif user_input == 4:
-		user_id = int(input("enter user ID"))
 		recomended_pictures = create_recommended_pictures_list(user_id)
 		for i in recomended_pictures:
 			print(i)
-			
+	
+	print(" ")		
 	print(" -=- -=- -=- -=- -=- ")
 	print(f"operation effectued in {time.time()-start} sec")
 	print(" -=- -=- -=- -=- -=- ")

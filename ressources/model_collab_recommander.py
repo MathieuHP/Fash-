@@ -4,6 +4,8 @@ import numpy as np
 import os
 from surprise import Reader, Dataset, Trainset, SVD, BaselineOnly
 from surprise.model_selection import cross_validate
+from ressources.config import db
+
 
 
 FIRST_PICTURES_LIST = [ 
@@ -14,14 +16,11 @@ FIRST_PICTURES_LIST = [
 ]
 
 
-
-def get_data():
-    path_df = r"C:\Users\mathi\Desktop\Cronos\Fash!\DB\user_ratings_unified_3001x1000.csv"
-    df = pd.read_csv(path_df)
-    return df
-
-
 def filtering_out_users_and_ratings(df):
+
+    """filter out user and images with too few 
+    ratings to preserve matrix sparsity"""
+
     min_picture_ratings = 50
     filter_picture = df['picture'].value_counts() > min_picture_ratings
     filter_picture = filter_picture[filter_picture].index.tolist()
@@ -36,10 +35,39 @@ def filtering_out_users_and_ratings(df):
     return df_new
 
 
-def predict_ratings():
-    df = get_data()
-    df = filtering_out_users_and_ratings(df)
+def get_already_rated_pictures(user_id):
 
+    try:
+        collection = db["user_ratings"]
+    except:
+        print("connecting to db")
+        db = db_connect()
+        collection = db["user_ratings"]
+
+    rated_pictures = pd.DataFrame(list(collection.find({"user_id":user_id})))
+    rated_pictures = np.array(rated_pictures[["picture"]])
+    return rated_pictures
+
+
+def predict_ratings():
+
+    """predict ratings using surprise, for the 
+    colaborative recommender system"""
+
+    #get ratings from db
+    try:
+        collection = db["user_ratings"]
+    except:
+        print("connecting to db")
+        db = db_connect()
+        collection = db["user_ratings"]
+
+
+    df = pd.DataFrame(list(collection.find({})))
+
+    # preprocess, feed and predict ratings
+
+    df = filtering_out_users_and_ratings(df)
     reader = Reader(rating_scale=(0, 2))
     data = Dataset.load_from_df(df[['user_id', 'picture', 'rating']], reader)
     trainset = data.build_full_trainset()
@@ -55,56 +83,41 @@ def predict_ratings():
     testset = trainset.build_anti_testset()
     predictions = algo.test(testset)
     predictions = np.array(predictions)
-    np.save(r"DB\predictions_reco.npy", predictions)
 
+    # update database
 
-PAHT_DB = r"C:\Users\mathi\Desktop\Cronos\Fash!\DB\user_ratings_unified_3001x1000.csv"
-def get_already_rated_pictures(user_id):
-    # ------------- get list of rated pictures from DB  ------------- *
-    data = pd.read_csv(PAHT_DB)
-    rated_pictures = data.loc[data["user_id"] == user_id]
-    rated_pictures.drop(["rating","user_id"],1, inplace = True)
-    rated_pictures = np.array(rated_pictures)
-    return rated_pictures
+    collection = db["predicted_ratings_collab"]
+    collection.delete_many({})
+    collection.insert_many([{
+        "user_id": pred[0], 
+        "picture" : pred[1],
+        "estimation":pred[3]} for pred in predictions])
 
 
 def get_collaborative_recommanded_picture(user_id=int):
-    """ get 10 best estimated pictures for an user_id from Surprise predictions """
-    predictions = np.load(r"DB/predictions_reco.npy", allow_pickle = True)
+
+    """ get 10 best estimated pictures for an user_id from 
+    Surprise predictions """
+
+    try:
+        collection = db["predicted_ratings_collab"]
+    except:
+        print("connecting to db")
+        db = db_connect()
+        collection = db["predicted_ratings_collab"]
+
+
+    predictions = collection.find({"user_id": user_id})
     rated_pictures = get_already_rated_pictures(user_id)
 
     estimated_ratings = []
     for pred in predictions:
-        if int(pred[0]) == user_id:
-            estimated_ratings.append([pred[3] , pred[1]])
+        if int(pred["user_id"]) == user_id:
+            estimated_ratings.append([pred["estimation"] , pred["picture"]])
     estimated_ratings.sort(reverse = True)
 
     return estimated_ratings
-
-
-def create_recommended_pictures_list(user_id):
-    rated_pictures = get_already_rated_pictures(user_id)
-    number_ratings = len(rated_pictures)
     
-    if number_ratings < 20:
-        return FIRST_PICTURES_LIST
-    
-    else:
-        estimated_ratings = get_collaborative_recommanded_picture(user_id)
-        result = []
-        i = 0
-        while len(result) < 50 :
-            if estimated_ratings[i]:
-                if estimated_ratings[i] in rated_pictures:
-                    estimated_ratings.remove(estimated_ratings[i])
-                    continue
-                result.append(estimated_ratings[i])
-                if estimated_ratings[i] == estimated_ratings[-1]:
-                    break
-            i+=1
-        return result
-        
-       
 # format surprise.predict()
 #Prediction (
 # uid=1, 
