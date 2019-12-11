@@ -11,6 +11,9 @@ function Company() {
     const [typeCLoth, setTypeCLoth] = useState('')
     const [materialCloth, setMaterialCloth] = useState('')
     const [productionMethod, setProductionMethod] = useState('')
+    const [price, setPrice] = useState('')
+    const [sex, setSex] = useState('')
+    const [description, setDescription] = useState('')
     const [formValidationText, setFormValidationText] = useState('')
 
     // FUNCTIONS
@@ -25,16 +28,32 @@ function Company() {
     }
 
     const sendValue = async () => {
+        const formDataObj = {
+            imageFile : image[0],
+            typeCLoth : typeCLoth,
+            materialCloth : materialCloth,
+            productionMethod : productionMethod,
+            price : price,
+            sex : sex,
+            description : description
+        }
+
         console.log(image[0])
         console.log(typeCLoth)
         console.log(materialCloth)
         console.log(productionMethod)
+        console.log(price)
+        console.log(sex)
+        console.log(description)
         console.log("Send values to backend");
 
         // TODO SEND ALL DATA TO FORMDATA
 
         const formData = new FormData();
-        formData.append('imageFile', image[0]);
+        // formData.append('imageFile', image[0]);
+        for ( var key in formDataObj ) {
+            formData.append(key, formDataObj[key]);
+        }
         const options = {
             method: 'POST',
             body: formData,
@@ -73,6 +92,18 @@ function Company() {
                 <div>
                     <label htmlFor="productionMethod">Production method : </label>
                     <input type="text" name="productionMethod" value={productionMethod} onChange={(e) => setProductionMethod(e.target.value)}/>
+                </div>
+                <div>
+                    <label htmlFor="price">Price : </label>
+                    <input type="text" name="price" value={price} onChange={(e) => setPrice(e.target.value)}/>
+                </div>
+                <div>
+                    <label htmlFor="sex">Sex : </label>
+                    <input type="text" name="sex" value={sex} onChange={(e) => setSex(e.target.value)}/>
+                </div>
+                <div>
+                    <label htmlFor="desciption">Description : </label>
+                    <textarea type="text" name="desciption" value={description} onChange={(e) => setDescription(e.target.value)}/>
                 </div>
                 <div>
                     <input type="submit" name="submitCloth" value="Submit" onClick={() => checkState()}/>
