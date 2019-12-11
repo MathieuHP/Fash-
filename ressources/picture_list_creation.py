@@ -63,7 +63,7 @@ def get_recommended_picture_list(user_id):
     else:
         pictures_list = less_rated_pictures_selection()
 
-    collection.update_one({"user_id":user_id},{"$set"{"list_image":pictures_list}})
+    collection.update_one({"user_id":user_id},{"$set":{"list_image":pictures_list}})
 
     return pictures_list
 
