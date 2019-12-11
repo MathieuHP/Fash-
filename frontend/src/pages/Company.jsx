@@ -8,7 +8,7 @@ function Company() {
     
     // STATE
     const [image, setImage] = useState('')
-    const [typeCLoth, setTypeCLoth] = useState('')
+    const [typeCloth, setTypeCloth] = useState('')
     const [materialCloth, setMaterialCloth] = useState('')
     const [productionMethod, setProductionMethod] = useState('')
     const [price, setPrice] = useState('')
@@ -30,7 +30,7 @@ function Company() {
     const sendValue = async () => {
         const formDataObj = {
             imageFile : image[0],
-            typeCLoth : typeCLoth,
+            typeCloth : typeCloth,
             materialCloth : materialCloth,
             productionMethod : productionMethod,
             price : price,
@@ -39,7 +39,7 @@ function Company() {
         }
 
         console.log(image[0])
-        console.log(typeCLoth)
+        console.log(typeCloth)
         console.log(materialCloth)
         console.log(productionMethod)
         console.log(price)
@@ -83,7 +83,7 @@ function Company() {
                 </div>
                 <div>
                     <label htmlFor="typeCloth">Type of cloth : </label>
-                    <input type="text" name="typeCloth" value={typeCLoth} onChange={(e) => setTypeCLoth(e.target.value)}/>
+                    <input type="text" name="typeCloth" value={typeCloth} onChange={(e) => setTypeCloth(e.target.value)}/>
                 </div>
                 <div>
                     <label htmlFor="materialCloth">Cloth material : </label>
