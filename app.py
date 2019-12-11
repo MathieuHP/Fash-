@@ -9,7 +9,7 @@ from flask_cors import CORS, cross_origin
 
 #custom modules
 from ressources.config import db
-from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture
+from ressources.model_collab_recommender import predict_ratings, get_collaborative_recommended_picture
 from ressources.picture_list_creation import create_recommended_pictures_list
 
 from image_similarity.get_embeddings import get_embeddings
@@ -73,7 +73,7 @@ def load_image_for_rating():
     user_id = 5
     # DATABASE_CONNECTION()
     # ------------- get picture list for the user ------------- *
-    pictures_list = get_recomended_picture_list(user_id)
+    pictures_list = get_recommended_picture_list(user_id)
 
 
     backend.clear_session()

@@ -2,24 +2,20 @@ import numpy as np
 import os
 import pandas as pd
 from random  import randrange
-from ressources.config import db
-from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture, get_already_rated_pictures
 
-FIRST_PICTURES_LIST = [
-"00b6d6ed71e27101211bd77627e5c1b2.jpg", 
-"000e18920575a2e59b3a0c38e6546d29.jpg",
-'00af8f65bb93f4131499dc9807129a24.jpg',
-"00a722065820c4561a5522054ee62fe4.jpg"]
+from ressources.config import db
+from ressources.model_collab_recommender import predict_ratings, get_collaborative_recommended_picture, get_already_rated_pictures
+
 
 def create_recommended_pictures_list(user_id):
     rated_pictures = get_already_rated_pictures(user_id)
     number_ratings = len(rated_pictures)
     
     if number_ratings < 20:
-        return FIRST_PICTURES_LIST
+        return less_rated_pictures_selection()
     
     else:
-        estimated_ratings = get_collaborative_recommanded_picture(user_id)
+        estimated_ratings = get_collaborative_recommended_picture(user_id)
         result = []
         i = 0
         while len(result) < 50 :
@@ -35,8 +31,13 @@ def create_recommended_pictures_list(user_id):
 
 
 def less_rated_pictures_selection():
-    path_ratings = r"C:\Users\mathi\Desktop\Cronos\Fash!\DB\user_ratings_unified_3001x1000.csv"
-    df = pd.read_csv(path_ratings)
+    try:
+        collection = db["user_ratings"]
+    except:
+        db = db_connect()
+        collection = db["user_ratings"]
+    
+    df = pd.read_csv(list(collection["user_ratings"].find_many({})))
     pics_count = df.picture.value_counts()
     ind = pics_count.index
     bag_pic = ind[-100:]
@@ -48,14 +49,19 @@ def less_rated_pictures_selection():
     return bag
 
     
-def get_recomended_picture_list(user_id):
-    LIST_PATH = r"DB\reco_list.csv" #DB
-    df = pd.read_csv(LIST_PATH)
+def get_recommended_picture_list(user_id):
+    try:
+        collection = db["list_images"]
+    except:
+        db = db_connect()
+        collection = db["list_images"]
+
+    df = pd.read_csv(list(collection.find_many({})))
 
     if user_id in df.user_id:
         x = df.iloc[user_id,1]
         cars = ["[","]","'"]
-        for i in cars:
+                for i in cars:
             x = x.replace(i, "")
 
         x = x.split(",")
