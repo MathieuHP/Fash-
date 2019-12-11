@@ -1,4 +1,3 @@
-from ressources.user_class import User
 from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture
 from ressources.picture_list_creation import create_recommended_pictures_list
 from ressources.config import db

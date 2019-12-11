@@ -9,8 +9,8 @@ from flask_cors import CORS, cross_origin
 
 #custom modules
 from ressources.config import db
-from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture, create_recommended_pictures_list
-from ressources.picture_list_creation import get_recomended_picture_list
+from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture
+from ressources.picture_list_creation import create_recommended_pictures_list
 
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
