@@ -50,28 +50,29 @@ def less_rated_pictures_selection():
 
     
 def get_recommended_picture_list(user_id):
-    try:
-        collection = db["list_images"]
-    except:
-        db = db_connect()
-        collection = db["list_images"]
+    print('Func to change')
+    # try:
+    #     collection = db["list_images"]
+    # except:
+    #     db = db_connect()
+    #     collection = db["list_images"]
 
-    df = pd.read_csv(list(collection.find_many({})))
+    # df = pd.read_csv(list(collection.find_many({})))
 
-    if user_id in df.user_id:
-        x = df.iloc[user_id,1]
-        cars = ["[","]","'"]
-                for i in cars:
-            x = x.replace(i, "")
+    # if user_id in df.user_id:
+    #     x = df.iloc[user_id,1]
+    #     cars = ["[","]","'"]
+    #             for i in cars:
+    #         x = x.replace(i, "")
 
-        x = x.split(",")
-        pictures_list = x
+    #     x = x.split(",")
+    #     pictures_list = x
 
-    else:
-        pictures_list = less_rated_pictures_selection()
+    # else:
+    #     pictures_list = less_rated_pictures_selection()
 
-    df.loc[user_id,"recommended_picture"] ,df.loc[user_id,"user_id"] = pictures_list, user_id #DB
-    df.to_csv(LIST_PATH, index = False)
+    # df.loc[user_id,"recommended_picture"] ,df.loc[user_id,"user_id"] = pictures_list, user_id #DB
+    # df.to_csv(LIST_PATH, index = False)
 
-    return pictures_list
+    # return pictures_list
 
