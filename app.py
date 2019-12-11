@@ -44,6 +44,9 @@ def upload_image():
     if not extension in ALLOWED_EXTENSIONS :
         return 'Invalid extension'
     
+    if not os.path.isdir(UPLOAD_FOLDER):
+        os.mkdir(UPLOAD_FOLDER)
+    
     if os.path.isfile('./image_similarity/outfile/nbrFiles.npy'):
         nbrFiles = np.load('./image_similarity/outfile/nbrFiles.npy').astype(int)
         filename = "IMG_" + str(nbrFiles +1) + extension

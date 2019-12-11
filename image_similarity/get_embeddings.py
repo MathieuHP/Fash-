@@ -31,11 +31,10 @@ def get_embeddings():
     print(os.getcwd())
     if os.path.isdir(mainDir + '/data'):
         if os.path.isdir(mainDir + '/data/train'):
-            if not os.path.isdir(mainDir + '/data/already_trained'):
-                os.mkdir(mainDir + '/data/already_trained')
-                print("already_trained directory has been created")
+            if not os.path.isdir(os.getcwd() + "/imagesOnDb"):
+                os.mkdir(os.getcwd() + "/imagesOnDb")
+                print("imagesOnDb directory has been created")
             dataTrainDir = os.path.join(mainDir, "data", "train")    
-            dataAlreadyTrainDir = os.path.join(mainDir, "data", "already_trained")
         else:
             os.mkdir(mainDir + '/data/train')
             print("Train directory has been created")
@@ -43,8 +42,8 @@ def get_embeddings():
     else:
         os.mkdir(mainDir + '/data')
         os.mkdir(mainDir + '/data/train')
-        os.mkdir(mainDir + '/data/already_trained')
-        print("Data, train, already_trained directories have been created")
+        os.mkdir(os.getcwd() + "/imagesOnDb")
+        print("Data, train, imagesOnDb directories have been created")
         return None
     
     # Read images
@@ -115,5 +114,5 @@ def get_embeddings():
         if f == dataTrainDir + "/.DS_Store" :
             os.remove(dataTrainDir + "/.DS_Store")
         else :    
-            shutil.move(dataTrainDir + "/" + f, dataAlreadyTrainDir)
+            shutil.move(dataTrainDir + "/" + f, os.getcwd() + "/imagesOnDb")
     
