@@ -8,9 +8,9 @@ import time
 from flask_cors import CORS, cross_origin
 
 #custom modules
-from ressources.config import db
+from ressources.config import db, db_connect
 from ressources.model_collab_recommender import predict_ratings, get_collaborative_recommended_picture
-from ressources.picture_list_creation import create_recommended_pictures_list
+from ressources.picture_list_creation import create_recommended_pictures_list, get_recommended_picture_list
 
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
@@ -27,6 +27,7 @@ FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 def home():
     print("Backend is on")
     return 'All good !'
+
 
 @app.route("/upload_image", methods= ["POST"])
 @cross_origin(supports_credentials=True)
