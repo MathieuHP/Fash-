@@ -4,8 +4,8 @@ import numpy as np
 import os
 from surprise import Reader, Dataset, Trainset, SVD, BaselineOnly
 from surprise.model_selection import cross_validate
-from ressources.database_connexion import db_connect
-from ressources.picture_list_creation import get_already_rated_pictures
+from ressources.config import db
+
 
 
 FIRST_PICTURES_LIST = [ 
@@ -14,6 +14,7 @@ FIRST_PICTURES_LIST = [
 '00af8f65bb93f4131499dc9807129a24.jpg',
 "00a722065820c4561a5522054ee62fe4.jpg"
 ]
+
 
 def filtering_out_users_and_ratings(df):
 
@@ -34,16 +35,34 @@ def filtering_out_users_and_ratings(df):
     return df_new
 
 
+def get_already_rated_pictures(user_id):
+
+    try:
+        collection = db["user_ratings"]
+    except:
+        print("connecting to db")
+        db = db_connect()
+        collection = db["user_ratings"]
+
+    rated_pictures = pd.DataFrame(list(collection.find({"user_id":user_id})))
+    rated_pictures = np.array(rated_pictures[["picture"]])
+    return rated_pictures
+
+
 def predict_ratings():
 
     """predict ratings using surprise, for the 
     colaborative recommender system"""
 
     #get ratings from db
-    if not db:
+    try:
+        collection = db["user_ratings"]
+    except:
+        print("connecting to db")
         db = db_connect()
+        collection = db["user_ratings"]
 
-    collection = db["user_ratings"]
+
     df = pd.DataFrame(list(collection.find({})))
 
     # preprocess, feed and predict ratings
@@ -80,10 +99,13 @@ def get_collaborative_recommanded_picture(user_id=int):
     """ get 10 best estimated pictures for an user_id from 
     Surprise predictions """
 
-    if not db:
+    try:
+        collection = db["predicted_ratings_collab"]
+    except:
+        print("connecting to db")
         db = db_connect()
+        collection = db["predicted_ratings_collab"]
 
-    collection = db["predicted_ratings_collab"]
 
     predictions = collection.find({"user_id": user_id})
     rated_pictures = get_already_rated_pictures(user_id)

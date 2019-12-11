@@ -2,8 +2,8 @@ import numpy as np
 import os
 import pandas as pd
 from random  import randrange
-from ressources.database_connexion import db_connect
-from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture
+from ressources.config import db
+from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture, get_already_rated_pictures
 
 FIRST_PICTURES_LIST = [
 "00b6d6ed71e27101211bd77627e5c1b2.jpg", 
@@ -32,16 +32,6 @@ def create_recommended_pictures_list(user_id):
                     break
             i+=1
         return result
-
-
-def get_already_rated_pictures(user_id):
-
-    if not db:
-        db = db_connect()
-    collection = db["user_ratings"]
-    rated_pictures = pd.DataFrame(list(collection.find({"user_id":user_id})))
-    rated_pictures = np.array(rated_pictures[["picture"]])
-    return rated_pictures
 
 
 def less_rated_pictures_selection():
