@@ -8,8 +8,7 @@ import time
 from flask_cors import CORS, cross_origin
 
 #custom modules
-from ressources.user_class import User, new_user_id
-from ressources.model_embeddings import image_to_embedding
+from ressources.config import db
 from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture, create_recommended_pictures_list
 from ressources.picture_list_creation import get_recomended_picture_list
 
@@ -47,6 +46,8 @@ def upload_image():
 
     destination = UPLOAD_FOLDER + filename
     image_file.save(destination)
+    coll = db["image_info"]
+    coll.insert_one({"name":filename, "path": destination})
 
     while not os.path.exists(destination):
         print('waiting')
