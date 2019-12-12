@@ -16,9 +16,6 @@ from ressources.picture_list_creation import create_recommended_pictures_list, g
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
 
-
-from werkzeug.utils import secure_filename
-
 # init app
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -88,21 +85,40 @@ def new_user():
 @cross_origin(supports_credentials=True)
 def load_image_for_rating():
     user_id = 1
-    pictures_list = get_recommended_picture_list(user_id)
-    # json.dumps(pictures_list)
-    return json.dumps(pictures_list)
+    pictures_list_info = get_recommended_picture_list(user_id)
+    # TODO GET ALL THE INFO FROM THE DB
+    
+    for i in range(len(pictures_list_info)):
+        pictures_list_info[i] = {
+            "name": pictures_list_info[i],
+            "path": "destination" + str([i]),
+            "typeCloth": "typeCloth"+ str([i]),
+            "materialCloth": "materialCloth"+ str([i]),
+            "productionMethod": "productionMethod"+ str([i]),
+            "price": "price"+ str([i]),
+            "sex": "sex"+ str([i]),
+            "description": "description"+ str([i])
+        }
+
+    send_image_info = jsonify(pictures_list_info)
+    return send_image_info
+
+@app.route("/show_image", methods=["POST"])
+@cross_origin(supports_credentials=True)
+def show_image():
+    json_data = request.get_json(force = True)
+    filename = './imagesOnDb/' + json_data['imageName']
+    send_file_image = send_file(filename, mimetype='image/jpg')    
+    return send_file_image
 
 @app.route("/rate_image", methods=["POST"])
-# @login_required 
+@cross_origin(supports_credentials=True)
 def rate_image():
-    json_data = request.get_json()
+    json_data = request.get_json(force = True)
     print(json_data)
+    return "All good!"
 
-    # DATABASE_CONNECTION()
-    # ------------- push to db : rating x image x user => to DB ------------- *
-
-    return redirect(url_for('load_image_for_rating'))
-
+    # TODO PUSH RATINGS INTO DB
 
 # @app.route("/train", methods = ["GET"])
 # def train():
@@ -112,8 +128,6 @@ def rate_image():
 
 # @app.route('/user/<username>')
 # # def profile(username):
-
-
 
 # run server
 if __name__ == "__main__":
