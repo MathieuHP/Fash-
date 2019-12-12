@@ -29,6 +29,11 @@ function Nav() {
                         Client
                     </Link>
                 </li>
+                <li>
+                    <Link to="/cart">
+                        Cart
+                    </Link>
+                </li>
            </ul>
         </NavDiv>  
     );

@@ -45,12 +45,8 @@ function Company() {
         console.log(price)
         console.log(sex)
         console.log(description)
-        console.log("Send values to backend");
-
-        // TODO SEND ALL DATA TO FORMDATA
 
         const formData = new FormData();
-        // formData.append('imageFile', image[0]);
         for ( var key in formDataObj ) {
             formData.append(key, formDataObj[key]);
         }

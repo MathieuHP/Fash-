@@ -17,12 +17,16 @@ function Home() {
                 Home
             </h1>
             <div>
-                <Link to="/company">
-                    Company
-                </Link>
-                <Link to="/client">
-                    Client
-                </Link>
+                <form method="POST">
+                    <label htmlFor="username">Username:</label>
+                    <input name="username" type="text"></input>
+                    <br/>
+                    <label htmlFor="password">Password:</label>
+                    <input name="password" type="password"></input>
+                    <br/>
+                    <input type="submit" value="Submit"/>
+                </form>
+                <Link to="/signin">Sign in</Link>
             </div>
         </HomeDiv>  
     );

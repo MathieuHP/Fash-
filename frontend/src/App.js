@@ -5,6 +5,8 @@ import Client from './pages/Client'
 import Company from './pages/Company'
 import Home from './pages/Home'
 import Nav from './pages/Nav'
+import SignIn from './pages/SignIn'
+import Cart from './pages/Cart'
 
 function App() {
 	// STYLED
@@ -26,6 +28,8 @@ function App() {
 						<Route exact path="/" component={Home} />
 						<Route path="/company" component={Company} />
 						<Route path="/client" component={Client} />
+						<Route path="/signin" component={SignIn} />
+						<Route path="/cart" component={Cart} />
 					</Switch>
 				</div>
 			</Router>

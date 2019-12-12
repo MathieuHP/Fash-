@@ -24,7 +24,7 @@ FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 @cross_origin(supports_credentials=True)
 def home():
     print("Backend is on")
-    return 'All good !'
+    return 'Backend is on'
 
 @app.route("/upload_image", methods= ["POST"])
 @cross_origin(supports_credentials=True)
@@ -115,6 +115,9 @@ def show_image():
 @cross_origin(supports_credentials=True)
 def rate_image():
     json_data = request.get_json(force = True)
+    if json_data["rating"] == 2 :
+        print("Super like : ", json_data)
+        # TODO CALL SIMILAR ANNOY MODEL
     print(json_data)
     return "All good!"
 
