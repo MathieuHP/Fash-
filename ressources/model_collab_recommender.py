@@ -8,24 +8,16 @@ from ressources.config import db, db_connect
 
 
 
-FIRST_PICTURES_LIST = [ 
-"00b6d6ed71e27101211bd77627e5c1b2.jpg", 
-"000e18920575a2e59b3a0c38e6546d29.jpg",
-'00af8f65bb93f4131499dc9807129a24.jpg',
-"00a722065820c4561a5522054ee62fe4.jpg"
-]
-
-
 def filtering_out_users_and_ratings(df):
 
     """filter out user and images with too few 
     ratings to preserve matrix sparsity"""
 
-    min_picture_ratings = 50
+    min_picture_ratings = 10
     filter_picture = df['picture'].value_counts() > min_picture_ratings
     filter_picture = filter_picture[filter_picture].index.tolist()
 
-    min_user_ratings = 20
+    min_user_ratings = 15
     filter_users = df['user_id'].value_counts() > min_user_ratings
     filter_users = filter_users[filter_users].index.tolist()
 

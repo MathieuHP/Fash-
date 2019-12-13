@@ -20,11 +20,15 @@ from image_similarity.train_annoy_model import train_annoy_model
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
+
+
 @app.route("/", methods= ["POST"])
 @cross_origin(supports_credentials=True)
 def home():
     print("Backend is on")
     return 'Backend is on'
+
+
 
 @app.route("/upload_image", methods= ["POST"])
 @cross_origin(supports_credentials=True)
@@ -74,11 +78,14 @@ def upload_image():
     
     return 'All good'
 
+
+
 @app.route("/new_user", methods=["POST"])
 def new_user():
     user = User(new_user_id())
     #push data to DB
     return "user created"
+
 
 
 @app.route("/load_image_for_rating", methods=["GET"])
@@ -103,6 +110,8 @@ def load_image_for_rating():
     send_image_info = jsonify(pictures_list_info)
     return send_image_info
 
+
+
 @app.route("/show_image", methods=["POST"])
 @cross_origin(supports_credentials=True)
 def show_image():
@@ -110,6 +119,8 @@ def show_image():
     filename = './imagesOnDb/' + json_data['imageName']
     send_file_image = send_file(filename, mimetype='image/jpg')    
     return send_file_image
+
+
 
 @app.route("/rate_image", methods=["POST"])
 @cross_origin(supports_credentials=True)
@@ -131,6 +142,28 @@ def rate_image():
 
 # @app.route('/user/<username>')
 # # def profile(username):
+
+
+
+@app.route("/cart", methods=["POST"])
+@cross_origin(supports_credentials=True)
+def cart():
+
+    user_id = 1
+
+    collection = db["user_ratings"]
+    super_like = list(collection.find({"user_id":user_id, "rating":2}))
+    like = list(collection.find({"user_id":user_id, "rating":1}))
+
+    liked_picture = []
+    for pic in super_like:
+        liked_picture.append(pic["picture"])
+    for pic in like:
+        liked_picture.append(pic["picture"])
+
+    return liked_picture
+
+
 
 # run server
 if __name__ == "__main__":

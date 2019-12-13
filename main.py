@@ -1,4 +1,4 @@
-from ressources.model_collab_recommander import predict_ratings, get_collaborative_recommanded_picture
+from ressources.model_collab_recommender import predict_ratings, get_collaborative_recommended_picture
 from ressources.picture_list_creation import create_recommended_pictures_list
 from ressources.config import db
 
@@ -17,7 +17,7 @@ while loop == True:
 	user_input =  int(input(f""" \n
 		0 => Exit \n 
 		99 = > change user_id (current = {user_id}) \n
-		1 => get_collaborative_recommanded_picture \n
+		1 => get_collaborative_recommended_picture \n
 		2 => predict ratings \n
 		3 => create_recommended_pictures_list \n """))
 
@@ -35,7 +35,7 @@ while loop == True:
 
 	elif user_input == 1:
 
-		results = get_collaborative_recommanded_picture(user_id)
+		results = get_collaborative_recommended_picture(user_id)
 		for i in results:
 			print(i)
 
@@ -46,8 +46,8 @@ while loop == True:
 		print("prediction complete")
 
 	elif user_input == 3:
-		recomended_pictures = create_recommended_pictures_list(user_id)
-		for i in recomended_pictures:
+		recommended_pictures = create_recommended_pictures_list(user_id)
+		for i in recommended_pictures:
 			print(i)
 	
 	print(" ")		
