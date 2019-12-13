@@ -5,6 +5,7 @@ import cv2
 import pandas as pd
 import numpy as np
 import time
+import json
 from flask_cors import CORS, cross_origin
 
 #custom modules
@@ -14,9 +15,6 @@ from ressources.picture_list_creation import create_recommended_pictures_list, g
 
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
-
-
-from werkzeug.utils import secure_filename
 
 # init app
 app = Flask(__name__)
@@ -44,6 +42,9 @@ def upload_image():
     extension = os.path.splitext(image_file.filename)[1]
     if not extension in ALLOWED_EXTENSIONS :
         return 'Invalid extension'
+    
+    if not os.path.isdir(UPLOAD_FOLDER):
+        os.mkdir(UPLOAD_FOLDER)
     
     if os.path.isfile('./image_similarity/outfile/nbrFiles.npy'):
         nbrFiles = np.load('./image_similarity/outfile/nbrFiles.npy').astype(int)
@@ -81,41 +82,44 @@ def new_user():
     return "user created"
 
 
-@app.route("/load_image_for_rating", methods=["POST"])
-# @login_required # protect route => only logged users can access it
+@app.route("/load_image_for_rating", methods=["GET"])
+@cross_origin(supports_credentials=True)
 def load_image_for_rating():
+    user_id = 1
+    pictures_list_info = get_recommended_picture_list(user_id)
+    # TODO GET ALL THE INFO FROM THE DB
+    
+    for i in range(len(pictures_list_info)):
+        pictures_list_info[i] = {
+            "name": pictures_list_info[i],
+            "path": "destination" + str([i]),
+            "typeCloth": "typeCloth"+ str([i]),
+            "materialCloth": "materialCloth"+ str([i]),
+            "productionMethod": "productionMethod"+ str([i]),
+            "price": "price"+ str([i]),
+            "sex": "sex"+ str([i]),
+            "description": "description"+ str([i])
+        }
 
-    user_id = 5
-    # DATABASE_CONNECTION()
-    # ------------- get picture list for the user ------------- *
-    pictures_list = get_recommended_picture_list(user_id)
+    send_image_info = jsonify(pictures_list_info)
+    return send_image_info
 
-
-    backend.clear_session()
-    image = pictures_list.pop(0)
-
-
-    # ------------- send updated list back to DB and create new one  ------------- *
-    # if len(pictures_list) < 10:  # MULTITHREADING !!!!
-    #     create_recommended_pictures_list(user_id)
-
-    img_folder_path = r"C:\Users\mathi\Desktop\Cronos\Fash!\Images"
-    image_path =  img_folder_path +r"\\" + image
-
-    return send_file(image_path, mimetype='image/gif') #jsonify(image)
-
+@app.route("/show_image", methods=["POST"])
+@cross_origin(supports_credentials=True)
+def show_image():
+    json_data = request.get_json(force = True)
+    filename = './imagesOnDb/' + json_data['imageName']
+    send_file_image = send_file(filename, mimetype='image/jpg')    
+    return send_file_image
 
 @app.route("/rate_image", methods=["POST"])
-# @login_required 
+@cross_origin(supports_credentials=True)
 def rate_image():
-    json_data = request.get_json()
+    json_data = request.get_json(force = True)
     print(json_data)
+    return "All good!"
 
-    # DATABASE_CONNECTION()
-    # ------------- push to db : rating x image x user => to DB ------------- *
-
-    return redirect(url_for('load_image_for_rating'))
-
+    # TODO PUSH RATINGS INTO DB
 
 # @app.route("/train", methods = ["GET"])
 # def train():
@@ -125,8 +129,6 @@ def rate_image():
 
 # @app.route('/user/<username>')
 # # def profile(username):
-
-
 
 # run server
 if __name__ == "__main__":

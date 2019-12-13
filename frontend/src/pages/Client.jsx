@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faStar, faHeart } from '@fortawesome/free-solid-svg-icons'
-import axios from 'axios';
 
 function Client() {
     // STYLED
@@ -12,37 +11,87 @@ function Client() {
     const ClothImg = styled.img`
         max-width : 640px;
         max-height : 640px;
+        height : 500px;
     `;
 
     // STATE, EFFECT
-    const [image, setImage] = useState('')
+    const [imageSrc, setImageSrc] = useState('')
     const [imageList, setImageList] = useState([])
+    const [name, setName] = useState('')
+    const [typeCloth, setTypeCloth] = useState('')
+    const [materialCloth, setMaterialCloth] = useState('')
+    const [productionMethod, setProductionMethod] = useState('')
+    const [price, setPrice] = useState('')
+    const [sex, setSex] = useState('')
+    const [description, setDescription] = useState('')
 
     useEffect(() => {
-        fetchData();
+        getListImages();
       }, []);
     
     // FUNCTIONS
-    const fetchData = async () => {
-        const result = await axios(
-          'https://picsum.photos/v2/list',
-        );
-        let newImageList = imageList.concat(result.data)
-        setImageList(newImageList);
-        if (image === '') {
-            setImage(newImageList[0].download_url)
-        }
+    const getListImages = async () => {
+        const options = {
+            method: 'GET',
+        };
+        fetch(`http://127.0.0.1:5000/load_image_for_rating`, options)
+        .then((response) => {
+            response.json().then(function (listImageFromBackend) {
+                let iL = imageList.concat(listImageFromBackend)
+                setImageList(iL)
+                if (!imageSrc) {
+                    showImage(iL[0])
+                }
+            });
+        })
     };
 
+    const showImage = async (imageInfo) => {
+        setName(imageInfo["name"])
+        setTypeCloth(imageInfo["typeCloth"])
+        setMaterialCloth(imageInfo["productionMethod"])
+        setProductionMethod(imageInfo["productionMethod"])
+        setPrice(imageInfo["price"])
+        setSex(imageInfo["sex"])
+        setDescription(imageInfo["description"])
+
+        const options = {
+            method: 'POST',
+            body: JSON.stringify({ imageName: imageInfo["name"] }),
+        };
+        fetch(`http://127.0.0.1:5000/show_image`, options)
+        .then((response) => {
+            response.blob().then(function (imageUrl) { 
+                var urlCreator = window.URL || window.webkitURL;
+                imageUrl = urlCreator.createObjectURL(imageUrl);
+                setImageSrc(imageUrl);
+            });
+        })
+    }
+
     const rateImage = (value) => {
-        let il = imageList
-        console.log(image, value);
-        console.log("Send values to backend");
-        il.shift()
-        setImage(il[0].download_url)
-        setImageList(il)
-        if (il.length < 15) {
-            fetchData()
+        const options = {
+            method: 'POST',
+            body: JSON.stringify({ imageName: imageList[0]["name"], rating: value }),
+        };
+        fetch(`http://127.0.0.1:5000/rate_image`, options)
+        .then((response) => {
+            response.text().then(function(resText) { 
+                console.log(resText);   
+            });
+        })
+
+        let iL = imageList
+        iL.shift()
+        if (iL.length === 0) {
+            console.log("Loading new images...")
+        } else if (iL.length < 3) {
+            getListImages()
+            showImage(iL[0])
+            setImageList(iL)
+        } else {
+            showImage(iL[0])
+            setImageList(iL)
         }
     }
 
@@ -54,7 +103,14 @@ function Client() {
                 </h1>
             </div>
             <div>
-                <ClothImg src={image} alt="image"/>
+                <ClothImg src={imageSrc} alt="image"/>
+                <p>{name}</p>
+                <p>{typeCloth}</p>
+                <p>{materialCloth}</p>
+                <p>{productionMethod}</p>
+                <p>{price}</p>
+                <p>{sex}</p>
+                <p>{description}</p>
             </div>
             <div>
                 <button onClick={() => rateImage(0)} type="button"><FontAwesomeIcon icon={faTimes} /></button>
