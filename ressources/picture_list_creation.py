@@ -18,7 +18,7 @@ def create_recommended_pictures_list(user_id):
         estimated_ratings = get_collaborative_recommended_picture(user_id)
         result = []
         i = 0
-        while len(result) < 50 :
+        while len(result) < 20 :
             if estimated_ratings[i]:
                 if estimated_ratings[i] in rated_pictures:
                     estimated_ratings.remove(estimated_ratings[i])
