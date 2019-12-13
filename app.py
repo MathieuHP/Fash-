@@ -142,7 +142,7 @@ def rate_image():
 
 
 
-@app.rout("/cart", methods=["POST"])
+@app.route("/cart", methods=["POST"])
 @cross_origin(supports_credentials=True)
 def cart():
 
