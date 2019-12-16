@@ -15,7 +15,6 @@ function Cart() {
     const [cartImageL, setCartImageL] = useState('')
     const [cartImageSL, setCartImageSL] = useState('')
 
-
     useEffect(() => {
         getCart()
       }, []);
@@ -27,19 +26,28 @@ function Cart() {
             method: 'POST',
         };
         const response = await fetch(`http://127.0.0.1:5000/cart`, options)
-        let cart = await response.json()
-
-        let super_like = []
-        for (let i = 0; i < cart["super_like"].length; i++) {
-            super_like.push(await getImage(i + 'SL', cart["super_like"][i]))
+        try {
+            let cart = await response.json()
+            if(!cart["super_like"].length === 0 && !cart["like"].length === 0 ) {
+                let super_like = []
+                for (let i = 0; i < cart["super_like"].length; i++) {
+                    super_like.push(await getImage(i + 'SL', cart["super_like"][i]))
+                }
+                setCartImageSL(super_like)
+        
+                let like = []
+                for (let i = 0; i < cart["like"].length; i++) {
+                    like.push(await getImage(i + "L", cart["like"][i]))
+                }
+                setCartImageL(like)
+            } else {
+                console.log('Your cart is empty');
+            }
         }
-        setCartImageSL(super_like)
-
-        let like = []
-        for (let i = 0; i < cart["like"].length; i++) {
-            like.push(await getImage(i + "L", cart["like"][i]))
+        catch(err) {
+            console.log(err);
+            console.log('Your cart is empty');
         }
-        setCartImageL(like)
     }
     
     const getImage = async (key, imageName) => {

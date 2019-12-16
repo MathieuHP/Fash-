@@ -135,21 +135,21 @@ def rate_image():
 @app.route("/cart", methods=["POST"])
 @cross_origin(supports_credentials=True)
 def cart():
+    try:
+        user_id = 1
+        collection = db["user_ratings"]
+        super_like = list(collection.find({"user_id":user_id, "rating":2}))
+        like = list(collection.find({"user_id":user_id, "rating":1}))
+        
+        for i in range(len(super_like)):
+            super_like[i] = super_like[i]["picture"]
+        for i in range(len(like)):
+            like[i] = like[i]["picture"]
 
-    user_id = 1
-
-    collection = db["user_ratings"]
-    super_like = list(collection.find({"user_id":user_id, "rating":2}))
-    like = list(collection.find({"user_id":user_id, "rating":1}))
-    
-    for i in range(len(super_like)):
-        super_like[i] = super_like[i]["picture"]
-    for i in range(len(like)):
-        like[i] = like[i]["picture"]
-
-    liked_picture = {"like" : tuple(like), "super_like" : tuple(super_like) }
-    return liked_picture
-
+        liked_picture = {"like" : tuple(like), "super_like" : tuple(super_like) }
+        return liked_picture
+    except:
+        return ''
 
 # run server
 if __name__ == "__main__":
