@@ -6,13 +6,15 @@ function Cart() {
     const CartDiv = styled.div`
     `;
 
-    const CartImage = styled.img`
+    const ImgCard = styled.img`
         width : 100px;
         height : 100px;
     `;
-    
+
     // STATE
-    const [cartImage, setCartImage] = useState({"super_like" : [], "like" : []})
+    const [cartImageL, setCartImageL] = useState('')
+    const [cartImageSL, setCartImageSL] = useState('')
+
 
     useEffect(() => {
         getCart()
@@ -24,43 +26,33 @@ function Cart() {
         const options = {
             method: 'POST',
         };
-        fetch(`http://127.0.0.1:5000/cart`, options)
-        .then((response) => {
-            response.json().then(function (cart) {
-                for (let i = 0; i < cart["super_like"].length; i++) {
-                    cart["super_like"][i] = imageCard(cart["super_like"][i])
-                }
-                // console.log(cart["super_like"]);
-                for (let j = 0; j < cart["like"].length; j++) {
-                    cart["like"][j] = imageCard(cart["like"][j])
-                }
-                console.log(cart)
-                setCartImage(cart)
-                // console.log(cart["super_like"]);
-            });
-        })
-    }
+        const response = await fetch(`http://127.0.0.1:5000/cart`, options)
+        let cart = await response.json()
 
-    const imageCard = async (imageName) => {
+        let super_like = []
+        for (let i = 0; i < cart["super_like"].length; i++) {
+            super_like.push(await getImage(i + 'SL', cart["super_like"][i]))
+        }
+        setCartImageSL(super_like)
+
+        let like = []
+        for (let i = 0; i < cart["like"].length; i++) {
+            like.push(await getImage(i + "L", cart["like"][i]))
+        }
+        setCartImageL(like)
+    }
+    
+    const getImage = async (key, imageName) => {
         const options = {
             method: 'POST',
             body: JSON.stringify({ imageName: imageName }),
         };
-        fetch(`http://127.0.0.1:5000/show_image`, options)
-        .then((response) => {
-            response.blob().then(function (imageUrl) { 
-                console.log(imageUrl);
-                var urlCreator = window.URL || window.webkitURL;
-                imageUrl = urlCreator.createObjectURL(imageUrl);
-                console.log(imageUrl)
-                return(
-                    <div>
-                        <CartImage src={imageUrl} alt="image"/>
-                        <p>{imageName}</p>
-                    </div>
-                )
-            });
-        })
+        const response = await fetch(`http://127.0.0.1:5000/show_image`, options)
+        const imageBlob = await response.blob()
+        var urlCreator = window.URL || window.webkitURL;
+        let imageUrl = urlCreator.createObjectURL(imageBlob);
+        
+        return <ImgCard key={key} src={imageUrl} alt="image"/>
     }
 
     return (
@@ -72,11 +64,7 @@ function Cart() {
                 <h3>Super like</h3>
                 <div>
                 {
-                    // cartImage["super_like"].map((imageInfo) => {
-                    //     console.log(imageInfo)
-                    //     return imageInfo
-                    // })
-                    // cartImage["super_like"]
+                    cartImageSL ? cartImageSL : <p>Loading ...</p>
                 }
                 </div>
             </div>
@@ -84,10 +72,7 @@ function Cart() {
                 <h3>Like</h3>
                 <div>
                 {
-                    // cartImage["like"].map((imageInfo) => {
-                    //     return imageInfo
-                    // })
-                    // cartImage["like"]
+                    cartImageL ? cartImageL : <p>Loading ...</p>
                 }
                 </div>
             </div>

@@ -18,11 +18,11 @@ function Home() {
             </h1>
             <div>
                 <form method="POST">
-                    <label htmlFor="username">Username:</label>
-                    <input name="username" type="text"></input>
+                    <label htmlFor="mail">Mail:</label>
+                    <input id="mail" type="text"></input>
                     <br/>
                     <label htmlFor="password">Password:</label>
-                    <input name="password" type="password"></input>
+                    <input id="password" type="password"></input>
                     <br/>
                     <input type="submit" value="Submit"/>
                 </form>

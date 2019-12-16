@@ -82,8 +82,6 @@ def upload_image():
 
 @app.route("/new_user", methods=["POST"])
 def new_user():
-    user = User(new_user_id())
-    #push data to DB
     return "user created"
 
 
@@ -133,15 +131,6 @@ def rate_image():
     return "All good!"
 
     # TODO PUSH RATINGS INTO DB
-
-# @app.route("/train", methods = ["GET"])
-# def train():
-#     model_cnn()
-#     return("training completed")
-
-
-# @app.route('/user/<username>')
-# # def profile(username):
 
 @app.route("/cart", methods=["POST"])
 @cross_origin(supports_credentials=True)
