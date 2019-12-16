@@ -49,9 +49,14 @@ def less_rated_pictures_selection():
     for i in results:
         pic_list.append(i["name"])
 
-    pics_rated_count = df.picture.value_counts()
-    ind = pics_rated_count.index
-    bag_pic = ind[-100:]
+    try:
+        pics_rated_count = df.picture.value_counts()
+        ind = pics_rated_count.index
+        bag_pic = ind[-100:]
+    except:
+        bag_pic = []
+
+
     bag = []
 
     for pic in pic_list:
