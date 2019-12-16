@@ -89,23 +89,30 @@ def new_user():
 @app.route("/load_image_for_rating", methods=["GET"])
 @cross_origin(supports_credentials=True)
 def load_image_for_rating():
-    user_id = 1
-    pictures_list_info = get_recommended_picture_list(user_id)
-    # TODO GET ALL THE INFO FROM THE DB
-    
-    for i in range(len(pictures_list_info)):
-        pictures_list_info[i] = {
-            "name": pictures_list_info[i],
-            "path": "destination" + str([i]),
-            "typeCloth": "typeCloth"+ str([i]),
-            "materialCloth": "materialCloth"+ str([i]),
-            "productionMethod": "productionMethod"+ str([i]),
-            "price": "price"+ str([i]),
-            "sex": "sex"+ str([i]),
-            "description": "description"+ str([i])
-        }
 
-    send_image_info = jsonify(pictures_list_info)
+
+    user_id = 1 #!!!!
+
+
+    pictures_list = get_recommended_picture_list(user_id)
+
+    coll = db["image_info"]
+    list_dict = []
+    i=0
+    for pic in pictures_list:
+        get_info = coll.find_one({"name":pic})
+        list_dict.append({
+            "name": pictures_list[i],
+            "typeCloth": get_info["typeCloth"],
+            "materialCloth": get_info["materialCloth"],
+            "productionMethod": get_info["productionMethod"],
+            "price": get_info["price"],
+            "sex": get_info["sex"],
+            "description": get_info["description"]
+            })
+        i+=1
+
+    send_image_info = jsonify(list_dict)
     return send_image_info
 
 

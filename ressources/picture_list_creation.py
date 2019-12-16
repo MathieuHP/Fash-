@@ -67,9 +67,10 @@ def less_rated_pictures_selection():
         im = bag_pic[randrange(len(bag_pic))]
         if im not in bag:
             bag.append(im)
-    bag = bag[:15]
 
-    return bag
+    bug = bag[:15]
+
+    return bug
     
 
 def get_recommended_picture_list(user_id):
