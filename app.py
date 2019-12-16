@@ -10,9 +10,8 @@ from flask_cors import CORS, cross_origin
 
 #custom modules
 from ressources.config import db, db_connect
-from ressources.model_collab_recommender import predict_ratings, get_collaborative_recommended_picture
-from ressources.picture_list_creation import create_recommended_pictures_list, get_recommended_picture_list
-
+from ressources.model_collab_recommender import predict_ratings
+from ressources.picture_list_creation import get_recommended_picture_list
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
 
@@ -120,9 +119,29 @@ def load_image_for_rating():
 @app.route("/show_image", methods=["POST"])
 @cross_origin(supports_credentials=True)
 def show_image():
+
+    user_id = 1
+
+
     json_data = request.get_json(force = True)
     filename = './imagesOnDb/' + json_data['imageName']
-    send_file_image = send_file(filename, mimetype='image/jpg')    
+    send_file_image = send_file(filename, mimetype='image/jpg')
+
+    name = json_data['imageName']
+    rating = json_data["rating"]
+    coll = db["user_ratings"]
+    post = {"user_id":user_id, "picture":name,"rating":rating}
+    coll.insert_one(post)
+    
+    if rating == 2:
+        coll = db["list_images"]
+        result = list(coll.find({"user_id":user_id}))
+        if "super_like" in result[0].keys():
+            result[0]["super_like"].append(name)
+        else:
+            result[0]["super_like"] = name
+        coll.update_one(result[0])
+
     return send_file_image
 
 

@@ -27,18 +27,6 @@ def filtering_out_users_and_ratings(df):
     return df_new
 
 
-def get_already_rated_pictures(user_id):
-
-    try:
-        collection = db["user_ratings"]
-    except:
-        db = db_connect()
-        collection = db["user_ratings"]
-
-    rated_pictures = pd.DataFrame(list(collection.find({"user_id":user_id})))
-    rated_pictures = np.array(rated_pictures[["picture"]])
-    return rated_pictures
-
 
 def predict_ratings():
 
@@ -83,35 +71,3 @@ def predict_ratings():
         "picture" : pred[1],
         "estimation":pred[3]} for pred in predictions])
 
-
-def get_collaborative_recommended_picture(user_id=int):
-
-    """ get 10 best estimated pictures for an user_id from 
-    Surprise predictions """
-
-    try:
-        collection = db["predicted_ratings_collab"]
-    except:
-        db = db_connect()
-        collection = db["predicted_ratings_collab"]
-
-
-    predictions = collection.find({"user_id": user_id})
-    rated_pictures = get_already_rated_pictures(user_id)
-
-    estimated_ratings = []
-    for pred in predictions:
-        if int(pred["user_id"]) == user_id:
-            estimated_ratings.append([pred["estimation"] , pred["picture"]])
-    estimated_ratings.sort(reverse = True)
-
-    return estimated_ratings
-    
-# format surprise.predict()
-#Prediction (
-# uid=1, 
-# iid='00b10502fb082dcc8f156562b71f6f91.jpg', 
-# r_ui=0.6009273632105954,
-# est=0.5726982131029839, 
-# details={'was_impossible': False}
-# )
