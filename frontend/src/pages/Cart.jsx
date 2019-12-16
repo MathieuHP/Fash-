@@ -28,20 +28,23 @@ function Cart() {
         const response = await fetch(`http://127.0.0.1:5000/cart`, options)
         try {
             let cart = await response.json()
-            if(!cart["super_like"].length === 0 && !cart["like"].length === 0 ) {
+            if(!cart["super_like"].length === 0) {
                 let super_like = []
                 for (let i = 0; i < cart["super_like"].length; i++) {
                     super_like.push(await getImage(i + 'SL', cart["super_like"][i]))
                 }
                 setCartImageSL(super_like)
-        
+            } else {
+                setCartImageSL([ <p key="cartSLEmpty">Your didn't super like any images yet</p> ])
+            }
+            if(!cart["like"].length === 0 ) {
                 let like = []
                 for (let i = 0; i < cart["like"].length; i++) {
                     like.push(await getImage(i + "L", cart["like"][i]))
                 }
                 setCartImageL(like)
             } else {
-                console.log('Your cart is empty');
+                setCartImageL([ <p key="cartLEmpty">Your didn't like any images yet</p> ])
             }
         }
         catch(err) {
