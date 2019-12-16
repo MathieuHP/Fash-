@@ -52,7 +52,7 @@ def less_rated_pictures_selection():
     try:
         pics_rated_count = df.picture.value_counts()
         ind = pics_rated_count.index
-        bag_pic = ind[-100:]
+        bag_pic = ind
     except:
         bag_pic = []
 
@@ -63,10 +63,11 @@ def less_rated_pictures_selection():
         if pic not in bag_pic:
             bag.append(pic)
 
-    while len(bag) < 20:
+    while len(bag) < 15:
         im = bag_pic[randrange(len(bag_pic))]
         if im not in bag:
             bag.append(im)
+    bag = bag[:15]
 
     return bag
     
