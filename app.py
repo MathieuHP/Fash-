@@ -30,7 +30,6 @@ jwt = JWTManager(app)
 CORS(app)
 
 @app.route("/", methods= ["GET"])
-@cross_origin(supports_credentials=True)
 def home():
     print("Backend is on")
     return 'Backend is on'
@@ -38,7 +37,6 @@ def home():
 
 
 @app.route("/upload_image", methods= ["POST"])
-@cross_origin(supports_credentials=True)
 def upload_image():
     UPLOAD_FOLDER = './image_similarity/data/train/'
     ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg']
@@ -94,7 +92,6 @@ def new_user():
 
 
 @app.route("/load_image_for_rating", methods=["GET"])
-@cross_origin(supports_credentials=True)
 def load_image_for_rating():
 
 
@@ -125,7 +122,6 @@ def load_image_for_rating():
 
 
 @app.route("/show_image", methods=["POST"])
-@cross_origin(supports_credentials=True)
 def show_image():
 
     user_id = 1
@@ -140,7 +136,6 @@ def show_image():
 
 
 @app.route("/rate_image", methods=["POST"])
-@cross_origin(supports_credentials=True)
 def rate_image():
     json_data = request.get_json(force = True)
 
@@ -172,7 +167,6 @@ def rate_image():
 
 
 @app.route("/cart", methods=["POST"])
-@cross_origin(supports_credentials=True)
 def cart():
     try:
         user_id = 1
