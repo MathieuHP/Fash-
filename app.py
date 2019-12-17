@@ -127,6 +127,17 @@ def show_image():
     filename = './imagesOnDb/' + json_data['imageName']
     send_file_image = send_file(filename, mimetype='image/jpg')
 
+    return send_file_image
+
+
+
+@app.route("/rate_image", methods=["POST"])
+@cross_origin(supports_credentials=True)
+def rate_image():
+    json_data = request.get_json(force = True)
+
+    user_id = 1 # !!!!
+
     name = json_data['imageName']
     rating = json_data["rating"]
     coll = db["user_ratings"]
@@ -134,6 +145,7 @@ def show_image():
     coll.insert_one(post)
     
     if rating == 2:
+        coll = db["list_images"]
         results = list(coll.find({}))
         for res in results:
             if res["user_id"] == user_id:
@@ -143,24 +155,13 @@ def show_image():
                 except:
                     super_like  = [name]
                 
-                result = coll.update_one({"_id":i["_id"]},{"$set":{"super_like":super_like}})
+                result = coll.update_one({"_id":res["_id"]},{"$set":{"super_like":super_like}})
 
 
-    return send_file_image
-
-
-
-@app.route("/rate_image", methods=["POST"])
-@cross_origin(supports_credentials=True)
-def rate_image():
-    json_data = request.get_json(force = True)
-    if json_data["rating"] == 2 :
-        print("Super like : ", json_data)
-        # TODO CALL SIMILAR ANNOY MODEL
     print(json_data)
     return "All good!"
 
-    # TODO PUSH RATINGS INTO DB
+
 
 @app.route("/cart", methods=["POST"])
 @cross_origin(supports_credentials=True)
@@ -180,6 +181,7 @@ def cart():
         return liked_picture
     except:
         return ''
+
 
 # run server
 if __name__ == "__main__":
