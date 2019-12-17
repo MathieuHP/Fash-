@@ -82,19 +82,13 @@ def upload_image():
     
     return 'All good'
 
-
-
-@app.route("/new_user", methods=["POST"])
-def new_user():
-    return "user created"
-
 # @app.route('/new_user', methods=["POST"])
 # def new_user():
 
-#     first_name = request.get_json()['first_name']
-#     last_name = request.get_json()['last_name']
-#     email = request.get_json()['email']
-#     password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+#     first_name = request.get_json(force = True)['first_name']
+#     last_name = request.get_json(force = True)['last_name']
+#     email = request.get_json(force = True)['email']
+#     password = bcrypt.generate_password_hash(request.get_json(force = True)['password']).decode('utf-8')
 #     created = datetime.utcnow()
 
 #     user_id = users.insert({
@@ -108,6 +102,8 @@ def new_user():
 #     new_user = users.find_one({'_id': user_id})
 
 #     result = {'email': new_user['email'] + ' registered'}
+    
+#     result = 'ok'
 
 #     return jsonify({'result' : result})
 
@@ -116,9 +112,7 @@ def new_user():
 @app.route("/load_image_for_rating", methods=["GET"])
 def load_image_for_rating():
 
-
     user_id = 1 #!!!!
-
 
     pictures_list = get_recommended_picture_list(user_id)
 
