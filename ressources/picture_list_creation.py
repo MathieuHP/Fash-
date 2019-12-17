@@ -43,8 +43,10 @@ def get_collaborative_recommended_picture(user_id, rated_pictures):
         if int(pred["user_id"]) == user_id:
             estimated_ratings.append([pred["estimation"] , pred["picture"]])
     estimated_ratings.sort(reverse = True)
-
-    return [estimated_ratings[i][1] for i in range(10) if i not in rated_pictures]
+    if len(estimated_ratings) < 20:
+        return []
+    else:
+        return [estimated_ratings[i][1] for i in range(20) if i not in rated_pictures]
 
 """    
 format surprise.predict()
@@ -83,7 +85,8 @@ def create_recommended_pictures_list(user_id, rated_pictures):
     if number_ratings > 20:
         collab_on = True
         list_collab = get_collaborative_recommended_picture(user_id, rated_pictures)
-
+        if len(list_collab) < 10:
+            collab_on = False
     list_final = []
 
     if super_like == True and collab_on == True:
@@ -115,18 +118,18 @@ def get_recommended_picture_list(user_id=1):
     """ check in DB if a list of recommended picture exists, and if not, generate it then return it """
     rated_pictures = get_already_rated_pictures(user_id)
     collection = db["list_images"]
-    result = list(collection.find_one({"user_id":user_id}))[0]
+    result = list(collection.find({"user_id":user_id}))[0]
 
     try:
         list_image = result["list_image"]
 
         if len(list_image) < 5 and type(pictures_list)== list:
-            pictures_list = list_image.extend(create_recommended_pictures_list(user_id))
+            pictures_list = list_image.extend(create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures))
         else:
             pictures_list = create_recommended_pictures_list(user_id)
 
     except:
-        pictures_list = create_recommended_pictures_list(user_id)
+        pictures_list = create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures)
     pictures_list = [pic for pic in pictures_list if pic not in rated_pictures]
 
     collection.update_one({"user_id": user_id },{"$set":{"user_id":user_id, "list_image":pictures_list}})
