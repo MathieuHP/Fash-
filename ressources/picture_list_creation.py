@@ -127,6 +127,7 @@ def get_recommended_picture_list(user_id=1):
 
     except:
         pictures_list = create_recommended_pictures_list(user_id)
-    pictures_list = [pic in pictures_list if pic not in rated_pictures]
+    pictures_list = [pic for pic in pictures_list if pic not in rated_pictures]
+
     collection.update_one({"user_id": user_id },{"$set":{"user_id":user_id, "list_image":pictures_list}})
     return pictures_list
