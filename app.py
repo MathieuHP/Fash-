@@ -35,7 +35,6 @@ def home():
     return 'Backend is on'
 
 
-
 @app.route("/upload_image", methods= ["POST"])
 def upload_image():
     UPLOAD_FOLDER = './image_similarity/data/train/'
@@ -89,6 +88,29 @@ def upload_image():
 def new_user():
     return "user created"
 
+# @app.route('/new_user', methods=["POST"])
+# def new_user():
+
+#     first_name = request.get_json()['first_name']
+#     last_name = request.get_json()['last_name']
+#     email = request.get_json()['email']
+#     password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+#     created = datetime.utcnow()
+
+#     user_id = users.insert({
+#         'first_name': first_name,
+#         'last_name': last_name,
+#         'email': email,
+#         'password': password,
+#         'created': created 
+#     })
+
+#     new_user = users.find_one({'_id': user_id})
+
+#     result = {'email': new_user['email'] + ' registered'}
+
+#     return jsonify({'result' : result})
+
 
 
 @app.route("/load_image_for_rating", methods=["GET"])
@@ -125,7 +147,6 @@ def load_image_for_rating():
 def show_image():
 
     user_id = 1
-
 
     json_data = request.get_json(force = True)
     filename = './imagesOnDb/' + json_data['imageName']
