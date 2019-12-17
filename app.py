@@ -167,12 +167,13 @@ def rate_image():
     coll = db["user_ratings"]
     post = {"user_id":user_id, "picture":name,"rating":rating}
     coll.insert_one(post)
-    
-    if rating == 2:
-        coll = db["list_images"]
-        results = list(coll.find({}))
-        for res in results:
-            if res["user_id"] == user_id:
+
+    coll = db["list_images"]
+    results = list(coll.find({}))
+      
+    for res in results:
+        if res["user_id"] == user_id:
+            if rating == 2:
                 try: 
                     super_like = res["super_like"]
                     super_like.append(name)
@@ -180,13 +181,9 @@ def rate_image():
                     super_like  = [name]
                 
                 result = coll.update_one({"_id":res["_id"]},{"$set":{"super_like":super_like}})
-
-
-    coll = db["list_images"]
-    result = coll.find({"user_id":user_id})
-    list_pic = result[0]["list_image"]
-    push_db = coll.update_one({"_id":result[0]["_id"]}{"$set"{"list_image":list_pic[1:]}})
-        
+                
+            list_pic = res[0]["list_image"]
+            push_db = coll.update_one({"_id":res[0]["_id"]},{"$set":{"list_image":list_pic[1:]}})
 
     print(json_data)
     return "All good!"
