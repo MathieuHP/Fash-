@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, json 
 from tensorflow.keras import backend
 import os
 import cv2
@@ -7,6 +7,12 @@ import numpy as np
 import time
 import json
 from flask_cors import CORS, cross_origin
+
+from bson.objectid import ObjectId 
+from datetime import datetime 
+from flask_bcrypt import Bcrypt 
+from flask_jwt_extended import JWTManager 
+from flask_jwt_extended import create_access_token
 
 #custom modules
 from ressources.config import db, db_connect
@@ -20,9 +26,11 @@ from image_similarity.train_annoy_model import train_annoy_model
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
+CORS(app)
 
-
-@app.route("/", methods= ["POST"])
+@app.route("/", methods= ["GET"])
 @cross_origin(supports_credentials=True)
 def home():
     print("Backend is on")
