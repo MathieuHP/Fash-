@@ -17,7 +17,7 @@ def filtering_out_users_and_ratings(df):
     filter_picture = df['picture'].value_counts() > min_picture_ratings
     filter_picture = filter_picture[filter_picture].index.tolist()
 
-    min_user_ratings = 15
+    min_user_ratings = 20
     filter_users = df['user_id'].value_counts() > min_user_ratings
     filter_users = filter_users[filter_users].index.tolist()
 

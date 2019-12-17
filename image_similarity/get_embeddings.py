@@ -23,8 +23,7 @@ def get_embeddings():
     
     modelName = "vgg19"  # try: "simpleAE", "convAE", "vgg19"
     parallel = True  # use multicore processing
-    
-    mainDir = os.getcwd()
+
     mainDir = os.getcwd() + "/image_similarity"
 
     # Make paths

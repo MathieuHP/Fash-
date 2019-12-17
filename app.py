@@ -140,8 +140,6 @@ def load_image_for_rating():
 @app.route("/show_image", methods=["POST"])
 def show_image():
 
-    user_id = 1
-
     json_data = request.get_json(force = True)
     filename = './imagesOnDb/' + json_data['imageName']
     send_file_image = send_file(filename, mimetype='image/jpg')
@@ -187,7 +185,7 @@ def rate_image():
 @app.route("/cart", methods=["POST"])
 def cart():
 
-    user_id = 1
+    user_id = 1 # !!!!
 
     try:
         

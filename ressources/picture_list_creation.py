@@ -27,11 +27,6 @@ def less_rated_pictures_selection(rated_pictures):
     pic_list = [i["name"] for i in results]    
     bag = [pic for pic in pic_list if pic not in rated_pictures]
 
-    while len(bag) < 15:
-        im = bag_pic[randrange(len(bag_pic))]
-        if im not in bag:
-            bag.append(im)
-
     return bag[:15]
 
 
@@ -76,21 +71,17 @@ def create_recommended_pictures_list(user_id):
 
     super_like = False
     collab_on = False
-    # check if super like in "short storage !!! (todo)"
+
     collection = db["list_images"]
-    results = list(collection.find({"user_id": user_id}))
+    results = list(collection.find({"user_id": user_id}))[0]
+    print(results)
 
-    try:
-        sup_like = results[0]["super_like"]
+    if len(results["super_like"]) > 0:
+        sup_like = results["super_like"]
         list_annoy = get_similar_images(sup_like[0])
+        list_annoy = [pic for pic in list_annoy if pic not in rated_pictures]
         super_like = True
-        try:
-            result = coll.update_one({"_id":results[0]["_id"]},{"$set":{"super_like":sup_like[1:]}})
-        except:
-            result = coll.update_one({"_id":results[0]["_id"]},{"$set":{"super_like":[]}})
-    except:
-        super_like = False
-
+        result = collection.update_one({"_id":results["_id"]},{"$set":{"super_like":sup_like[1:]}})
 
     if number_ratings > 20:
         collab_on = True
@@ -102,7 +93,7 @@ def create_recommended_pictures_list(user_id):
         for i in range(5):
             list_final.append(list_annoy.pop(0))
             list_final.append(list_collab.pop(0))
-            list_final.append(list_new_pic.pop(0))
+            list_final.append(list_new_pic.pop(0))          
 
     elif super_like == False and collab_on == True:
         for i in range(5):
@@ -110,29 +101,34 @@ def create_recommended_pictures_list(user_id):
             list_final.append(list_collab.pop(0))
             list_final.append(list_new_pic.pop(0))
 
+
     elif super_like == True and collab_on == False:
         for i in range(5):
             list_final.append(list_annoy.pop(0))
             list_final.append(list_annoy.pop(0))
             list_final.append(list_new_pic.pop(0))
 
-    else:
-        return list_new_pic      
-
-    return list_final
+    if len(list_final) > 0:
+        return list_final
+    else:     
+        return list_new_pic
 
 
 def get_recommended_picture_list(user_id=1):
-    """ check in DB if a list of recommended picture exists, and if not, generate it, then return it """
+    """ check in DB if a list of recommended picture exists, and if not, generate it then return it """
 
     collection = db["list_images"]
+    result = list(collection.find_one({"user_id":user_id}))[0]
+    try:
+        list_image = result["list_image"]
 
-    if list(collection.find({"user_id":user_id})):
-        result = list(collection.find({"user_id":user_id}))
-        try:
-            pictures_list = result[0]["list_image"]
-        except:
+        if len(list_image) < 5 and type(pictures_list)== list:
+            pictures_list = list_image.extend(create_recommended_pictures_list(user_id))
+        else:
             pictures_list = create_recommended_pictures_list(user_id)
-            collection.insert_one({"user_id":user_id, "list_image":pictures_list, "super_like":[]})
 
+    except:
+        pictures_list = create_recommended_pictures_list(user_id)
+    
+    collection.update_one({"user_id": user_id },{"$set":{"user_id":user_id, "list_image":pictures_list}})
     return pictures_list

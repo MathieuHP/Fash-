@@ -9,16 +9,16 @@ import annoy
 
 def get_similar_images(picture_name ="IMG_1.jpg"):
 
-    train_filenames = list(np.load('outfile/filenames.npy'))
-    train_embs = np.load('outfile/embs.npy')
+    train_filenames = list(np.load('image_similarity/outfile/filenames.npy'))
+    train_embs = np.load('image_similarity/outfile/embs.npy')
     embeddings_size = train_embs.shape[1]
 
     index_image = train_filenames.index(picture_name)
 
     load_annoy_model = annoy.AnnoyIndex(embeddings_size, metric='angular')
-    load_annoy_model.load('models/annoy_model.annoy')
+    load_annoy_model.load('image_similarity/models/annoy_model.annoy')
 
-    similar_images = load_annoy_model.get_nns_by_item(index_image, 11)
+    similar_images = load_annoy_model.get_nns_by_item(index_image, 15)
     list_annoy = [train_filenames[i] for i in similar_images]
     del list_annoy[0]
     return list_annoy
