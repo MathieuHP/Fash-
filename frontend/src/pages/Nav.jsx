@@ -10,6 +10,18 @@ function Nav() {
      // STATE
  
      // FUNCTIONS
+
+    const testBack = () => {
+        const options = {
+            method: 'GET',
+        };
+        fetch(`http://127.0.0.1:5000/`, options)
+        .then((response) => {
+            response.text().then(function (text) {
+                console.log(text)
+            });
+        })
+    }
  
     return (
         <NavDiv>
@@ -34,6 +46,7 @@ function Nav() {
                         Cart
                     </Link>
                 </li>
+                <button onClick={testBack}>Testing backend</button>
            </ul>
         </NavDiv>  
     );
