@@ -38,14 +38,6 @@ function Company() {
             description : description
         }
 
-        console.log(image[0])
-        console.log(typeCloth)
-        console.log(materialCloth)
-        console.log(productionMethod)
-        console.log(price)
-        console.log(sex)
-        console.log(description)
-
         const formData = new FormData();
         for ( var key in formDataObj ) {
             formData.append(key, formDataObj[key]);

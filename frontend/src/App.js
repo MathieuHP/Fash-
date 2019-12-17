@@ -5,7 +5,7 @@ import Client from './pages/Client'
 import Company from './pages/Company'
 import Home from './pages/Home'
 import Nav from './pages/Nav'
-import SignIn from './pages/SignIn'
+import SignUp from './pages/SignUp'
 import Cart from './pages/Cart'
 
 function App() {
@@ -26,10 +26,10 @@ function App() {
 				<div>
 					<Switch>
 						<Route exact path="/" component={Home} />
-						<Route path="/company" component={Company} />
-						<Route path="/client" component={Client} />
-						<Route path="/signin" component={SignIn} />
-						<Route path="/cart" component={Cart} />
+						<Route exact path="/company" component={Company} />
+						<Route exact path="/client" component={Client} />
+						<Route exact path="/signup" component={SignUp} />
+						<Route exact path="/cart" component={Cart} />
 					</Switch>
 				</div>
 			</Router>

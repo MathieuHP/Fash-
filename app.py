@@ -112,6 +112,30 @@ def new_user():
 #     return jsonify({'result' : result})
 
 
+@app.route('/login', methods=['POST'])
+def login():
+    user = db.user_info 
+    email = request.get_json(force = True)['email']
+    password = request.get_json(force = True)['password']
+    result = ""
+
+    response = user.find_one({'email': email})
+
+    if response:
+        if bcrypt.check_password_hash(response['password'], password):
+            access_token = create_access_token(identity = {
+                'first_name': response['first_name'],
+                'last_name': response['last_name'],
+                'email': response['email']
+            })
+            result = jsonify({'token':access_token})
+        else:
+            result = jsonify({"error":"Invalid username and password"})
+    else:
+        result = jsonify({"result":"No results found"})
+    return result 
+
+
 
 @app.route("/load_image_for_rating", methods=["GET"])
 def load_image_for_rating():
