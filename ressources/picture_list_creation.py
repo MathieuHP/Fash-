@@ -80,9 +80,17 @@ def create_recommended_pictures_list(user_id):
     collection = db["list_images"]
     results = list(collection.find({"user_id": user_id}))
 
-    if results[0]["super_like"]:
-        list_annoy = get_similar_images(results[0]["super_like"])
+    try:
+        sup_like = results[0]["super_like"]
+        list_annoy = get_similar_images(sup_like[0])
         super_like = True
+        try:
+            result = coll.update_one({"_id":results[0]["_id"]},{"$set":{"super_like":sup_like[1:]}})
+        except:
+            result = coll.update_one({"_id":results[0]["_id"]},{"$set":{"super_like":[]}})
+    except:
+        super_like = False
+
 
     if number_ratings > 20:
         collab_on = True
@@ -125,6 +133,6 @@ def get_recommended_picture_list(user_id=1):
             pictures_list = result[0]["list_image"]
         except:
             pictures_list = create_recommended_pictures_list(user_id)
-            collection.insert_one({"user_id":user_id, "list_image":pictures_list})
+            collection.insert_one({"user_id":user_id, "list_image":pictures_list, "super_like":[]})
 
     return pictures_list

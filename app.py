@@ -134,13 +134,17 @@ def show_image():
     coll.insert_one(post)
     
     if rating == 2:
-        coll = db["list_images"]
-        result = list(coll.find({"user_id":user_id}))
-        if "super_like" in result[0].keys():
-            result[0]["super_like"].append(name)
-        else:
-            result[0]["super_like"] = name
-        coll.update_one(result[0])
+        results = list(coll.find({}))
+        for res in results:
+            if res["user_id"] == user_id:
+                try: 
+                    super_like = res["super_like"]
+                    super_like.append(name)
+                except:
+                    super_like  = [name]
+                
+                result = coll.update_one({"_id":i["_id"]},{"$set":{"super_like":super_like}})
+
 
     return send_file_image
 
