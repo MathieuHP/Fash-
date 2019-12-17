@@ -161,6 +161,12 @@ def rate_image():
                 result = coll.update_one({"_id":res["_id"]},{"$set":{"super_like":super_like}})
 
 
+    coll = db["list_images"]
+    result = coll.find({"user_id":user_id})
+    list_pic = result[0]["list_image"]
+    push_db = coll.update_one({"_id":result[0]["_id"]}{"$set"{"list_image":list_pic[1:]}})
+        
+
     print(json_data)
     return "All good!"
 
@@ -168,8 +174,11 @@ def rate_image():
 
 @app.route("/cart", methods=["POST"])
 def cart():
+
+    user_id = 1
+
     try:
-        user_id = 1
+        
         collection = db["user_ratings"]
         super_like = list(collection.find({"user_id":user_id, "rating":2}))
         like = list(collection.find({"user_id":user_id, "rating":1}))
