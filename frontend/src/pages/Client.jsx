@@ -70,28 +70,32 @@ function Client() {
     }
 
     const rateImage = (value) => {
-        const options = {
-            method: 'POST',
-            body: JSON.stringify({ imageName: imageList[0]["name"], rating: value }),
-        };
-        fetch(`http://127.0.0.1:5000/rate_image`, options)
-        .then((response) => {
-            response.text().then(function(resText) { 
-                console.log(resText);   
-            });
-        })
-
-        let iL = imageList
-        iL.shift()
-        if (iL.length === 0) {
-            console.log("Loading new images...")
-        } else if (iL.length < 3) {
-            getListImages()
-            showImage(iL[0])
-            setImageList(iL)
-        } else {
-            showImage(iL[0])
-            setImageList(iL)
+        try {
+            const options = {
+                method: 'POST',
+                body: JSON.stringify({ imageName: imageList[0]["name"], rating: value }),
+            };
+            fetch(`http://127.0.0.1:5000/rate_image`, options)
+            .then((response) => {
+                response.text().then(function(resText) { 
+                    console.log(resText);   
+                });
+            })
+    
+            let iL = imageList
+            iL.shift()
+            if (iL.length === 0) {
+                console.log("Loading new images...")
+            } else if (iL.length < 7) {
+                getListImages()
+                showImage(iL[0])
+                setImageList(iL)
+            } else {
+                showImage(iL[0])
+                setImageList(iL)
+            }
+        } catch (err) {
+            console.log("Loading images ...");
         }
     }
 
@@ -103,7 +107,9 @@ function Client() {
                 </h1>
             </div>
             <div>
-                <ClothImg src={imageSrc} alt="image"/>
+                {
+                    imageSrc ? <ClothImg src={imageSrc} alt="image"/> : <p>Loading ...</p>
+                }
                 <p>{name}</p>
                 <p>{typeCloth}</p>
                 <p>{materialCloth}</p>
