@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import pandas as pd
-from random  import randrange
+from random  import randrange, shuffle
 
 from ressources.config import db, db_connect
 from ressources.model_collab_recommender import predict_ratings
@@ -21,14 +21,19 @@ def get_already_rated_pictures(user_id):
 def less_rated_pictures_selection(rated_pictures):
     """ return a list with the least reated pictures """
 
-    collection = db["image_info"]
-    results = list(collection.find({}))
+    collection = db["user_ratings"]
+    ratings = pd.DataFrame(list(collection.find({})))
+    ratings_count = ratings["picture"].value_counts()
 
-    pic_list = [i["name"] for i in results]    
-    bag = [pic for pic in pic_list if pic not in rated_pictures]
+    rate_ind = np.array(ratings_count.index)
+    rate_ind =np.flip(rate_ind)
 
-    return bag[:15]
-
+    bag = [pic for pic in rate_ind if pic not in rated_pictures]
+    shuffle(bag)
+    if len(bag) > 0:
+        return bag[:15]
+    else:
+        return None
 
 def get_collaborative_recommended_picture(user_id, rated_pictures):
 
@@ -64,6 +69,8 @@ def create_recommended_pictures_list(user_id, rated_pictures):
     number_ratings = len(rated_pictures)
 
     list_new_pic = less_rated_pictures_selection(rated_pictures)
+    if list_new_pic == None:
+        return "YOU ALREADY LIKE ALL THE PICTURES"
 
     if number_ratings < 15:
         return list_new_pic
@@ -88,6 +95,9 @@ def create_recommended_pictures_list(user_id, rated_pictures):
         if len(list_collab) < 10:
             collab_on = False
     list_final = []
+
+    print(f"-=_=- super_like => {super_like}")
+    print(f"-=_=- collab_on => {collab_on}")
 
     if super_like == True and collab_on == True:
         for i in range(5):
@@ -123,7 +133,7 @@ def get_recommended_picture_list(user_id=1):
     try:
         list_image = result["list_image"]
 
-        if len(list_image) < 5 and type(pictures_list)== list:
+        if len(list_image) < 8 and type(pictures_list)== list:
             pictures_list = list_image.extend(create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures))
         else:
             pictures_list = create_recommended_pictures_list(user_id)
