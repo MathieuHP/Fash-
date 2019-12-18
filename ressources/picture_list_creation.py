@@ -18,7 +18,7 @@ def get_already_rated_pictures(user_id):
     return rated_pictures
 
 
-def less_rated_pictures_selection(rated_pictures):
+def less_rated_pictures_selection(rated_pictures, sex):
     """ return a list with the least reated pictures """
 
     collection = db["user_ratings"]
@@ -28,7 +28,12 @@ def less_rated_pictures_selection(rated_pictures):
     rate_ind = np.array(ratings_count.index)
     rate_ind =np.flip(rate_ind)
 
-    bag = [pic for pic in rate_ind if pic not in rated_pictures]
+    coll = db["image_info"]
+    results = list(coll.find({"sex":sex}))
+    result = [res["name"] for res in results]
+
+    bag = [pic for pic in rate_ind if pic not in rated_pictures and pic in result]
+
     shuffle(bag)
     if len(bag) > 0:
         return bag[:15]
@@ -64,11 +69,11 @@ details={'was_impossible': False}
 )"""
 
 
-def create_recommended_pictures_list(user_id, rated_pictures):
+def create_recommended_pictures_list(user_id, rated_pictures, sex):
     """ return a list of picture that the user had not rated yet """    
     number_ratings = len(rated_pictures)
 
-    list_new_pic = less_rated_pictures_selection(rated_pictures)
+    list_new_pic = less_rated_pictures_selection(rated_pictures, sex)
     if list_new_pic == None:
         return "YOU ALREADY LIKE ALL THE PICTURES"
 
@@ -129,18 +134,20 @@ def get_recommended_picture_list(user_id=1):
     rated_pictures = get_already_rated_pictures(user_id)
     collection = db["list_images"]
     result = list(collection.find({"user_id":user_id}))[0]
+    coll = db["user_info"]
+    sex = list(coll.find({"user_id":user_id}))[0]["sex"]
 
     try:
         list_image = result["list_image"]
 
         if len(list_image) < 8 and type(pictures_list)== list:
-            pictures_list = list_image.extend(create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures))
+            pictures_list = list_image.extend(create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex))
         else:
-            pictures_list = create_recommended_pictures_list(user_id)
+            pictures_list = list_image
 
     except:
-        pictures_list = create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures)
-    pictures_list = [pic for pic in pictures_list if pic not in rated_pictures]
+        pictures_list = create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex)
+    final_list = [pic for pic in pictures_list if pic not in rated_pictures]
 
-    collection.update_one({"user_id": user_id },{"$set":{"user_id":user_id, "list_image":pictures_list}})
-    return pictures_list
+    collection.update_one({"user_id": user_id },{"$set":{"user_id":user_id, "list_image":final_list}})
+    return final_list
