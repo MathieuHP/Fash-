@@ -1,7 +1,7 @@
-from ressources.model_collab_recommender import predict_ratings
+from ressources.model_collab_recommender import predict_ratings, check_minimum_data
 from ressources.picture_list_creation import create_recommended_pictures_list
 from ressources.config import db
-from ressources.enable_collab import check_minimum_data
+from ressources.enable_collab import run_thread
 
 import time
 from pymongo import MongoClient
@@ -19,7 +19,9 @@ while loop == True:
 		1 => get_collaborative_recommended_picture \n
 		2 => predict ratings \n
 		3 => create_recommended_pictures_list \n
-		4 => enable collab \n """))
+		4 => enable collab \n
+		5 => run_thread \n
+		 """))
 
 	start = time.time()
 
@@ -53,6 +55,11 @@ while loop == True:
 	elif user_input == 4:
 		x = check_minimum_data()
 		print(x)
+
+	elif user_input == 5:
+		print("launching thread to predict with collab")
+		run_thread()
+
 	
 	print(" ")		
 	print(" -=- -=- -=- -=- -=- ")
