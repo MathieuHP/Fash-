@@ -93,7 +93,7 @@ def create_recommended_pictures_list(user_id, rated_pictures, sex):
         list_annoy = get_similar_images(sup_like[0])
         list_annoy = [pic for pic in list_annoy if pic not in rated_pictures]
         super_like = True
-        result = collection.update_one({"_id":results["_id"]},{"$set":{"super_like":sup_like[1:]}})
+        cursor = collection.update_one({"_id":results["_id"]},{"$set":{"super_like":sup_like[1:]}})
 
     if number_ratings > 20:
         collab_on = True
@@ -151,5 +151,5 @@ def get_recommended_picture_list(user_id):
         pictures_list = create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex)
     final_list = [pic for pic in pictures_list if pic not in rated_pictures]
 
-    collection.update_one({"user_id": user_id },{"$set":{"user_id":user_id, "list_image":final_list}})
+    cursor = collection.update_one({"user_id": user_id },{"$set":{"user_id":user_id, "list_image":final_list}})
     return final_list
