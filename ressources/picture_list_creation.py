@@ -134,12 +134,13 @@ def get_recommended_picture_list(user_id):
     """ check in DB if a list of recommended picture exists, and if not, generate it then return it """
     rated_pictures = get_already_rated_pictures(user_id)
     collection = db["list_images"]
-    result = list(collection.find({"user_id":user_id}))[0]
+    result = list(collection.find({"user_id":user_id}))
+
     coll = db["user_info"]
     sex = list(coll.find({"_id":ObjectId(user_id)}))[0]["sex"]
 
     try:
-        list_image = result["list_image"]
+        list_image = result[0]["list_image"]
 
         if len(list_image) < 8 and type(pictures_list)== list:
             pictures_list = list_image.extend(create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex))
