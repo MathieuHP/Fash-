@@ -40,7 +40,7 @@ function Nav() {
         })
     }
 
-    const logOut = (e) => {
+    const logOut = () => {
         localStorage.removeItem('usertoken')
         history.push("/")
     }
