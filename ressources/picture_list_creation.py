@@ -2,6 +2,7 @@ import numpy as np
 import os
 import pandas as pd
 from random  import randrange, shuffle
+from bson import ObjectId
 
 from ressources.config import db, db_connect
 from ressources.model_collab_recommender import predict_ratings
@@ -135,7 +136,7 @@ def get_recommended_picture_list(user_id):
     collection = db["list_images"]
     result = list(collection.find({"user_id":user_id}))[0]
     coll = db["user_info"]
-    sex = list(coll.find({"user_id":user_id}))[0]["sex"]
+    sex = list(coll.find({"_id":ObjectId(user_id)}))[0]["sex"]
 
     try:
         list_image = result["list_image"]
