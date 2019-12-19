@@ -217,8 +217,8 @@ def rate_image():
                 result = coll.update_one({"_id":res["_id"]},{"$set":{"super_like":super_like}})
             list_pic = res["list_image"]
             push_db = coll.update_one({"_id":res["_id"]},{"$set":{"list_image":list_pic[1:]}})
-
-    print(json_data)
+    
+    return jsonify({"valid" : "Cloth has been rated"})
 
 
 @app.route("/cart", methods=["POST"])
