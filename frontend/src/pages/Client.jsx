@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faStar, faHeart } from '@fortawesome/free-solid-svg-icons'
+import { useHistory } from "react-router-dom";
 
 function Client() {
     // STYLED
@@ -25,18 +26,33 @@ function Client() {
     const [sex, setSex] = useState('')
     const [description, setDescription] = useState('')
 
+    const token = localStorage.usertoken
+    const history = useHistory();
+
     useEffect(() => {
-        getListImages();
-      }, []);
+        if(!token){
+            history.push("/")
+        } else {
+            getListImages();
+        }
+    }, []);
     
     // FUNCTIONS
     const getListImages = async () => {
         const options = {
             method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            }
         };
         fetch(`http://127.0.0.1:5000/load_image_for_rating`, options)
         .then((response) => {
             response.json().then(function (listImageFromBackend) {
+                if ("msg" in listImageFromBackend) {
+                    history.push("/")
+                    return;
+                }
                 let iL = imageList.concat(listImageFromBackend)
                 setImageList(iL)
                 if (!imageSrc) {
@@ -74,11 +90,19 @@ function Client() {
             const options = {
                 method: 'POST',
                 body: JSON.stringify({ imageName: imageList[0]["name"], rating: value }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': token
+                }
             };
             fetch(`http://127.0.0.1:5000/rate_image`, options)
             .then((response) => {
-                response.text().then(function(resText) { 
-                    console.log(resText);   
+                response.json().then(function(resText) {
+                    if ("msg" in resText) {
+                    history.push("/")
+                    return;
+                } else if ("valid" in resText)
+                    console.log(resText["valid"]);   
                 });
             })
     

@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState,useEffect} from 'react';
 import styled from 'styled-components';
+import { useHistory } from "react-router-dom";
+
 
 function Company() {
     // STYLED
-    const CompanyDiv = styled.div`
-    `;
     
     // STATE
     const [image, setImage] = useState('')
@@ -16,7 +16,37 @@ function Company() {
     const [description, setDescription] = useState('')
     const [formValidationText, setFormValidationText] = useState('')
 
+    const token = localStorage.usertoken
+    const history = useHistory();
+
+    useEffect(() => {
+        if(!token){
+            history.push("/")
+        } else {
+            checkToken()
+        }
+    }, []);
+
     // FUNCTIONS
+
+    const checkToken = () => {
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            }
+        };
+        fetch(`http://127.0.0.1:5000/check_token`, options)
+        .then((response) => {
+            response.json().then(function (text) {
+                if ("msg" in text) {
+                    history.push("/")
+                    return;
+                }
+            });
+        })
+    }
     
     const checkState = () => {
         if (image) {
@@ -45,11 +75,20 @@ function Company() {
         const options = {
             method: 'POST',
             body: formData,
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            }
         };
         fetch(`http://127.0.0.1:5000/upload_image`, options)
         .then((response) => {
-            response.text().then(function (text) {
-                console.log(text)
+            response.json().then(function (text) {
+                if ("msg" in text) {
+                    history.push("/")
+                    return;
+                } else if ("valid" in text) {
+                    console.log(text["valid"]);
+                }
             });
         })
     }
@@ -71,27 +110,27 @@ function Company() {
                 </div>
                 <div>
                     <label htmlFor="typeCloth">Type of cloth : </label>
-                    <input type="text" name="typeCloth" value={typeCloth} onChange={(e) => setTypeCloth(e.target.value)}/>
+                    <input type="text" id="typeCloth" value={typeCloth} onChange={(e) => setTypeCloth(e.target.value)}/>
                 </div>
                 <div>
                     <label htmlFor="materialCloth">Cloth material : </label>
-                    <input type="text" name="materialCloth" value={materialCloth} onChange={(e) => setMaterialCloth(e.target.value)}/>
+                    <input type="text" id="materialCloth" value={materialCloth} onChange={(e) => setMaterialCloth(e.target.value)}/>
                 </div>
                 <div>
                     <label htmlFor="productionMethod">Production method : </label>
-                    <input type="text" name="productionMethod" value={productionMethod} onChange={(e) => setProductionMethod(e.target.value)}/>
+                    <input type="text" id="productionMethod" value={productionMethod} onChange={(e) => setProductionMethod(e.target.value)}/>
                 </div>
                 <div>
                     <label htmlFor="price">Price : </label>
-                    <input type="text" name="price" value={price} onChange={(e) => setPrice(e.target.value)}/>
+                    <input type="text" id="price" value={price} onChange={(e) => setPrice(e.target.value)}/>
                 </div>
                 <div>
                     <label htmlFor="sex">Sex : </label>
-                    <input type="text" name="sex" value={sex} onChange={(e) => setSex(e.target.value)}/>
+                    <input type="text" id="sex" value={sex} onChange={(e) => setSex(e.target.value)}/>
                 </div>
                 <div>
                     <label htmlFor="desciption">Description : </label>
-                    <textarea type="text" name="desciption" value={description} onChange={(e) => setDescription(e.target.value)}/>
+                    <textarea type="text" id="desciption" value={description} onChange={(e) => setDescription(e.target.value)}/>
                 </div>
                 <div>
                     <input type="submit" name="submitCloth" value="Submit" onClick={() => checkState()}/>

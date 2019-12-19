@@ -6,83 +6,63 @@ import axios from 'axios'
 
 function Home() {
     // STYLED
-    const HomeDiv = styled.div`
-    `;
     
     // STATE
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [connectionMessage, setConnectionMessage] = useState('')
 
     const history = useHistory();
 
     // FUNCTIONS
     
-    const onSubmit = (e) => {
-        e.preventDefault()
-
+    const onSubmit = () => {
         const user = {
             email: email,
             password: password
         }
-
-        login(user).then(res => {
-            if (!res.error) {
-                history.push("/client")
-            }
-        })
+        login(user)
     }
 
     const login = (user) => {
-        return axios
-            .post("http://127.0.0.1:5000/login", {
-                email: user.email,
-                password: user.password
-            })
-            .then(response => {
+        return axios.post("http://127.0.0.1:5000/login", {
+            email: user.email,
+            password: user.password
+        }).then(response => {
+            if (response.data) {
                 localStorage.setItem('usertoken', response.data.token)
-                return response.data.token
-            })
-            .catch(err => {
-                console.log(err)
-            })
+                history.push("/client")
+            } else {
+                console.log("Cannot connect");
+                setConnectionMessage('Wrong email or password')
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
     }
 
     return (
-        <HomeDiv>
+        <div>
             <h1>
                 Home
             </h1>
             <div>
-                <form noValidate onSubmit={(e) => onSubmit(e)}>
-                    <div>
-                        <label htmlFor="email">Email Address</label>
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            placeholder="Enter Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            />
-                    </div>
-                    <div>
-                        <label htmlFor="password">Password </label>
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            placeholder="Enter Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            />
-                    </div>
-                    <button type="submit">
-                        Log in
-                    </button>
-                </form>
-                <Link to="/signup">Sign up</Link>
+                <div>
+                    <label htmlFor="email">Email Address</label>
+                    <input type="email" name="email" id="email" placeholder="Enter Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                </div>
+                <div>
+                    <label htmlFor="password">Password </label>
+                    <input type="password" name="password" id="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                </div>
+                <div>
+                    <input type="submit" name="login" value="Log in" onClick={() => onSubmit()}/>
+                    <p>{connectionMessage}</p>
+                </div>
             </div>
-        </HomeDiv>  
+            <Link to="/signup">Sign up</Link>
+        </div>  
     );
 }
 

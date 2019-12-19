@@ -1,5 +1,51 @@
-import React from 'react';
-import { Link } from "react-router-dom";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useEffect } from 'react';
+import { Link, useHistory } from "react-router-dom";
 import styled from 'styled-components';
 
 function Nav() {
@@ -8,8 +54,42 @@ function Nav() {
      `;
      
      // STATE
+     const token = localStorage.usertoken
+     const history = useHistory();
+
+     useEffect(() => {
+        if(!token){
+            history.push("/")
+        } else {
+            checkToken()
+        }
+    }, []);
  
      // FUNCTIONS
+
+     const checkToken = () => {
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            }
+        };
+        fetch(`http://127.0.0.1:5000/check_token`, options)
+        .then((response) => {
+            response.json().then(function (text) {
+                if ("msg" in text) {
+                    logOut()
+                    return;
+                }
+            });
+        })
+    }
+
+    const logOut = (e) => {
+        localStorage.removeItem('usertoken')
+        history.push("/")
+    }
 
     const testBack = () => {
         const options = {
@@ -46,8 +126,13 @@ function Nav() {
                         Cart
                     </Link>
                 </li>
-                <button onClick={testBack}>Testing backend</button>
-           </ul>
+                <li>
+                    {
+                        localStorage.usertoken ? <p><button onClick={logOut}>Click to disconnect</button></p> : <Link to="/">Click to connect</Link>
+                    }
+                </li>
+            </ul>
+            <button onClick={testBack}>Testing backend</button>
         </NavDiv>  
     );
 }
