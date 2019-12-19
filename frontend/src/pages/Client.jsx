@@ -50,6 +50,7 @@ function Client() {
         .then((response) => {
             response.json().then(function (listImageFromBackend) {
                 if ("msg" in listImageFromBackend) {
+                    localStorage.removeItem('usertoken')
                     history.push("/")
                     return;
                 }
@@ -99,6 +100,7 @@ function Client() {
             .then((response) => {
                 response.json().then(function(resText) {
                     if ("msg" in resText) {
+                    localStorage.removeItem('usertoken')
                     history.push("/")
                     return;
                 } else if ("valid" in resText)

@@ -102,6 +102,7 @@ def new_user():
         first_name = request.get_json()['first_name']
         last_name = request.get_json()['last_name']
         email = request.get_json()['email']
+        sex = request.get_json()['sex']
         password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
         created = datetime.utcnow()
 
@@ -110,7 +111,8 @@ def new_user():
             'last_name': last_name,
             'email': email,
             'password': password,
-            'created': created 
+            'created': created,
+            "sex" : sex
         })
         
         return 'ok'

@@ -12,19 +12,29 @@ function SignUp() {
     const [last_name, setLast_name] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [rePassword, setRePassword] = useState('')
+    const [sex, setSex] = useState('')
+    const [connectionMessage, setConnectionMessage] = useState('')
+    
+
 
     const history = useHistory();
 
     // FUNCTIONS
 
     const onSubmit = () => {
-        const newUser = {
-            first_name: first_name,
-            last_name: last_name,
-            email: email,
-            password: password
+        if (password === rePassword) {
+            const newUser = {
+                first_name: first_name,
+                last_name: last_name,
+                email: email,
+                password: password,
+                sex: sex
+            }
+            register(newUser)
+        } else {
+            setConnectionMessage(<p>Passwords are different</p>)
         }
-        register(newUser)
     }
 
     const register = newUser => {
@@ -34,6 +44,7 @@ function SignUp() {
                 last_name: newUser.last_name,
                 email: newUser.email,
                 password: newUser.password,
+                sex: newUser.sex
             })
             .then(response => {
                 if (response.data) {
@@ -66,7 +77,16 @@ function SignUp() {
                     <label htmlFor="password">Password </label>
                     <input  type="password" name="password" id="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
+                <div >
+                    <label htmlFor="rePassword">Password again </label>
+                    <input  type="rePassword" name="rePassword" id="rePassword" placeholder="Enter Password again" value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
+                </div>
+                <div >
+                    <label htmlFor="sex">Sex </label>
+                    <input  type="sex" name="sex" id="sex" placeholder="Enter Sex" value={sex} onChange={(e) => setSex(e.target.value)} />
+                </div>
                 <input type="submit" name="signUp" value="Register" onClick={() => onSubmit()}/>
+                {connectionMessage}
         </div>  
     );
 }

@@ -41,6 +41,7 @@ function Company() {
         .then((response) => {
             response.json().then(function (text) {
                 if ("msg" in text) {
+                    localStorage.removeItem('usertoken')
                     history.push("/")
                     return;
                 }
@@ -84,6 +85,7 @@ function Company() {
         .then((response) => {
             response.json().then(function (text) {
                 if ("msg" in text) {
+                    localStorage.removeItem('usertoken')
                     history.push("/")
                     return;
                 } else if ("valid" in text) {

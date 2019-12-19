@@ -42,6 +42,7 @@ function Cart() {
             setEmail(decoded.identity.email)
         } catch (error) {
             console.log("Not connected");
+            localStorage.removeItem('usertoken')
             history.push("/")
         }
     }
@@ -77,6 +78,7 @@ function Cart() {
             }
         } catch(err) {
             if ("msg" in cart){
+                localStorage.removeItem('usertoken')
                 history.push("/")
             }
             setCartImageSL([ <p key="cartSLEmpty">Sorry, an error occurred try again later</p> ])
