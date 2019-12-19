@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import time
 import json
+from bson import ObjectId
 from flask_cors import CORS, cross_origin
 
 from bson.objectid import ObjectId 
@@ -32,7 +33,7 @@ jwt = JWTManager(app)
 CORS(app)
 
 @app.route("/", methods= ["GET"])
-def home():
+def testingBackend():
     print("Backend is on")
     return 'Backend is on'
 
@@ -45,6 +46,9 @@ def check_token():
 @app.route("/upload_image", methods= ["POST"])
 @jwt_required
 def upload_image():
+    
+    # TODO WILL ADD AN ID FOR EVERY COMPANY 
+    
     UPLOAD_FOLDER = './image_similarity/data/train/'
     ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg']
     image_file = request.files["imageFile"]
@@ -122,12 +126,14 @@ def login():
     result = ""
 
     response = user.find_one({'email': email})
+    
     if response:
         if bcrypt.check_password_hash(response['password'], password):
             access_token = create_access_token(identity = {
                 'first_name': response['first_name'],
                 'last_name': response['last_name'],
-                'email': response['email']
+                'email': response['email'],
+                '_id': str(response['_id'])
             })
             result = jsonify({'token' : access_token})
         else:
@@ -143,7 +149,8 @@ def login():
 @app.route("/load_image_for_rating", methods=["GET"])
 @jwt_required
 def load_image_for_rating():
-    user_id = 1 #!!!!
+    current_user = get_jwt_identity()
+    user_id = current_user["_id"]
 
     pictures_list = get_recommended_picture_list(user_id)
 
@@ -183,7 +190,8 @@ def show_image():
 def rate_image():
     json_data = request.get_json(force = True)
 
-    user_id = 1 # !!!!
+    current_user = get_jwt_identity()
+    user_id = current_user["_id"]
 
     name = json_data['imageName']
     rating = json_data["rating"]
@@ -215,12 +223,10 @@ def rate_image():
 @jwt_required
 def cart():
 
-    user_id = 1 # !!!!
-
-    # current_user = get_jwt_identity()
-    # if current_user:
+    current_user = get_jwt_identity()
+    user_id = current_user["_id"]
+    
     try:
-        
         collection = db["user_ratings"]
         super_like = list(collection.find({"user_id":user_id, "rating":2}))
         like = list(collection.find({"user_id":user_id, "rating":1}))
