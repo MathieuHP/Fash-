@@ -102,6 +102,7 @@ def new_user():
         first_name = request.get_json()['first_name']
         last_name = request.get_json()['last_name']
         email = request.get_json()['email']
+        sex = request.get_json()['sex']
         password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
         created = datetime.utcnow()
 
@@ -110,7 +111,8 @@ def new_user():
             'last_name': last_name,
             'email': email,
             'password': password,
-            'created': created 
+            'created': created,
+            "sex" : sex
         })
         
         return 'ok'
@@ -171,6 +173,7 @@ def load_image_for_rating():
         i+=1
 
     send_image_info = jsonify(list_dict)
+    print(send_image_info)
     return send_image_info
 
 
@@ -215,8 +218,8 @@ def rate_image():
                 result = coll.update_one({"_id":res["_id"]},{"$set":{"super_like":super_like}})
             list_pic = res["list_image"]
             push_db = coll.update_one({"_id":res["_id"]},{"$set":{"list_image":list_pic[1:]}})
-
-    print(json_data)
+    
+    return jsonify({"valid" : "Cloth has been rated"})
 
 
 @app.route("/cart", methods=["POST"])
