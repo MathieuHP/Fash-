@@ -33,10 +33,7 @@ jwt = JWTManager(app)
 CORS(app)
 
 @app.route("/", methods= ["GET"])
-def home():
-    current_user = get_jwt_identity()
-    if current_user:
-        print(current_user)
+def testingBackend():
     print("Backend is on")
     return 'Backend is on'
 
@@ -49,6 +46,9 @@ def check_token():
 @app.route("/upload_image", methods= ["POST"])
 @jwt_required
 def upload_image():
+    
+    # TODO WILL ADD AN ID FOR EVERY COMPANY 
+    
     UPLOAD_FOLDER = './image_similarity/data/train/'
     ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg']
     image_file = request.files["imageFile"]
@@ -149,7 +149,8 @@ def login():
 @app.route("/load_image_for_rating", methods=["GET"])
 @jwt_required
 def load_image_for_rating():
-    user_id = 1 #!!!!
+    current_user = get_jwt_identity()
+    user_id = current_user["_id"]
 
     pictures_list = get_recommended_picture_list(user_id)
 
@@ -189,7 +190,8 @@ def show_image():
 def rate_image():
     json_data = request.get_json(force = True)
 
-    user_id = 1 # !!!!
+    current_user = get_jwt_identity()
+    user_id = current_user["_id"]
 
     name = json_data['imageName']
     rating = json_data["rating"]
@@ -220,12 +222,10 @@ def rate_image():
 @jwt_required
 def cart():
 
-    user_id = 1 # !!!!
-
-    # current_user = get_jwt_identity()
-    # if current_user:
+    current_user = get_jwt_identity()
+    user_id = current_user["_id"]
+    
     try:
-        
         collection = db["user_ratings"]
         super_like = list(collection.find({"user_id":user_id, "rating":2}))
         like = list(collection.find({"user_id":user_id, "rating":1}))
