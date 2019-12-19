@@ -129,7 +129,7 @@ def create_recommended_pictures_list(user_id, rated_pictures, sex):
         return list_new_pic
 
 
-def get_recommended_picture_list(user_id=1):
+def get_recommended_picture_list(user_id):
     """ check in DB if a list of recommended picture exists, and if not, generate it then return it """
     rated_pictures = get_already_rated_pictures(user_id)
     collection = db["list_images"]
