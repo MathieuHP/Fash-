@@ -1,34 +1,68 @@
-import React from 'react';
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link, useHistory } from "react-router-dom";
 import styled from 'styled-components';
+import axios from 'axios'
+
 
 function Home() {
     // STYLED
-    const HomeDiv = styled.div`
-    `;
     
     // STATE
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [connectionMessage, setConnectionMessage] = useState('')
+
+    const history = useHistory();
 
     // FUNCTIONS
+    
+    const onSubmit = () => {
+        const user = {
+            email: email,
+            password: password
+        }
+        login(user)
+    }
+
+    const login = (user) => {
+        return axios.post("http://127.0.0.1:5000/login", {
+            email: user.email,
+            password: user.password
+        }).then(response => {
+            if (response.data) {
+                localStorage.setItem('usertoken', response.data.token)
+                history.push("/client")
+            } else {
+                console.log("Cannot connect");
+                setConnectionMessage('Wrong email or password')
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
+    }
 
     return (
-        <HomeDiv>
+        <div>
             <h1>
                 Home
             </h1>
             <div>
-                <form method="POST">
-                    <label htmlFor="mail">Mail:</label>
-                    <input id="mail" type="text"></input>
-                    <br/>
-                    <label htmlFor="password">Password:</label>
-                    <input id="password" type="password"></input>
-                    <br/>
-                    <input type="submit" value="Submit"/>
-                </form>
-                <Link to="/signin">Sign in</Link>
+                <div>
+                    <label htmlFor="email">Email Address</label>
+                    <input type="email" name="email" id="email" placeholder="Enter Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                </div>
+                <div>
+                    <label htmlFor="password">Password </label>
+                    <input type="password" name="password" id="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                </div>
+                <div>
+                    <input type="submit" name="login" value="Log in" onClick={() => onSubmit()}/>
+                    <p>{connectionMessage}</p>
+                </div>
             </div>
-        </HomeDiv>  
+            <Link to="/signup">Sign up</Link>
+        </div>  
     );
 }
 

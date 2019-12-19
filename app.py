@@ -11,8 +11,7 @@ from flask_cors import CORS, cross_origin
 from bson.objectid import ObjectId 
 from datetime import datetime 
 from flask_bcrypt import Bcrypt 
-from flask_jwt_extended import JWTManager 
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 
 #custom modules
 from ressources.config import db, db_connect
@@ -25,6 +24,9 @@ from image_similarity.train_annoy_model import train_annoy_model
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
+app.config['JWT_SECRET_KEY'] = 'this_secret_wont_be_enough'
+app.config['JWT_HEADER_TYPE'] = None
+
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
@@ -34,8 +36,14 @@ def home():
     print("Backend is on")
     return 'Backend is on'
 
+@app.route("/check_token", methods= ["GET"])
+@jwt_required
+def check_token():
+    return jsonify({"valid" : 'Token is valid'})
+
 
 @app.route("/upload_image", methods= ["POST"])
+@jwt_required
 def upload_image():
     UPLOAD_FOLDER = './image_similarity/data/train/'
     ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg']
@@ -80,38 +88,61 @@ def upload_image():
             "description": description
         })
     
-    return 'All good'
+    return jsonify({"valid" : "Cloth has been uploaded"})
 
-# @app.route('/new_user', methods=["POST"])
-# def new_user():
 
-#     first_name = request.get_json(force = True)['first_name']
-#     last_name = request.get_json(force = True)['last_name']
-#     email = request.get_json(force = True)['email']
-#     password = bcrypt.generate_password_hash(request.get_json(force = True)['password']).decode('utf-8')
-#     created = datetime.utcnow()
+@app.route('/new_user', methods=["POST"])
+def new_user():
+    try:
+        user = db.user_info
+        first_name = request.get_json()['first_name']
+        last_name = request.get_json()['last_name']
+        email = request.get_json()['email']
+        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+        created = datetime.utcnow()
 
-#     user_id = users.insert({
-#         'first_name': first_name,
-#         'last_name': last_name,
-#         'email': email,
-#         'password': password,
-#         'created': created 
-#     })
+        user_id = user.insert_one({
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'password': password,
+            'created': created 
+        })
+        
+        return 'ok'
+    except:
+        return ''
 
-#     new_user = users.find_one({'_id': user_id})
 
-#     result = {'email': new_user['email'] + ' registered'}
-    
-#     result = 'ok'
+@app.route('/login', methods=['POST'])
+def login():
+    user = db.user_info
+    email = request.get_json(force = True)['email']
+    password = request.get_json(force = True)['password']
+    result = ""
 
-#     return jsonify({'result' : result})
+    response = user.find_one({'email': email})
+    if response:
+        if bcrypt.check_password_hash(response['password'], password):
+            access_token = create_access_token(identity = {
+                'first_name': response['first_name'],
+                'last_name': response['last_name'],
+                'email': response['email']
+            })
+            result = jsonify({'token' : access_token})
+        else:
+            print("Invalid username and password")
+            result = ""
+    else:
+        print("No results found")
+        result = ""
+    return result 
 
 
 
 @app.route("/load_image_for_rating", methods=["GET"])
+@jwt_required
 def load_image_for_rating():
-
     user_id = 1 #!!!!
 
     pictures_list = get_recommended_picture_list(user_id)
@@ -139,7 +170,6 @@ def load_image_for_rating():
 
 @app.route("/show_image", methods=["POST"])
 def show_image():
-
     json_data = request.get_json(force = True)
     filename = './imagesOnDb/' + json_data['imageName']
     send_file_image = send_file(filename, mimetype='image/jpg')
@@ -149,6 +179,7 @@ def show_image():
 
 
 @app.route("/rate_image", methods=["POST"])
+@jwt_required
 def rate_image():
     json_data = request.get_json(force = True)
 
@@ -173,20 +204,20 @@ def rate_image():
                     super_like  = [name]
                 
                 result = coll.update_one({"_id":res["_id"]},{"$set":{"super_like":super_like}})
-                
             list_pic = res["list_image"]
             push_db = coll.update_one({"_id":res["_id"]},{"$set":{"list_image":list_pic[1:]}})
 
     print(json_data)
-    return "All good!"
-
 
 
 @app.route("/cart", methods=["POST"])
+@jwt_required
 def cart():
 
     user_id = 1 # !!!!
 
+    # current_user = get_jwt_identity()
+    # if current_user:
     try:
         
         collection = db["user_ratings"]
