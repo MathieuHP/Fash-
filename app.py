@@ -173,6 +173,7 @@ def load_image_for_rating():
         i+=1
 
     send_image_info = jsonify(list_dict)
+    print(send_image_info)
     return send_image_info
 
 
