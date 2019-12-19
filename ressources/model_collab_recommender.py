@@ -7,7 +7,6 @@ from surprise.model_selection import cross_validate
 from ressources.config import db, db_connect
 
 
-
 def filtering_out_users_and_ratings(df):
 
     """filter out user and images with too few 
@@ -27,20 +26,12 @@ def filtering_out_users_and_ratings(df):
     return df_new
 
 
-
 def predict_ratings():
 
     """predict ratings using surprise, for the 
     colaborative recommender system"""
 
-    #get ratings from db
-    try:
-        collection = db["user_ratings"]
-    except:
-        db = db_connect()
-        collection = db["user_ratings"]
-
-
+    collection = db["user_ratings"]
     df = pd.DataFrame(list(collection.find({})))
 
     # preprocess, feed and predict ratings
@@ -71,3 +62,44 @@ def predict_ratings():
         "picture" : pred[1],
         "estimation":pred[3]} for pred in predictions])
 
+"""    
+format surprise.predict()
+Prediction (
+uid=1, 
+iid='00b10502fb082dcc8f156562b71f6f91.jpg', 
+r_ui=0.6009273632105954,
+est=0.5726982131029839, 
+details={'was_impossible': False}
+)
+"""
+
+
+def check_minimum_data():
+    # minimum data needed
+    min_user = 10
+    min_picture = 10
+
+    #threshold to filter data before using collab recommender
+    min_user_ratings = 20
+    min_picture_ratings = 10
+
+    collection = db["user_ratings"]
+    ratings = pd.DataFrame(list(collection.find({})))
+    count_rating = np.array(ratings["picture"].value_counts())
+    count_user = np.array(ratings["user_id"].value_counts())
+
+    picture_count = 0
+    for i in count_rating:
+        if i >= min_picture_ratings:
+            picture_count += 1
+
+    user_count = 0
+    for i in count_user:
+        if i >= min_user_ratings:
+            user_count += 1
+
+
+    if picture_count >= min_picture and user_count >= min_user:
+        return True
+    else:
+        return False

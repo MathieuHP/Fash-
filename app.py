@@ -188,7 +188,7 @@ def rate_image():
     name = json_data['imageName']
     rating = json_data["rating"]
     coll = db["user_ratings"]
-    post = {"user_id":user_id, "picture":name,"rating":rating}
+    post = {"user_id":user_id, "picture":name,"rating":rating, "timestamp":time.ctime()}
     coll.insert_one(post)
 
     coll = db["list_images"]
