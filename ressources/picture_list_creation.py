@@ -22,24 +22,35 @@ def get_already_rated_pictures(user_id):
 def less_rated_pictures_selection(rated_pictures, sex):
     """ return a list with the least reated pictures """
 
-    collection = db["user_ratings"]
-    ratings = pd.DataFrame(list(collection.find({})))
-    ratings_count = ratings["picture"].value_counts()
-
-    rate_ind = np.array(ratings_count.index)
-    rate_ind =np.flip(rate_ind)
-
     coll = db["image_info"]
     results = list(coll.find({"sex":sex}))
     result = [res["name"] for res in results]
 
-    bag = [pic for pic in rate_ind if pic not in rated_pictures and pic in result]
+    collection = db["user_ratings"]
+    ratings = pd.DataFrame(list(collection.find({})))
+
+    if ratings.shape == (0,0):
+        rate_ind = result
+
+    else:
+        ratings_count = ratings["picture"].value_counts()
+
+        rate_ind = np.array(ratings_count.index)
+        rate_ind =np.flip(rate_ind)
+
+
+
+    bag = []
+    for pic in rate_ind:
+        if pic in result and pic not in rated_pictures:
+            bag.append(pic)
 
     shuffle(bag)
     if len(bag) > 0:
         return bag[:15]
     else:
         return None
+
 
 def get_collaborative_recommended_picture(user_id, rated_pictures):
 
@@ -76,7 +87,8 @@ def create_recommended_pictures_list(user_id, rated_pictures, sex):
 
     list_new_pic = less_rated_pictures_selection(rated_pictures, sex)
     if list_new_pic == None:
-        return "YOU ALREADY LIKE ALL THE PICTURES"
+        print("YOU ALREADY LIKED ALL THE PICTURES")
+        return None 
 
     if number_ratings < 15:
         return list_new_pic
@@ -149,6 +161,7 @@ def get_recommended_picture_list(user_id):
 
     except:
         pictures_list = create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex)
+    
     final_list = [pic for pic in pictures_list if pic not in rated_pictures]
 
     cursor = collection.update_one({"user_id": user_id },{"$set":{"user_id":user_id, "list_image":final_list}})
