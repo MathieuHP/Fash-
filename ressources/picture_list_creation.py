@@ -41,8 +41,10 @@ def less_rated_pictures_selection(rated_pictures, sex):
 
 
     bag = []
-    for pic in rate_ind:
-        if pic in result and pic not in rated_pictures:
+    for pic in result:
+        if pic not in rate_ind:
+            bag.append(pic)
+        elif pic not in rated_pictures:
             bag.append(pic)
 
     shuffle(bag)
@@ -156,13 +158,17 @@ def get_recommended_picture_list(user_id):
 
         if len(list_image) < 8 and type(pictures_list)== list:
             pictures_list = list_image.extend(create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex))
+            print(pictures_list)
+
         else:
             pictures_list = list_image
+            print(pictures_list)
 
     except:
         pictures_list = create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex)
-    
+        print(pictures_list)
     final_list = [pic for pic in pictures_list if pic not in rated_pictures]
 
-    cursor = collection.update_one({"user_id": user_id },{"$set":{"user_id":user_id, "list_image":final_list}})
+
+    cursor = collection.update_one({"user_id": user_id },{"$set":{"list_image":final_list}})
     return final_list
