@@ -81,9 +81,8 @@ def upload_image():
         get_embeddings()
         train_annoy_model()
         coll = db["image_info"]
-        coll.insert_one({
+        x = coll.insert_one({
             "name":filename,
-            "path": destination,
             "typeCloth": typeCloth,
             "materialCloth": materialCloth,
             "productionMethod": productionMethod,
@@ -106,7 +105,7 @@ def new_user():
         password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
         created = datetime.utcnow()
 
-        user_id = user.insert_one({
+        x = user.insert_one({
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
@@ -115,6 +114,17 @@ def new_user():
             "sex" : sex
         })
         
+        result = user.find_one({"email":email})
+        user_id = str(result["_id"])
+
+        collection = db.list_images
+        x = collection.insert_one({
+            "user_id":user_id,
+            "super_like":[],
+            "list_image":[]
+            })
+
+
         return 'ok'
     except:
         return ''
@@ -201,7 +211,7 @@ def rate_image():
     post = {"user_id":user_id, "picture":name,"rating":rating, "timestamp":time.ctime()}
     
     coll = db["user_ratings"]    
-    coll.insert_one(post)
+    x = coll.insert_one(post)
 
     coll = db["list_images"]
     results = list(coll.find({}))
