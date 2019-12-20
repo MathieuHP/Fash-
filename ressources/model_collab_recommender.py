@@ -4,6 +4,7 @@ import numpy as np
 import os
 from surprise import Reader, Dataset, Trainset, SVD, BaselineOnly
 from surprise.model_selection import cross_validate
+
 from ressources.config import db, db_connect
 
 
