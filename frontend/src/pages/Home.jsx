@@ -16,7 +16,8 @@ function Home() {
 
     // FUNCTIONS
     
-    const onSubmit = () => {
+    const onSubmit = (e) => {
+        e.preventDefault()
         const user = {
             email: email,
             password: password
@@ -48,18 +49,20 @@ function Home() {
                 Home
             </h1>
             <div>
-                <div>
-                    <label htmlFor="email">Email Address</label>
-                    <input type="email" name="email" id="email" placeholder="Enter Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
-                </div>
-                <div>
-                    <label htmlFor="password">Password </label>
-                    <input type="password" name="password" id="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
-                </div>
-                <div>
-                    <input type="submit" name="login" value="Log in" onClick={() => onSubmit()}/>
-                    <p>{connectionMessage}</p>
-                </div>
+                <form onSubmit={(e) => onSubmit(e)}>
+                    <div>
+                        <label htmlFor="email">Email Address</label>
+                        <input type="email" name="email" id="email" placeholder="Enter Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                    </div>
+                    <div>
+                        <label htmlFor="password">Password </label>
+                        <input type="password" name="password" id="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                    </div>
+                    <div>
+                        <input type="submit" name="login" value="Log in"/>
+                        <p>{connectionMessage}</p>
+                    </div>
+                </form>
             </div>
             <Link to="/signup">Sign up</Link>
         </div>  

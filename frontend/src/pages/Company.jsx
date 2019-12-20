@@ -49,7 +49,8 @@ function Company() {
         })
     }
     
-    const checkState = () => {
+    const checkState = (e) => {
+        e.preventDefault()
         if (image) {
             setFormValidationText("")
             sendValue()
@@ -103,41 +104,43 @@ function Company() {
                 </h1>
             </div>
             <div>
-                <h3>
-                    Upload cloth
-                </h3>
-                <div>
-                    <label htmlFor="uploadImage">Cloth image : </label>
-                    <input type="file" id="uploadImage" name="uploadImage" onChange={(e) => setImage(e.target.files)}/>
-                </div>
-                <div>
-                    <label htmlFor="typeCloth">Type of cloth : </label>
-                    <input type="text" id="typeCloth" value={typeCloth} onChange={(e) => setTypeCloth(e.target.value)}/>
-                </div>
-                <div>
-                    <label htmlFor="materialCloth">Cloth material : </label>
-                    <input type="text" id="materialCloth" value={materialCloth} onChange={(e) => setMaterialCloth(e.target.value)}/>
-                </div>
-                <div>
-                    <label htmlFor="productionMethod">Production method : </label>
-                    <input type="text" id="productionMethod" value={productionMethod} onChange={(e) => setProductionMethod(e.target.value)}/>
-                </div>
-                <div>
-                    <label htmlFor="price">Price : </label>
-                    <input type="text" id="price" value={price} onChange={(e) => setPrice(e.target.value)}/>
-                </div>
-                <div>
-                    <label htmlFor="sex">Sex : </label>
-                    <input type="text" id="sex" value={sex} onChange={(e) => setSex(e.target.value)}/>
-                </div>
-                <div>
-                    <label htmlFor="desciption">Description : </label>
-                    <textarea type="text" id="desciption" value={description} onChange={(e) => setDescription(e.target.value)}/>
-                </div>
-                <div>
-                    <input type="submit" name="submitCloth" value="Submit" onClick={() => checkState()}/>
-                    <p>{formValidationText}</p>
-                </div>
+                <form onSubmit={(e) => checkState(e)}>
+                    <h3>
+                        Upload cloth
+                    </h3>
+                    <div>
+                        <label htmlFor="uploadImage">Cloth image : </label>
+                        <input type="file" id="uploadImage" name="uploadImage" onChange={(e) => setImage(e.target.files)}/>
+                    </div>
+                    <div>
+                        <label htmlFor="typeCloth">Type of cloth : </label>
+                        <input type="text" id="typeCloth" value={typeCloth} onChange={(e) => setTypeCloth(e.target.value)}/>
+                    </div>
+                    <div>
+                        <label htmlFor="materialCloth">Cloth material : </label>
+                        <input type="text" id="materialCloth" value={materialCloth} onChange={(e) => setMaterialCloth(e.target.value)}/>
+                    </div>
+                    <div>
+                        <label htmlFor="productionMethod">Production method : </label>
+                        <input type="text" id="productionMethod" value={productionMethod} onChange={(e) => setProductionMethod(e.target.value)}/>
+                    </div>
+                    <div>
+                        <label htmlFor="price">Price : </label>
+                        <input type="text" id="price" value={price} onChange={(e) => setPrice(e.target.value)}/>
+                    </div>
+                    <div>
+                        <label htmlFor="sex">Sex : </label>
+                        <input type="text" id="sex" value={sex} onChange={(e) => setSex(e.target.value)}/>
+                    </div>
+                    <div>
+                        <label htmlFor="desciption">Description : </label>
+                        <textarea type="text" id="desciption" value={description} onChange={(e) => setDescription(e.target.value)}/>
+                    </div>
+                    <div>
+                        <input type="submit" name="submitCloth" value="Submit"/>
+                        <p>{formValidationText}</p>
+                    </div>
+                </form>
             </div>
         </div>
     );

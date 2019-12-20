@@ -83,7 +83,6 @@ def upload_image():
         coll = db["image_info"]
         coll.insert_one({
             "name":filename,
-            "path": destination,
             "typeCloth": typeCloth,
             "materialCloth": materialCloth,
             "productionMethod": productionMethod,
