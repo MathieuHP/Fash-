@@ -126,7 +126,7 @@ function Company() {
                     </div>
                     <div>
                         <label htmlFor="price">Price : </label>
-                        <input type="text" id="price" value={price} onChange={(e) => setPrice(e.target.value)}/>
+                        <input type="number" id="price" min="0" step="any" value={price} onChange={(e) => setPrice(e.target.value)}/>
                     </div>
                     <div>
                         <input  type="radio" name="sex" id="sexM" value="M" onChange={(e) => setSex(e.target.value)} />
