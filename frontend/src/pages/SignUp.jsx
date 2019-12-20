@@ -22,7 +22,8 @@ function SignUp() {
 
     // FUNCTIONS
 
-    const onSubmit = () => {
+    const onSubmit = (e) => {
+        e.preventDefault()
         if (password === rePassword) {
             const newUser = {
                 first_name: first_name,
@@ -61,32 +62,40 @@ function SignUp() {
             <h1>
                 Sign in
             </h1>
-                <div >
-                    <label htmlFor="first_name">First Name </label>
-                    <input type="text" name="first_name" id="first_name" placeholder="Enter First Name" value={first_name} onChange={(e) => setFirst_name(e.target.value)} />
-                </div>
-                <div >
-                    <label htmlFor="last_name">Last Name </label>
-                    <input type="text" name="last_name" id="last_name" placeholder="Enter Last Name" value={last_name} onChange={(e) => setLast_name(e.target.value)} />
-                </div>
-                <div >
-                    <label htmlFor="email">Email Address </label>
-                    <input type="email" name="email" id="email" placeholder="Enter Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div >
-                    <label htmlFor="password">Password </label>
-                    <input  type="password" name="password" id="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                <div >
-                    <label htmlFor="rePassword">Password again </label>
-                    <input  type="rePassword" name="rePassword" id="rePassword" placeholder="Enter Password again" value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
-                </div>
-                <div >
-                    <label htmlFor="sex">Sex </label>
-                    <input  type="sex" name="sex" id="sex" placeholder="Enter Sex" value={sex} onChange={(e) => setSex(e.target.value)} />
-                </div>
-                <input type="submit" name="signUp" value="Register" onClick={() => onSubmit()}/>
-                {connectionMessage}
+            <div>
+                <form onSubmit={(e) => onSubmit(e)}>
+                    <div >
+                        <label htmlFor="first_name">First Name </label>
+                        <input type="text" name="first_name" id="first_name" placeholder="Enter First Name" value={first_name} onChange={(e) => setFirst_name(e.target.value)} />
+                    </div>
+                    <div >
+                        <label htmlFor="last_name">Last Name </label>
+                        <input type="text" name="last_name" id="last_name" placeholder="Enter Last Name" value={last_name} onChange={(e) => setLast_name(e.target.value)} />
+                    </div>
+                    <div >
+                        <label htmlFor="email">Email Address </label>
+                        <input type="email" name="email" id="email" placeholder="Enter Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                    <div >
+                        <label htmlFor="password">Password </label>
+                        <input  type="password" name="password" id="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    </div>
+                    <div >
+                        <label htmlFor="rePassword">Password again </label>
+                        <input  type="Password" name="rePassword" id="rePassword" placeholder="Enter Password again" value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
+                    </div>
+                    <div >
+                        <input  type="radio" name="sex" id="sexM" value="M" onChange={(e) => setSex(e.target.value)} />
+                        <label htmlFor="sexM">M </label>
+                        <input type="radio" name="sex" id="sexF" value="F" onChange={(e) => setSex(e.target.value)}/>
+                        <label htmlFor="sexF">F </label>
+                        <input type="radio" name="sex" id="sexND" value="ND" onChange={(e) => setSex(e.target.value)}/>
+                        <label htmlFor="sexND">Not Defined </label>
+                    </div>
+                    <input type="submit" name="signUp" value="Register"/>
+                    {connectionMessage}
+                </form>
+            </div>
         </div>  
     );
 }
