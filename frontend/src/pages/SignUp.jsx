@@ -85,8 +85,12 @@ function SignUp() {
                         <input  type="Password" name="rePassword" id="rePassword" placeholder="Enter Password again" value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
                     </div>
                     <div >
-                        <label htmlFor="sex">Sex </label>
-                        <input  type="sex" name="sex" id="sex" placeholder="Enter Sex" value={sex} onChange={(e) => setSex(e.target.value)} />
+                        <input  type="radio" name="sex" id="sexM" value="M" onChange={(e) => setSex(e.target.value)} />
+                        <label htmlFor="sexM">M </label>
+                        <input type="radio" name="sex" id="sexF" value="F" onChange={(e) => setSex(e.target.value)}/>
+                        <label htmlFor="sexF">F </label>
+                        <input type="radio" name="sex" id="sexND" value="ND" onChange={(e) => setSex(e.target.value)}/>
+                        <label htmlFor="sexND">Not Defined </label>
                     </div>
                     <input type="submit" name="signUp" value="Register"/>
                     {connectionMessage}

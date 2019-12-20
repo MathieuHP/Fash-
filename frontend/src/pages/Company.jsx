@@ -129,8 +129,12 @@ function Company() {
                         <input type="text" id="price" value={price} onChange={(e) => setPrice(e.target.value)}/>
                     </div>
                     <div>
-                        <label htmlFor="sex">Sex : </label>
-                        <input type="text" id="sex" value={sex} onChange={(e) => setSex(e.target.value)}/>
+                        <input  type="radio" name="sex" id="sexM" value="M" onChange={(e) => setSex(e.target.value)} />
+                        <label htmlFor="sexM">M </label>
+                        <input type="radio" name="sex" id="sexF" value="F" onChange={(e) => setSex(e.target.value)}/>
+                        <label htmlFor="sexF">F </label>
+                        <input type="radio" name="sex" id="sexND" value="ND" onChange={(e) => setSex(e.target.value)}/>
+                        <label htmlFor="sexND">Not Defined </label>
                     </div>
                     <div>
                         <label htmlFor="desciption">Description : </label>

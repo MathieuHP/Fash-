@@ -65,7 +65,7 @@ function Cart() {
                 }
                 setCartImageSL(super_like)
             } else {
-                setCartImageSL([ <p key="cartSLEmpty">Your didn't super like any images yet</p> ])
+                setCartImageSL([ <p key="cartSLEmpty">Your didn't super like any image yet</p> ])
             }
             if(!(cart["like"].length === 0)) {
                 let like = []
@@ -74,7 +74,7 @@ function Cart() {
                 }
                 setCartImageL(like)
             } else {
-                setCartImageL([ <p key="cartLEmpty">Your didn't like any images yet</p> ])
+                setCartImageL([ <p key="cartLEmpty">Your didn't like any image yet</p> ])
             }
         } catch(err) {
             if ("msg" in cart){
