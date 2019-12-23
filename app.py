@@ -105,6 +105,13 @@ def new_user():
         password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
         created = datetime.utcnow()
 
+        try:
+            res = user.find_one({"email":email})
+            if res["email"] == email:
+                return "already exists"
+        except:
+            None
+
         x = user.insert_one({
             'first_name': first_name,
             'last_name': last_name,
