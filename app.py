@@ -225,8 +225,14 @@ def rate_image():
     rating = json_data["rating"]
     post = {"user_id":user_id, "picture":name,"rating":rating, "timestamp":time.ctime()}
     
-    coll = db["user_ratings"]    
-    x = coll.insert_one(post)
+    coll = db["user_ratings"]
+    results = list(coll.find({"user_id":user_id, "picture":name}))
+    try:
+        temp_id = results[0]["_id"]
+        cursor = coll.update_one({"_id":temp_id},{"$set":post})
+        print(" SAME IMAGE RATED TWICE !!!")
+    except:
+        x = coll.insert_one(post)
 
     coll = db["list_images"]
     results = list(coll.find({}))
