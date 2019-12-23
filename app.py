@@ -154,7 +154,23 @@ def login():
     else:
         print("No results found")
         result = ""
-    return result 
+    return result
+
+
+
+@app.route('/remove_account', methods=['POST'])
+@jwt_required
+def remove_account():
+    current_user = get_jwt_identity()
+    user_id = ObjectId(current_user["_id"])
+    
+    collection = db["user_info"]
+    cursor = collection.delete_one({"_id":user_id})
+    
+    collection = db["user_ratings"]
+    cursor = collection.delete_many({"_id":user_id})
+
+    return jsonify({"valid" : "Account has been removed"})
 
 
 
@@ -182,7 +198,6 @@ def load_image_for_rating():
             })
         i+=1
 
-    # print(list_dict)
     send_image_info = jsonify(list_dict)
     return send_image_info
 

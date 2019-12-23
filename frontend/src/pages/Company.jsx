@@ -114,7 +114,7 @@ function Company() {
                     </div>
                     <div>
                         <label htmlFor="typeCloth">Type of cloth : </label>
-                        <input type="text" id="typeCloth" value={typeCloth} onChange={(e) => setTypeCloth(e.target.value)}/>
+                        <input type="text" id="typeCloth" required value={typeCloth} onChange={(e) => setTypeCloth(e.target.value)}/>
                     </div>
                     <div>
                         <label htmlFor="materialCloth">Cloth material : </label>
@@ -126,10 +126,10 @@ function Company() {
                     </div>
                     <div>
                         <label htmlFor="price">Price : </label>
-                        <input type="number" id="price" min="0" step="any" value={price} onChange={(e) => setPrice(e.target.value)}/>
+                        <input type="number" id="price" min="0" step="any" required value={price} onChange={(e) => setPrice(e.target.value)}/>
                     </div>
                     <div>
-                        <input  type="radio" name="sex" id="sexM" value="M" onChange={(e) => setSex(e.target.value)} />
+                        <input  type="radio" name="sex" id="sexM" value="M" required onChange={(e) => setSex(e.target.value)} />
                         <label htmlFor="sexM">M </label>
                         <input type="radio" name="sex" id="sexF" value="F" onChange={(e) => setSex(e.target.value)}/>
                         <label htmlFor="sexF">F </label>

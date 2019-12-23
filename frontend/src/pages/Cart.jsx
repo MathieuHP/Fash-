@@ -99,6 +99,32 @@ function Cart() {
         return <ImgCard key={key} src={imageUrl} alt="image"/>
     }
 
+
+    const removeAccount = () => {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            }
+        };
+        fetch(`http://127.0.0.1:5000/remove_account`, options)
+        .then((response) => {
+            response.json().then(function (text) {
+                if ("msg" in text) {
+                    localStorage.removeItem('usertoken')
+                    history.push("/")
+                    return;
+                } else if ("valid" in text) {
+                    console.log(text["valid"])
+                    localStorage.removeItem('usertoken')
+                    history.push("/")
+                    return;
+                }
+            });
+        })
+    }
+
     return (
         <CartDiv>
              <div>
@@ -117,6 +143,13 @@ function Cart() {
                     <tr>
                         <td>Email : </td>
                         <td>{email}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button onClick={removeAccount}>
+                                Delete my account
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
