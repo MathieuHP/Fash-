@@ -2,11 +2,18 @@ import React  from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 
 import Home from './pages/Home'
+import Nav from './pages/Nav'
+import SignUp from './pages/SignUp'
 
-export default function App() {
+function App() {
   return (
     <View style={styles.container}>
-      <Home/>
+      {/* <Scene key="root">
+         <Scene key = "home" component = {Home} title = "Home" initial = {true}/>
+         <Scene key = "nav" component = {Nav} title = "Nav" />
+         <Scene key = "signUp" component = {SignUp} title = "Sign Up" />
+      </Scene> */}
+      <Text>App page</Text>
     </View>
   );
 }
@@ -19,3 +26,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+export default App

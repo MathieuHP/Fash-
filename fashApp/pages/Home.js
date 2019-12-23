@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, Button } from 'react-native';
+import { Text, View, TouchableOpacity, TextInput, Button } from 'react-native';
 import axios from 'axios'
 
 
@@ -39,6 +39,10 @@ function Home() {
         })
     }
 
+    const goToSignUp = () => {
+        Actions.SignUp()
+     }
+
     return (
         <View>
             <Text>Home</Text>
@@ -60,6 +64,9 @@ function Home() {
                 />
                 <Text>{connectionMessage}</Text>
             </View>
+            <TouchableOpacity onPress = {goToSignUp}>
+                <Text>This is HOME!</Text>
+            </TouchableOpacity>
         </View>
 
 //         <div>

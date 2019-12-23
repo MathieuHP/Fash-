@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import styled from 'styled-components';
 import Client from './pages/Client'
 import Company from './pages/Company'
 import Home from './pages/Home'
@@ -10,15 +9,13 @@ import Cart from './pages/Cart'
 
 function App() {
 	// STYLED
-	const AppDiv = styled.div`
-	`;
 	
 	// STATE
 
 	// FUNCTIONS
 
 	return (
-		<AppDiv>
+		<div>
 			<Router>
 				<div>
 					<Nav />
@@ -33,7 +30,7 @@ function App() {
 					</Switch>
 				</div>
 			</Router>
-		</AppDiv>
+		</div>
 	); 
 }
 
