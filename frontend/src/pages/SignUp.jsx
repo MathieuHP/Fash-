@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
-import styled from 'styled-components';
 import axios from 'axios'
 
 function SignUp() {
@@ -14,10 +13,9 @@ function SignUp() {
     const [password, setPassword] = useState('')
     const [rePassword, setRePassword] = useState('')
     const [sex, setSex] = useState('')
+    const [phone, setPhone] = useState('')
     const [connectionMessage, setConnectionMessage] = useState('')
     
-
-
     const history = useHistory();
 
     // FUNCTIONS
@@ -30,7 +28,8 @@ function SignUp() {
                 last_name: last_name,
                 email: email,
                 password: password,
-                sex: sex
+                sex: sex,
+                phone: phone,
             }
             register(newUser)
         } else {
@@ -45,7 +44,8 @@ function SignUp() {
                 last_name: newUser.last_name,
                 email: newUser.email,
                 password: newUser.password,
-                sex: newUser.sex
+                sex: newUser.sex,
+                phone: newUser.phone
             })
             .then(response => {
                 if (response.data === "ok") {
@@ -74,6 +74,10 @@ function SignUp() {
                     <div >
                         <label htmlFor="last_name">Last Name </label>
                         <input type="text" name="last_name" id="last_name" placeholder="Enter Last Name" value={last_name} onChange={(e) => setLast_name(e.target.value)} />
+                    </div>
+                    <div >
+                        <label htmlFor="phone">Phone number </label>
+                        <input type="tel" name="phone" id="phone" placeholder="Enter Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} />
                     </div>
                     <div >
                         <label htmlFor="email">Email Address </label>

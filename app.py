@@ -101,6 +101,7 @@ def new_user():
         first_name = request.get_json()['first_name']
         last_name = request.get_json()['last_name']
         email = request.get_json()['email']
+        phone = request.get_json()['phone']
         sex = request.get_json()['sex']
         password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
         created = datetime.utcnow()
@@ -118,7 +119,8 @@ def new_user():
             'email': email,
             'password': password,
             'created': created,
-            "sex" : sex
+            "sex" : sex,
+            'phone' : phone
         })
         
         result = user.find_one({"email":email})
