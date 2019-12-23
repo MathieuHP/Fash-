@@ -49,8 +49,6 @@ function SignUp() {
             })
             .then(response => {
                 if (response.data === "ok") {
-                    console.log(response.data);
-                    
                     console.log("Registered")
                     history.push("/")
                 } else if (response.data === "already exists"){
