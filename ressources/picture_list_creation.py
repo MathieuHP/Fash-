@@ -6,6 +6,7 @@ from bson import ObjectId
 
 from ressources.config import db, db_connect
 from ressources.model_collab_recommender import predict_ratings, check_minimum_data
+from ressources.enable_collab import train_collab
 from image_similarity.get_similar_images import get_similar_images
 
 def get_already_rated_pictures(user_id):
@@ -104,11 +105,12 @@ def create_recommended_pictures_list(user_id, rated_pictures, sex):
 
     if check_minimum_data():
         collab_on = True
+        predict_ratings()   #TO REMOVE
         print("-- data amount OK --")
 
     collection = db["list_images"]
     results = list(collection.find({"user_id": user_id}))[0]
-    print(results)
+    print(f"results => {results}")
 
     if len(results["super_like"]) > 0:
         sup_like = results["super_like"]
@@ -166,15 +168,15 @@ def get_recommended_picture_list(user_id):
 
         if len(list_image) < 8 and type(pictures_list)== list:
             pictures_list = list_image.extend(create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex))
-            print(pictures_list)
+            print(f"picture list => {pictures_list}")
 
         else:
             pictures_list = list_image
-            print(pictures_list)
+            print(f"picture list => {pictures_list}")
 
     except:
         pictures_list = create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex)
-        print(pictures_list)
+        print(f"picture list => {pictures_list}")
     final_list = [pic for pic in pictures_list if pic not in rated_pictures]
 
 
