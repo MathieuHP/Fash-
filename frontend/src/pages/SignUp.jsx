@@ -48,10 +48,15 @@ function SignUp() {
                 sex: newUser.sex
             })
             .then(response => {
-                if (response.data) {
+                if (response.data === "ok") {
+                    console.log(response.data);
+                    
                     console.log("Registered")
                     history.push("/")
+                } else if (response.data === "already exists"){
+                    setConnectionMessage(<p>This email address already exists</p>)
                 } else {
+                    setConnectionMessage(<p>An error occured. Try again later please.</p>)
                     history.push("/signup")
                 }
             })
