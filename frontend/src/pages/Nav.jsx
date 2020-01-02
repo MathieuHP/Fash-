@@ -4,14 +4,14 @@ import styled from 'styled-components';
 
 function Nav() {
      // STYLED
-     const NavDiv = styled.div`
-     `;
-     
-     // STATE
-     const token = localStorage.usertoken
-     const history = useHistory();
+    const NavDiv = styled.div`
+    `;
+    
+    // STATE, USEFFECT, HISTORY, TOKEN
+    const token = localStorage.usertoken
+    const history = useHistory();
 
-     useEffect(() => {
+    useEffect(() => {
         if(!token){
             history.push("/")
         } else {

@@ -15,8 +15,8 @@ function App() {
 	// FUNCTIONS
 
 	return (
-		<div>
-			<Router>
+		<Router>
+			<div>
 				<div>
 					<Nav />
 				</div>
@@ -29,8 +29,8 @@ function App() {
 						<Route exact path="/cart" component={Cart} />
 					</Switch>
 				</div>
-			</Router>
-		</div>
+			</div>
+		</Router>
 	); 
 }
 

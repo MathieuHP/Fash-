@@ -107,7 +107,6 @@ function Client() {
                     console.log(resText["valid"]);   
                 });
             })
-    
             let iL = imageList
             iL.shift()
             if (iL.length === 0) {
