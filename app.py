@@ -215,6 +215,7 @@ def remove_account():
     
     collection = db["user_ratings"]
     cursor = collection.delete_many({"user_id":user_id})
+    print(cursor.deleted_count, " documents deleted.")
 
     collection = db["pictures_list"]
     cursor = collection.delete_many({"user_id":user_id})
