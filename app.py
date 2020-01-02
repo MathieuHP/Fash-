@@ -211,7 +211,7 @@ def remove_account():
     user_id = ObjectId(current_user["_id"])
     
     collection = db["user_info"]
-    cursor = collection.delete_one({"_id":user_id})
+    cursor = collection.delete_one({"_id":ObjectId(user_id)})
     
     collection = db["user_ratings"]
     cursor = collection.delete_many({"user_id":user_id})
