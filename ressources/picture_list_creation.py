@@ -26,7 +26,13 @@ def less_rated_pictures_selection(rated_pictures, sex):
     """ return a list with the least reated pictures """
 
     coll = db["image_info"]
-    results = list(coll.find({"sex":sex}))
+
+    sex = str(sex)
+    if sex == "M" or sex == "F":
+        results = list(coll.find({"sex":sex}))
+    else:
+        results = list(coll.find({}))
+
     result = [res["name"] for res in results]
 
     collection = db["user_ratings"]
@@ -40,8 +46,6 @@ def less_rated_pictures_selection(rated_pictures, sex):
 
         rate_ind = np.array(ratings_count.index)
         rate_ind =np.flip(rate_ind)
-
-
 
     bag = []
     for pic in result:
@@ -74,16 +78,6 @@ def get_collaborative_recommended_picture(user_id, rated_pictures):
         return []
     else:
         return [estimated_ratings[i][1] for i in range(10) if i not in rated_pictures]
-
-"""    
-format surprise.predict()
-Prediction (
-uid=1, 
-iid='00b10502fb082dcc8f156562b71f6f91.jpg', 
-r_ui=0.6009273632105954,
-est=0.5726982131029839, 
-details={'was_impossible': False}
-)"""
 
 
 def create_recommended_pictures_list(user_id, rated_pictures, sex):
@@ -182,3 +176,5 @@ def get_recommended_picture_list(user_id):
 
     cursor = collection.update_one({"user_id": user_id },{"$set":{"list_image":final_list}})
     return final_list
+
+

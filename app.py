@@ -49,6 +49,8 @@ def upload_image():
     
     # TODO WILL ADD AN ID FOR EVERY COMPANY 
     
+    #company_name = "get_from_session !"
+    
     UPLOAD_FOLDER = './image_similarity/data/train/'
     ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg']
     image_file = request.files["imageFile"]
@@ -88,7 +90,7 @@ def upload_image():
             "productionMethod": productionMethod,
             "price": price,
             "sex": sex,
-            "description": description
+            "description": description  #,"company" : company_name
         })
     
     return jsonify({"valid" : "Cloth has been uploaded"})
@@ -137,6 +139,41 @@ def new_user():
         return 'ok'
     except:
         return ''
+
+# @app.route('/new_company', methods=["POST"])
+# def new_company():
+#     try:
+#         company = db.company_info
+#         company_name = request.get_json()['company_name']
+#         location = request.get_json()["location"]
+#         email = request.get_json()['email']
+#         phone = request.get_json()['phone']
+#         password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+#         created = datetime.utcnow()
+
+#         try:
+#             res = company.find_one({"email":email})
+#             if res["email"] == email:
+#                 return "already exists"
+#         except:
+#             None
+
+#         x = company.insert_one({
+#             'company_name': company_name,
+#             "location":location,
+#             'email': email,
+#             'password': password,
+#             'created': created,
+#             'phone' : phone,
+#             "images_uploaded":[]
+#         })
+                
+#         result = company.find_one({"email":email})
+#         company_id = str(result["_id"])
+
+#         return 'ok'
+#     except:
+#         return ''
 
 
 @app.route('/login', methods=['POST'])

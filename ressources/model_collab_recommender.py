@@ -7,6 +7,35 @@ from surprise.model_selection import cross_validate
 
 from ressources.config import db, db_connect
 
+def check_minimum_data():
+    # minimum data needed
+    min_user = 10
+    min_picture = 10
+
+    #threshold to filter data before using collab recommender
+    min_user_ratings = 20
+    min_picture_ratings = 10
+
+    collection = db["user_ratings"]
+    ratings = pd.DataFrame(list(collection.find({})))
+    count_rating = np.array(ratings["picture"].value_counts())
+    count_user = np.array(ratings["user_id"].value_counts())
+
+    picture_count = 0
+    for i in count_rating:
+        if i >= min_picture_ratings:
+            picture_count += 1
+
+    user_count = 0
+    for i in count_user:
+        if i >= min_user_ratings:
+            user_count += 1
+
+
+    if picture_count >= min_picture and user_count >= min_user:
+        return True
+    else:
+        return False
 
 def filtering_out_users_and_ratings(df):
 
@@ -25,7 +54,6 @@ def filtering_out_users_and_ratings(df):
     print('The original data frame shape:\t{}'.format(df.shape))
     print('The new data frame shape:\t{}'.format(df_new.shape))
     return df_new
-
 
 def predict_ratings():
 
@@ -75,32 +103,3 @@ details={'was_impossible': False}
 """
 
 
-def check_minimum_data():
-    # minimum data needed
-    min_user = 10
-    min_picture = 10
-
-    #threshold to filter data before using collab recommender
-    min_user_ratings = 20
-    min_picture_ratings = 10
-
-    collection = db["user_ratings"]
-    ratings = pd.DataFrame(list(collection.find({})))
-    count_rating = np.array(ratings["picture"].value_counts())
-    count_user = np.array(ratings["user_id"].value_counts())
-
-    picture_count = 0
-    for i in count_rating:
-        if i >= min_picture_ratings:
-            picture_count += 1
-
-    user_count = 0
-    for i in count_user:
-        if i >= min_user_ratings:
-            user_count += 1
-
-
-    if picture_count >= min_picture and user_count >= min_user:
-        return True
-    else:
-        return False
