@@ -217,6 +217,9 @@ def remove_account():
     collection = db["user_ratings"]
     cursor = collection.delete_many({"_id":user_id})
 
+    collection = db["pictures_list"]
+    cursor = collection.delete_many({"_id":user_id})
+
     return jsonify({"valid" : "Account has been removed"})
 
 
