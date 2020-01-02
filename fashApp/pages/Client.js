@@ -18,8 +18,8 @@ function Client() {
 	const [sex, setSex] = useState('')
 	const [description, setDescription] = useState('')
 
-	const [tokenState, setTokenState] = useState('')
     const history = useHistory();
+	const [tokenState, setTokenState] = useState('')
 
     useEffect(() => {
         async function asyncFuncForAsyncStorage() {

@@ -3,7 +3,7 @@ import { Link, useHistory } from "react-router-dom";
 import styled from 'styled-components';
 import axios from 'axios'
 
-function Home() {
+function Business() {
     // STYLED
     
     // STATE
@@ -31,7 +31,7 @@ function Home() {
         }).then(response => {
             if (response.data) {
                 localStorage.setItem('usertoken', response.data.token)
-                history.push("/client")
+                history.push("/business/company")
             } else {
                 console.log("Cannot connect");
                 setConnectionMessage('Wrong email or password')
@@ -45,7 +45,7 @@ function Home() {
     return (
         <div>
             <h1>
-                Home
+                Business
             </h1>
             <div>
                 <form onSubmit={(e) => onSubmit(e)}>
@@ -64,14 +64,14 @@ function Home() {
                 </form>
             </div>
             <div>
-                <Link to="/signup">Sign up</Link>
+                <Link to="/business/signupbusiness">Sign up as company</Link>
             </div>
             <div>
                 <br/>
-                <Link to="/business">Business mode</Link>
+                <Link to="/">Normal mode</Link>
             </div>
         </div>  
     );
 }
 
-export default Home;
+export default Business;

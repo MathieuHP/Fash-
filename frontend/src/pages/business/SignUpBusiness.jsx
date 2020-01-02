@@ -60,10 +60,12 @@ function SignUp() {
             })
     }
 
+    // What info do we need for company ?
+
     return (
         <div>
             <h1>
-                Sign up
+                Sign up as company
             </h1>
             <div>
                 <form onSubmit={(e) => onSubmit(e)}>

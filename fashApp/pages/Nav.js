@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Button, AsyncStorage } from 'react-native';
 import { Link, useHistory } from "react-router-native";
 
-
 function Nav() {
      // STYLED
 
@@ -11,28 +10,28 @@ function Nav() {
     const [tokenState, setTokenState] = useState('')
     
     const history = useHistory();
+    const token = async () => {
+        setTokenState(await AsyncStorage.getItem('usertoken'))
+    }
+    token()
+    
 
     useEffect( () => {
-        async function asyncFuncForAsyncStorage() {
-            const token = await AsyncStorage.getItem('usertoken')
-            setTokenState(token)
-            if(!token){
-                history.push("/")
-            } else {
-                checkToken(token)
-            }
+        if(!tokenState){
+            history.push("/")
+        } else {
+            checkToken()
         }
-        asyncFuncForAsyncStorage();
     }, []);
  
      // FUNCTIONS
 
-     const checkToken = (token) => {         
+     const checkToken = () => {
         const options = {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-                'Authorization': token
+                'Authorization': tokenState
             }
         };
         fetch(`http://127.0.0.1:5000/check_token`, options)

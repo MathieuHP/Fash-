@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useHistory } from "react-router-dom";
 import styled from 'styled-components';
 
-function Nav() {
+function NavBusiness() {
      // STYLED
     const NavDiv = styled.div`
     `;
@@ -42,7 +42,7 @@ function Nav() {
 
     const logOut = () => {
         localStorage.removeItem('usertoken')
-        history.push("/")
+        history.push("/business")
     }
 
     const testBack = () => {
@@ -59,26 +59,21 @@ function Nav() {
  
     return (
         <NavDiv>
-            <h3>Normal NAV</h3>
-           <ul>
+            <h3>Business NAV</h3>
+            <ul>
                 <li>
-                    <Link to="/">
-                        Home
+                    <Link to="/business">
+                        Business 
                     </Link>
                 </li>
                 <li>
-                    <Link to="/client">
-                        Client
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/cart">
-                        Cart
+                    <Link to="/business/company">
+                        Company
                     </Link>
                 </li>
                 <li>
                     {
-                        localStorage.usertoken ? <p><button onClick={logOut}>Click to disconnect</button></p> : <Link to="/">Click to connect</Link>
+                        localStorage.usertoken ? <p><button onClick={logOut}>Click to disconnect</button></p> : <Link to="/business">Click to connect</Link>
                     }
                 </li>
             </ul>
@@ -87,4 +82,4 @@ function Nav() {
     );
 }
 
-export default Nav;
+export default NavBusiness;
