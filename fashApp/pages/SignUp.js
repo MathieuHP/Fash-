@@ -1,113 +1,109 @@
 import React, { useState } from 'react';
 import axios from 'axios'
-import { View, Text } from 'react-native';
+import { View, Text, Button, TextInput } from 'react-native';
+import RadioForm from 'react-native-simple-radio-button';
+import { useHistory } from "react-router-native";
+
 
 function SignUp() {
-    // STYLED
+	// STYLED
 
-    
-    // STATE
-    const [first_name, setFirst_name] = useState('')
-    const [last_name, setLast_name] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [rePassword, setRePassword] = useState('')
-    const [sex, setSex] = useState('')
-    const [phone, setPhone] = useState('')
-    const [connectionMessage, setConnectionMessage] = useState('')
-    
-    // FUNCTIONS
 
-    // const onSubmit = (e) => {
-    //     e.preventDefault()
-    //     if (password === rePassword) {
-    //         const newUser = {
-    //             first_name: first_name,
-    //             last_name: last_name,
-    //             email: email,
-    //             password: password,
-    //             sex: sex,
-    //             phone: phone,
-    //         }
-    //         register(newUser)
-    //     } else {
-    //         setConnectionMessage(<p>Passwords are different</p>)
-    //     }
-    // }
+	// STATE
+	const [first_name, setFirst_name] = useState('')
+	const [last_name, setLast_name] = useState('')
+	const [email, setEmail] = useState('')
+	const [password, setPassword] = useState('')
+	const [rePassword, setRePassword] = useState('')
+	const [sex, setSex] = useState('')
+	const [phone, setPhone] = useState('')
+	const [connectionMessage, setConnectionMessage] = useState('')
 
-    // const register = newUser => {
-    //     return axios
-    //         .post("http://127.0.0.1:5000/new_user", {
-    //             first_name: newUser.first_name,
-    //             last_name: newUser.last_name,
-    //             email: newUser.email,
-    //             password: newUser.password,
-    //             sex: newUser.sex,
-    //             phone: newUser.phone
-    //         })
-    //         .then(response => {
-    //             if (response.data === "ok") {
-    //                 console.log("Registered")
-    //                 history.push("/")
-    //             } else if (response.data === "already exists"){
-    //                 setConnectionMessage(<p>This email address already exists</p>)
-    //             } else {
-    //                 setConnectionMessage(<p>An error occured. Try again later please.</p>)
-    //                 history.push("/signup")
-    //             }
-    //         })
-    // }
+	var radio_props = [
+		{label: 'M', value: "M" },
+		{label: 'F', value: "F" },
+		{label: 'ND', value: "ND" }
+	];
 
-    return (
-        <View>
-            <Text>
-                SignUp
-            </Text>
-        </View>
-        // <div>
-        //     <h1>
-        //         Sign in
-        //     </h1>
-        //     <div>
-        //         <form onSubmit={(e) => onSubmit(e)}>
-        //             <div >
-        //                 <label htmlFor="first_name">First Name </label>
-        //                 <input type="text" name="first_name" id="first_name" placeholder="Enter First Name" value={first_name} onChange={(e) => setFirst_name(e.target.value)} />
-        //             </div>
-        //             <div >
-        //                 <label htmlFor="last_name">Last Name </label>
-        //                 <input type="text" name="last_name" id="last_name" placeholder="Enter Last Name" value={last_name} onChange={(e) => setLast_name(e.target.value)} />
-        //             </div>
-        //             <div >
-        //                 <label htmlFor="phone">Phone number </label>
-        //                 <input type="tel" name="phone" id="phone" placeholder="Enter Phone number" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        //             </div>
-        //             <div >
-        //                 <label htmlFor="email">Email Address </label>
-        //                 <input type="email" name="email" id="email" placeholder="Enter Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-        //             </div>
-        //             <div >
-        //                 <label htmlFor="password">Password </label>
-        //                 <input  type="password" name="password" id="password" placeholder="Enter Password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-        //             </div>
-        //             <div >
-        //                 <label htmlFor="rePassword">Password again </label>
-        //                 <input  type="Password" name="rePassword" id="rePassword" placeholder="Enter Password again" required value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
-        //             </div>
-        //             <div >
-        //                 <input type="radio" name="sex" id="sexM" value="M" required onChange={(e) => setSex(e.target.value)} />
-        //                 <label htmlFor="sexM">M </label>
-        //                 <input type="radio" name="sex" id="sexF" value="F" onChange={(e) => setSex(e.target.value)}/>
-        //                 <label htmlFor="sexF">F </label>
-        //                 <input type="radio" name="sex" id="sexND" value="ND" onChange={(e) => setSex(e.target.value)}/>
-        //                 <label htmlFor="sexND">Not Defined </label>
-        //             </div>
-        //             <input type="submit" name="signUp" value="Register"/>
-        //             {connectionMessage}
-        //         </form>
-        //     </div>
-        // </div>  
-    );
+	const history = useHistory();
+
+	// FUNCTIONS
+
+	const onSubmit = () => {
+	    if (password === rePassword) {
+	        const newUser = {
+	            first_name: first_name,
+	            last_name: last_name,
+	            email: email,
+	            password: password,
+	            sex: sex,
+	            phone: phone,
+	        }
+	        register(newUser)
+	    } else {
+	        setConnectionMessage(<Text>Passwords are different</Text>)
+	    }
+	}
+
+	const register = newUser => {
+	    return axios
+	        .post("http://127.0.0.1:5000/new_user", {
+	            first_name: newUser.first_name,
+	            last_name: newUser.last_name,
+	            email: newUser.email,
+	            password: newUser.password,
+	            sex: newUser.sex,
+	            phone: newUser.phone
+	        })
+	        .then(response => {
+	            if (response.data === "ok") {
+	                console.log("Registered")
+	                history.push("/")
+	            } else if (response.data === "already exists"){
+	                setConnectionMessage(<Text>This email address already exists</Text>)
+	            } else {
+	                setConnectionMessage(<Text>An error occured. Try again later please.</Text>)
+	                history.push("/signup")
+	            }
+	        })
+	}
+
+	return (
+		<View>
+		    <Text>
+		        Sign in
+		    </Text>
+		    <View>
+				<View >	
+					<TextInput placeholder="First Name" autoCapitalize="none" autoCapitalize="none" value={first_name} onChangeText={text => setFirst_name(text)} />
+				</View>
+				<View >
+					<TextInput placeholder="Last Name" autoCapitalize="none" onChangeText={text => setLast_name(text)} />
+				</View>
+				<View >
+					<TextInput placeholder="Phone number" autoCapitalize="none" onChangeText={text => setPhone(text)} />
+				</View>
+				<View >
+					<TextInput placeholder="Email Address" autoCapitalize="none" onChangeText={text => setEmail(text)} />
+				</View>
+				<View >
+					<TextInput placeholder="Password" secureTextEntry={true} autoCapitalize="none" onChangeText={text => setPassword(text)} />
+				</View>
+				<View >
+					<TextInput placeholder="Password again" secureTextEntry={true} autoCapitalize="none" onChangeText={text => setRePassword(text)} />
+				</View>
+				<View>
+					<RadioForm
+						radio_props={radio_props}
+						initial={-1}
+						onPress={(value) => setSex(value)}
+					/>
+				</View>
+				<Button title="Register" onPress={() => onSubmit()} />
+				<Text>{connectionMessage}</Text>
+		    </View>
+		</View>  
+	);
 }
 
 export default SignUp;

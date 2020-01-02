@@ -3,7 +3,6 @@ import { Link, useHistory } from "react-router-dom";
 import styled from 'styled-components';
 import axios from 'axios'
 
-
 function Home() {
     // STYLED
     

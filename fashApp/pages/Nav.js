@@ -1,92 +1,90 @@
-import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Button, AsyncStorage } from 'react-native';
+import { Link, useHistory } from "react-router-native";
+
 
 function Nav() {
      // STYLED
 
      
      // STATE
+    const [tokenState, setTokenState] = useState('')
+    
+    const history = useHistory();
 
-    //  useEffect(() => {
-    //     if(!token){
-    //         history.push("/")
-    //     } else {
-    //         checkToken()
-    //     }
-    // }, []);
+    useEffect( () => {
+        async function asyncFuncForAsyncStorage() {
+            const token = await AsyncStorage.getItem('usertoken')
+            setTokenState(token)
+            if(!token){
+                history.push("/")
+            } else {
+                checkToken(token)
+            }
+        }
+        asyncFuncForAsyncStorage();
+    }, []);
  
      // FUNCTIONS
 
-    //  const checkToken = () => {
-    //     const options = {
-    //         method: 'GET',
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Authorization': token
-    //         }
-    //     };
-    //     fetch(`http://127.0.0.1:5000/check_token`, options)
-    //     .then((response) => {
-    //         response.json().then(function (text) {
-    //             if ("msg" in text) {
-    //                 logOut()
-    //                 return;
-    //             }
-    //         });
-    //     })
-    // }
+     const checkToken = (token) => {         
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            }
+        };
+        fetch(`http://127.0.0.1:5000/check_token`, options)
+        .then((response) => {
+            response.json().then(function (text) {
+                if ("msg" in text) {
+                    logOut()
+                    return;
+                }
+            });
+        })
+    }
 
-    // const logOut = () => {
-    //     localStorage.removeItem('usertoken')
-    //     history.push("/")
-    // }
+    const logOut = async () => {
+        await AsyncStorage.removeItem('usertoken');
+        setTokenState('')
+		history.push("/")
+    }
 
-    // const testBack = () => {
-    //     const options = {
-    //         method: 'GET',
-    //     };
-    //     fetch(`http://127.0.0.1:5000/`, options)
-    //     .then((response) => {
-    //         response.text().then(function (text) {
-    //             console.log(text)
-    //         });
-    //     })
-    // }
+    const testBack = () => {
+        const options = {
+            method: 'GET',
+        };
+        fetch(`http://127.0.0.1:5000/`, options)
+        .then((response) => {
+            response.text().then(async function (text) {
+                console.log(text)
+                console.log("Token State : ", await AsyncStorage.getItem('usertoken'));
+            });
+        })
+    }
  
     return (
         <View>
-            <Text>NAAAAV</Text>
+           <View>
+                <Link to="/">
+                    <Text>Home</Text>
+                </Link>
+                <Link to="/client">
+                    <Text>Client</Text>
+                </Link>
+                <Link to="/cart">
+                    <Text>Cart</Text>
+                </Link>
+                {
+                    tokenState ? 
+                    <Button title="Click to disconnect" onPress={logOut}></Button> :
+                    <Link to="/"><Text>Click to connect</Text></Link>
+                }
+            </View>
+            <Button title="Testing backend" onPress={testBack}/>
         </View>
-        // <div>
-        //    <ul>
-        //         <li>
-        //             <Link to="/">
-        //                 Home
-        //             </Link>
-        //         </li>
-        //         <li>
-        //             <Link to="/company">
-        //                 Company
-        //             </Link>
-        //         </li>
-        //         <li>
-        //             <Link to="/client">
-        //                 Client
-        //             </Link>
-        //         </li>
-        //         <li>
-        //             <Link to="/cart">
-        //                 Cart
-        //             </Link>
-        //         </li>
-        //         <li>
-        //             {
-        //                 localStorage.usertoken ? <p><button onClick={logOut}>Click to disconnect</button></p> : <Link to="/">Click to connect</Link>
-        //             }
-        //         </li>
-        //     </ul>
-        //     <button onClick={testBack}>Testing backend</button>
-        // </NavDiv>
     );
 }
 

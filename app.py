@@ -132,8 +132,7 @@ def new_user():
             "super_like":[],
             "list_image":[]
             })
-
-
+        
         return 'ok'
     except:
         return ''
