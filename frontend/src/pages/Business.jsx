@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useHistory } from "react-router-dom";
 import styled from 'styled-components';
 import axios from 'axios'
@@ -12,6 +12,13 @@ function Business() {
     const [connectionMessage, setConnectionMessage] = useState('')
 
     const history = useHistory();
+    const token = localStorage.usertoken
+
+    useEffect(() => {
+        if(token){
+            history.push("/business/company")
+        }
+    }, []);
 
     // FUNCTIONS
     

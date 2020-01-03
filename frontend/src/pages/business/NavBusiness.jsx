@@ -21,17 +21,18 @@ function NavBusiness() {
  
      // FUNCTIONS
 
-     const checkToken = () => {
+    const checkToken = () => {
         const options = {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
+                'fromUserType' : 'company',
                 'Authorization': token
             }
         };
         fetch(`http://127.0.0.1:5000/check_token`, options)
         .then((response) => {
-            response.json().then(function (text) {
+            response.json().then(function (text) {                
                 if ("msg" in text) {
                     logOut()
                     return;
@@ -57,6 +58,11 @@ function NavBusiness() {
                 <li>
                     <Link to="/business/company">
                         Company
+                    </Link>
+                </li>
+                <li>
+                    <Link to="/business/products">
+                         Products
                     </Link>
                 </li>
                 <li>

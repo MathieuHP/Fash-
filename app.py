@@ -40,7 +40,12 @@ def testingBackend():
 @app.route("/check_token", methods= ["GET"])
 @jwt_required
 def check_token():
-    return jsonify({"valid" : 'Token is valid'})
+    current_user = get_jwt_identity()
+    
+    if current_user["userType"] == request.headers.get('fromUserType') :
+        return jsonify({"valid" : 'Token is valid'})
+    else :
+        return jsonify({"msg" : "Wrong type of user"})
 
 
 @app.route("/upload_image", methods= ["POST"])
@@ -221,6 +226,10 @@ def login():
 @jwt_required
 def remove_account():
     current_user = get_jwt_identity()
+    
+    if current_user["userType"] != 'client' :
+        return jsonify({"msg" : "Wrong type of user"})
+    
     user_id = ObjectId(current_user["_id"])
     
     collection = db["user_info"]
@@ -348,6 +357,29 @@ def cart():
         return liked_picture
     except:
         return ''
+
+
+
+@app.route("/images_uploaded", methods=["POST"])
+@jwt_required
+def images_uploaded():
+    
+    current_user = get_jwt_identity()
+    if current_user["userType"] != 'company' :
+        return jsonify({"msg" : "Wrong type of user"})
+    company_id = current_user["_id"]
+
+    try:
+        collection = db["company_info"]
+        company_list_images = list(collection.find({"_id":ObjectId(company_id)}))[0]['images_uploaded']
+        
+        return {"company_list_images" : tuple(company_list_images)}
+    except:
+        return ''
+    
+@app.errorhandler(404)
+def page_not_found(e):
+    return '', 404
 
 # run server
 if __name__ == "__main__":

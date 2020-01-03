@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import axios from 'axios'
 
@@ -6,7 +6,7 @@ function SignUp() {
     // STYLED
 
     
-    // STATE
+    // STATE, USEEFFECT
     const [first_name, setFirst_name] = useState('')
     const [last_name, setLast_name] = useState('')
     const [email, setEmail] = useState('')
@@ -17,6 +17,13 @@ function SignUp() {
     const [connectionMessage, setConnectionMessage] = useState('')
     
     const history = useHistory();
+    const token = localStorage.usertoken
+
+    useEffect(() => {
+        if(token){
+            history.push("/client")
+        }
+    }, []);
 
     // FUNCTIONS
 

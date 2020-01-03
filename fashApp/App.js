@@ -7,6 +7,7 @@ import Nav from './pages/Nav'
 import SignUp from './pages/SignUp'
 import Client from './pages/Client'
 import Cart from './pages/Cart'
+import NotFound from './pages/NotFound'
 
 function App() {
 	return (
@@ -19,6 +20,7 @@ function App() {
 				<Route exact path="/client" component={Client} />
 				<Route exact path="/signup" component={SignUp} />
 				<Route exact path="/cart" component={Cart} />
+				{/* <Route component={NotFound}/> */}
 			</View>
 		</NativeRouter>
 	);

@@ -34,6 +34,7 @@ function Company() {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
+                'fromUserType' : 'company',
                 'Authorization': token
             }
         };

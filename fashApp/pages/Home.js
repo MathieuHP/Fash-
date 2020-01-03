@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity, TextInput, Button, AsyncStorage } from 'react-native';
 import axios from 'axios'
 import { Link, useHistory } from "react-router-native";
@@ -12,6 +12,16 @@ function Home() {
     const [connectionMessage, setConnectionMessage] = useState('')
 
     const history = useHistory();
+
+    useEffect(() => {
+        async function asyncFuncForAsyncStorage() {
+            const token = await AsyncStorage.getItem('usertoken')
+            if (token) {
+                history.push("/client")
+            }
+        }
+        asyncFuncForAsyncStorage();
+    }, []);
 
     // FUNCTIONS
     

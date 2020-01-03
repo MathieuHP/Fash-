@@ -9,6 +9,8 @@ import Business from './pages/Business'
 import Company from './pages/business/Company'
 import SignUpBusiness from './pages/business/SignUpBusiness'
 import NavBusiness from "./pages/business/NavBusiness"
+import ImagesUploaded from "./pages/business/ImagesUploaded"
+import NotFound from './pages/NotFound'
 
 function App() {
 	// STYLED
@@ -46,6 +48,8 @@ function App() {
 						<Route exact path="/business" component={Business} />
 						<Route exact path="/business/company" component={Company} />
 						<Route exact path="/business/signupbusiness" component={SignUpBusiness} />
+						<Route exact path="/business/products" component={ImagesUploaded} />
+						<Route path="*" component={NotFound}/>
 					</Switch>
 				</div>
 			</div>

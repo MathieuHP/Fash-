@@ -31,6 +31,7 @@ function Nav() {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
+                'fromUserType' : 'client',
                 'Authorization': tokenState
             }
         };
