@@ -45,8 +45,12 @@ def check_token():
 
 @app.route("/upload_image", methods= ["POST"])
 @jwt_required
-def upload_image():    
-    current_user = get_jwt_identity()    
+def upload_image():
+    current_user = get_jwt_identity()
+    
+    if current_user["userType"] != 'company' :
+        return jsonify({"msg" : "Wrong type of user"})
+
     company_name = current_user["company_name"]
     
     UPLOAD_FOLDER = './image_similarity/data/train/'
@@ -237,6 +241,10 @@ def remove_account():
 @jwt_required
 def load_image_for_rating():
     current_user = get_jwt_identity()
+    
+    if current_user["userType"] != 'client' :
+        return jsonify({"msg" : "Wrong type of user"})
+
     user_id = current_user["_id"]
 
     pictures_list = get_recommended_picture_list(user_id)
@@ -278,6 +286,10 @@ def rate_image():
     json_data = request.get_json(force = True)
 
     current_user = get_jwt_identity()
+    
+    if current_user["userType"] != 'client' :
+        return jsonify({"msg" : "Wrong type of user"})
+    
     user_id = current_user["_id"]
 
     name = json_data['imageName']
@@ -315,8 +327,11 @@ def rate_image():
 @app.route("/cart", methods=["POST"])
 @jwt_required
 def cart():
-
+    
     current_user = get_jwt_identity()
+    
+    if current_user["userType"] != 'client' :
+        return jsonify({"msg" : "Wrong type of user"})
     user_id = current_user["_id"]
     
     try:
