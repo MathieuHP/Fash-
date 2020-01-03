@@ -45,11 +45,9 @@ def check_token():
 
 @app.route("/upload_image", methods= ["POST"])
 @jwt_required
-def upload_image():
-    
-    # TODO WILL ADD AN ID FOR EVERY COMPANY 
-    
-    #company_name = "get_from_session !"
+def upload_image():    
+    current_user = get_jwt_identity()    
+    company_name = current_user["company_name"]
     
     UPLOAD_FOLDER = './image_similarity/data/train/'
     ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg']
@@ -90,7 +88,8 @@ def upload_image():
             "productionMethod": productionMethod,
             "price": price,
             "sex": sex,
-            "description": description  #,"company" : company_name
+            "description": description,
+            "company_name" : company_name
         })
     
     return jsonify({"valid" : "Cloth has been uploaded"})
@@ -141,44 +140,46 @@ def new_user():
 
 @app.route('/new_company', methods=["POST"])
 def new_company():
-    company = db.company_info
-    company_name = request.get_json()['company_name']
-    location = request.get_json()["location"]
-    email = request.get_json()['email']
-    phone = str(request.get_json()['phone'])
-    password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
-    created = datetime.utcnow()
-
     try:
-        res = company.find_one({"email":email})
-        if res["email"] == email:
-            return "already exists"
+        company = db.company_info
+        company_name = request.get_json()['company_name']
+        location = request.get_json()["location"]
+        email = request.get_json()['email']
+        phone = str(request.get_json()['phone'])
+        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+        created = datetime.utcnow()
+
+        try:
+            res = company.find_one({"email":email})
+            if res["email"] == email:
+                return "already exists"
+        except:
+            None
+
+        x = company.insert_one({
+            'company_name': company_name,
+            "location":location,
+            'email': email,
+            'password': password,
+            'created': created,
+            'phone' : phone,
+            "images_uploaded":[]
+        })
+                
+        result = company.find_one({"email":email})
+        company_id = str(result["_id"])
+
+        return 'ok'
     except:
-        print("new email is valid")
-        None
-
-    x = company.insert_one({
-        'company_name': company_name,
-        "location":location,
-        'email': email,
-        'password': password,
-        'created': created,
-        'phone' : phone,
-        "images_uploaded":[]
-    })
-            
-    result = company.find_one({"email":email})
-    company_id = str(result["_id"])
-
-    print("new company created")
-
-    return 'ok'
+        return ''
 
 
 
 @app.route('/login', methods=['POST'])
 def login():
-    user = db.user_info
+    userType = request.get_json(force = True)['userType']
+    user = db.user_info if userType == 'client' else db.company_info
+    print(user)
     email = request.get_json(force = True)['email']
     password = request.get_json(force = True)['password']
     result = ""
@@ -187,19 +188,27 @@ def login():
     
     if response:
         if bcrypt.check_password_hash(response['password'], password):
-            access_token = create_access_token(identity = {
-                'first_name': response['first_name'],
-                'last_name': response['last_name'],
-                'email': response['email'],
-                '_id': str(response['_id'])
-            })
+            if userType == 'client' :
+                access_token = create_access_token(identity = {
+                    'first_name': response['first_name'],
+                    'last_name': response['last_name'],
+                    'email': response['email'],
+                    'userType': userType,
+                    '_id': str(response['_id'])
+                })
+            elif userType == 'company' :
+                access_token = create_access_token(identity = {
+                    'company_name': response['company_name'],
+                    'location': response['location'],
+                    'email': response['email'],
+                    'userType': userType,
+                    '_id': str(response['_id'])
+                })
             result = jsonify({'token' : access_token})
         else:
             print("Invalid username and password")
-            result = ""
     else:
         print("No results found")
-        result = ""
     return result
 
 

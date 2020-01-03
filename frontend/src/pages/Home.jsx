@@ -27,7 +27,8 @@ function Home() {
     const login = (user) => {
         return axios.post("http://127.0.0.1:5000/login", {
             email: user.email,
-            password: user.password
+            password: user.password,
+            userType: "client"
         }).then(response => {
             if (response.data) {
                 localStorage.setItem('usertoken', response.data.token)

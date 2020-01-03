@@ -44,18 +44,6 @@ function NavBusiness() {
         localStorage.removeItem('usertoken')
         history.push("/business")
     }
-
-    const testBack = () => {
-        const options = {
-            method: 'GET',
-        };
-        fetch(`http://127.0.0.1:5000/`, options)
-        .then((response) => {
-            response.text().then(function (text) {
-                console.log(text)
-            });
-        })
-    }
  
     return (
         <NavDiv>
@@ -77,7 +65,6 @@ function NavBusiness() {
                     }
                 </li>
             </ul>
-            <button onClick={testBack}>Testing backend</button>
         </NavDiv>  
     );
 }

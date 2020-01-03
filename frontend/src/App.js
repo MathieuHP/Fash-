@@ -17,9 +17,22 @@ function App() {
 
 	// FUNCTIONS
 
+	const testBack = () => {
+        const options = {
+            method: 'GET',
+        };
+        fetch(`http://127.0.0.1:5000/`, options)
+        .then((response) => {
+            response.text().then(function (text) {
+                console.log(text)
+            });
+        })
+    }
+
 	return (
 		<Router>
 			<div>
+			<button onClick={testBack}>Testing backend</button>
 				<div>
 					<Nav />
 					<NavBusiness />
