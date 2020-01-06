@@ -97,12 +97,27 @@ function Nav(props) {
      // FUNCTIONS
 
     const logOut = (userType) => {
-        localStorage.removeItem('usertoken')
-        if (userType === "client"){
-            history.push("/")
-        } else if (userType === "company"){
-            history.push("/business")
+        let pushTo = '/'
+        if (userType === "company") {
+            pushTo = '/business'
         }
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': props.tokenState
+            }
+        };
+        fetch(`http://127.0.0.1:5000/logout`, options)
+        .then((response) => {
+            response.json().then(function(resText) {
+                if ("msg" in resText) {
+                    localStorage.removeItem('usertoken')
+                    history.push(pushTo)
+                    return;
+                }
+            });
+        })
     }
 
     return (

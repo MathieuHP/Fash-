@@ -12,7 +12,7 @@ from flask_cors import CORS, cross_origin
 from bson.objectid import ObjectId 
 from datetime import datetime 
 from flask_bcrypt import Bcrypt 
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_raw_jwt
 
 #custom modules
 from ressources.config import db, db_connect
@@ -25,12 +25,22 @@ from image_similarity.train_annoy_model import train_annoy_model
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
+# app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
 app.config['JWT_SECRET_KEY'] = 'this_secret_wont_be_enough'
 app.config['JWT_HEADER_TYPE'] = None
+app.config['JWT_BLACKLIST_ENABLED'] = True
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access']
 
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
+
+blacklist = set()
+
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    return jti in blacklist
 
 @app.route("/", methods= ["GET"])
 def testingBackend():
@@ -188,7 +198,6 @@ def new_company():
 def login():
     userType = request.get_json(force = True)['userType']
     user = db.user_info if userType == 'client' else db.company_info
-    print(user)
     email = request.get_json(force = True)['email']
     password = request.get_json(force = True)['password']
     result = ""
@@ -225,7 +234,23 @@ def login():
 @app.route('/getProfileInfo', methods=['POST'])
 @jwt_required
 def getProfileInfo():
-    return ''
+    current_user = get_jwt_identity()
+    user_id = ObjectId(current_user["_id"])
+    user = db.user_info if current_user["userType"] == 'client' else db.company_info
+    
+    allInfo = user.find_one({'_id': user_id})
+    allInfo = { k : v for k,v in allInfo.items() if k != '_id' and k != 'password' and k !='images_uploaded' and k != 'created' }
+    
+    return jsonify(allInfo)
+
+
+
+@app.route('/logout', methods=['DELETE'])
+@jwt_required
+def logout():
+    jti = get_raw_jwt()['jti']
+    blacklist.add(jti)
+    return jsonify({"msg": "Successfully logged out"})
 
 
 
@@ -248,6 +273,9 @@ def remove_account():
 
     collection = db["pictures_list"]
     cursor = collection.delete_many({"user_id":user_id})
+    
+    jti = get_raw_jwt()['jti']
+    blacklist.add(jti)
 
     return jsonify({"valid" : "Account has been removed"})
 

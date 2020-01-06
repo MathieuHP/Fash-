@@ -64,11 +64,28 @@ function Nav(props) {
  
      // FUNCTIONS
 
-     const logOut = async (userType) => {
-        await AsyncStorage.removeItem('usertoken');
-        if (userType === "client"){
-            history.push("/")
+     const logOut = (userType) => {
+        let pushTo = '/'
+        if (userType === "company") {
+            pushTo = '/business'
         }
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': props.tokenState
+            }
+        };
+        fetch(`http://127.0.0.1:5000/logout`, options)
+        .then((response) => {
+            response.json().then(async function(resText) {
+                if ("msg" in resText) {
+                    await AsyncStorage.removeItem('usertoken');
+                    history.push(pushTo)
+                    return;
+                }
+            });
+        })
     }
  
     return (

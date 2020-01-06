@@ -1,7 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import { useHistory } from "react-router-dom";
 import styled from 'styled-components';
-import jwt_decode from 'jwt-decode'
 
 function Cart(props) {
     // STYLED
@@ -16,9 +15,7 @@ function Cart(props) {
     // STATE
     const [cartImageL, setCartImageL] = useState('')
     const [cartImageSL, setCartImageSL] = useState('')
-    const [first_name, setFirst_name] = useState('')
-    const [last_name, setLast_name] = useState('')
-    const [email, setEmail] = useState('')
+    const [objInfo, setObjInfo] = useState({})
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -35,14 +32,45 @@ function Cart(props) {
     // FUNCTIONS
 
     const getProfileInfo = () => {
-        // TODO faire la route pour getProfileInfo
         try {
-            const decoded = jwt_decode(token)
-            setFirst_name(decoded.identity.first_name)
-            setLast_name(decoded.identity.last_name)
-            setEmail(decoded.identity.email)
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': token
+                }
+            };
+            fetch(`http://127.0.0.1:5000/getProfileInfo`, options)
+            .then((response) => {
+                response.json().then(function (res) {
+                    let infos = {}
+                    for (let key in res){
+                        switch (key) {
+                            case 'first_name':
+                                infos["First Name"] = res[key]
+                                break;
+                            
+                            case 'last_name':
+                                infos["Last Name"] = res[key]
+                                break;
+                            
+                            case 'email':
+                                infos["Email"] = res[key]
+                                break;
+
+                            case 'sex':
+                                infos["Sex"] = res[key]
+                                break;
+
+                            case 'phone':
+                                infos["Phone"] = res[key]
+                                break;
+                        }
+                    }
+                    setObjInfo(infos)
+                });
+            })
         } catch (error) {
-            console.log("Not connected");
             localStorage.removeItem('usertoken')
             history.push("/")
         }
@@ -128,18 +156,18 @@ function Cart(props) {
             </div>
             <table>
                 <tbody>
-                    <tr>
-                        <td>First Name :</td>
-                        <td>{first_name}</td>
-                    </tr>
-                    <tr>
-                        <td>Last Name : </td>
-                        <td>{last_name}</td>
-                    </tr>
-                    <tr>
-                        <td>Email : </td>
-                        <td>{email}</td>
-                    </tr>
+                    {
+                        Object.keys(objInfo).map((item, i) => (
+                            <tr key={'tr' + i}>
+                                <td key={'td' + item}>
+                                    {item} : 
+                                </td>
+                                <td key={'td' + objInfo[item]}>
+                                    {objInfo[item]}
+                                </td>
+                            </tr>
+                        ))
+                    }
                     <tr>
                         <td>
                             <button onClick={removeAccount}>

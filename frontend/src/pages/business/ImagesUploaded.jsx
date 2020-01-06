@@ -1,7 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import { useHistory } from "react-router-dom";
 import styled from 'styled-components';
-import jwt_decode from 'jwt-decode'
 
 function ImagesUploaded(props) {
     // STYLED
@@ -14,9 +13,7 @@ function ImagesUploaded(props) {
     // STATE
 
     const [companyImages, setCompanyImages] = useState('')
-    const [companyName, setCompanyName] = useState('')
-    const [location, setLocation] = useState('')
-    const [email, setEmail] = useState('')
+    const [objInfo, setObjInfo] = useState({})
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -34,14 +31,42 @@ function ImagesUploaded(props) {
 
     const getProfileInfo = () => {
         try {
-            const decoded = jwt_decode(token)
-            setCompanyName(decoded.identity.company_name)
-            setLocation(decoded.identity.location)
-            setEmail(decoded.identity.email)
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': token
+                }
+            };
+            fetch(`http://127.0.0.1:5000/getProfileInfo`, options)
+            .then((response) => {
+                response.json().then(function (res) {
+                    let infos = {}
+                    for (let key in res){
+                        switch (key) {
+                            case 'company_name':
+                                infos["Company Name"] = res[key]
+                                break;
+                            
+                            case 'location':
+                                infos["Location"] = res[key]
+                                break;
+                            
+                            case 'email':
+                                infos["Email"] = res[key]
+                                break;
+
+                            case 'phone':
+                                infos["Phone"] = res[key]
+                                break;
+                        }
+                    }
+                    setObjInfo(infos)
+                });
+            })
         } catch (error) {
-            console.log("Not connected");
             localStorage.removeItem('usertoken')
-            history.push("/business")
+            history.push("/")
         }
     }
 
@@ -116,18 +141,18 @@ function ImagesUploaded(props) {
             </div>
             <table>
                 <tbody>
-                    <tr>
-                        <td>Company Name :</td>
-                        <td>{companyName}</td>
-                    </tr>
-                    <tr>
-                        <td>Location : </td>
-                        <td>{location}</td>
-                    </tr>
-                    <tr>
-                        <td>Email : </td>
-                        <td>{email}</td>
-                    </tr>
+                    {
+                        Object.keys(objInfo).map((item, i) => (
+                            <tr key={'tr' + i}>
+                                <td key={'td' + item}>
+                                    {item} : 
+                                </td>
+                                <td key={'td' + objInfo[item]}>
+                                    {objInfo[item]}
+                                </td>
+                            </tr>
+                        ))
+                    }
                     {/* <tr>
                         <td>
                             <button onClick={removeAccount}>
