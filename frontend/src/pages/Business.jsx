@@ -3,7 +3,7 @@ import { Link, useHistory } from "react-router-dom";
 import styled from 'styled-components';
 import axios from 'axios'
 
-function Business() {
+function Business(props) {
     // STYLED
     
     // STATE
@@ -16,7 +16,10 @@ function Business() {
 
     useEffect(() => {
         if(token){
+            props.setTokenState(token)
             history.push("/business/company")
+        } else {
+            props.setTokenState('')
         }
     }, []);
 
@@ -39,6 +42,7 @@ function Business() {
         }).then(response => {
             if (response.data) {
                 localStorage.setItem('usertoken', response.data.token)
+                props.setTokenState(response.data.token)
                 history.push("/business/company")
             } else {
                 console.log("Cannot connect");

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Client from './pages/Client'
 import Home from './pages/Home'
@@ -8,7 +8,6 @@ import Cart from './pages/Cart'
 import Business from './pages/Business'
 import Company from './pages/business/Company'
 import SignUpBusiness from './pages/business/SignUpBusiness'
-import NavBusiness from "./pages/business/NavBusiness"
 import ImagesUploaded from "./pages/business/ImagesUploaded"
 import NotFound from './pages/NotFound'
 
@@ -16,6 +15,7 @@ function App() {
 	// STYLED
 	
 	// STATE
+	const [tokenState, setTokenState] = useState('');
 
 	// FUNCTIONS
 
@@ -29,23 +29,23 @@ function App() {
                 console.log(text)
             });
         })
-    }
+	}
+	
 
 	return (
 		<Router>
 			<div>
 			<button onClick={testBack}>Testing backend</button>
 				<div>
-					<Nav />
-					<NavBusiness />
+					<Nav tokenState={tokenState} />
 				</div>
 				<div>
 					<Switch>
-						<Route exact path="/" component={Home} />
+						<Route exact path="/" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/client" component={Client} />
 						<Route exact path="/signup" component={SignUp} />
 						<Route exact path="/cart" component={Cart} />
-						<Route exact path="/business" component={Business} />
+						<Route exact path="/business" render={(props) => <Business {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/business/company" component={Company} />
 						<Route exact path="/business/signupbusiness" component={SignUpBusiness} />
 						<Route exact path="/business/products" component={ImagesUploaded} />

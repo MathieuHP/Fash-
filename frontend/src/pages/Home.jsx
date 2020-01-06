@@ -3,7 +3,7 @@ import { Link, useHistory } from "react-router-dom";
 import styled from 'styled-components';
 import axios from 'axios'
 
-function Home() {
+function Home(props) {
     // STYLED
     
     // STATE
@@ -16,7 +16,10 @@ function Home() {
 
     useEffect(() => {
         if(token){
+            props.setTokenState(token)
             history.push("/client")
+        } else {
+            props.setTokenState('')
         }
     }, []);
 
@@ -39,6 +42,7 @@ function Home() {
         }).then(response => {
             if (response.data) {
                 localStorage.setItem('usertoken', response.data.token)
+                props.setTokenState(response.data.token)
                 history.push("/client")
             } else {
                 console.log("Cannot connect");
