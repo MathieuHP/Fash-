@@ -1,89 +1,84 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button, AsyncStorage } from 'react-native';
 import { Link, useHistory } from "react-router-native";
+import jwt_decode from 'jwt-decode'
 
+function NavClient(props) {
+    console.log("inside Nav client");
+    
+    return (
+        <View>
+            <Text>Normal NAV</Text>
+            <View>
+                <View>
+                    <Link to="/client">
+                       <Text>Client</Text>
+                    </Link>
+                </View>
+                <View>
+                    <Link to="/cart">
+                        <Text>Cart</Text>
+                    </Link>
+                </View>
+                <View>
+                    <Button onPress={() => props.logOut(props.navUserType)} title='Click to disconnect' />
+                </View>
+            </View>
+        </View>
+    );
+}
 
-function Nav() {
+function NavLog() {
+    return (
+        <View>
+            <Text>Welcome</Text>
+            <View>
+                <View>
+                    <Link to="/">
+                        <Text>Home</Text>
+                    </Link>
+                </View>
+            </View>
+        </View>
+    )
+}
+
+function Nav(props) {
      // STYLED
 
      
      // STATE
-    const [tokenState, setTokenState] = useState('')
+     const [navContent, setNavContent] = useState('');
     
     const history = useHistory();
 
-    useEffect( () => {
-        async function asyncFuncForAsyncStorage() {
-            const token = await AsyncStorage.getItem('usertoken')
-            setTokenState(token)
-            if(!token){
-                history.push("/")
+    useEffect(() => {
+        if(props.tokenState){
+            console.log("tokenState update");
+            
+            const decoded = jwt_decode(props.tokenState)
+            if (decoded.identity.userType === "client") {
+                setNavContent([<NavClient key={'navClient'} logOut={logOut} navUserType={"client"} />])
             } else {
-                checkToken(token)
+                setNavContent([<NavLog key={'navLog'} />])
             }
+        } else {
+            setNavContent([<NavLog key={'navLog'} />])
         }
-        asyncFuncForAsyncStorage();
-    }, []);
+    }, [props.tokenState]);
  
      // FUNCTIONS
 
-     const checkToken = (token) => {         
-        const options = {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': token
-            }
-        };
-        fetch(`http://127.0.0.1:5000/check_token`, options)
-        .then((response) => {
-            response.json().then(function (text) {
-                if ("msg" in text) {
-                    logOut()
-                    return;
-                }
-            });
-        })
-    }
-
-    const logOut = async () => {
+     const logOut = async (userType) => {
         await AsyncStorage.removeItem('usertoken');
-        setTokenState('')
-		history.push("/")
-    }
-
-    const testBack = () => {
-        const options = {
-            method: 'GET',
-        };
-        fetch(`http://127.0.0.1:5000/`, options)
-        .then((response) => {
-            response.text().then(async function (text) {
-                console.log(text)
-                console.log("Token State : ", await AsyncStorage.getItem('usertoken'));
-            });
-        })
+        if (userType === "client"){
+            history.push("/")
+        }
     }
  
     return (
         <View>
-           <View>
-                <Link to="/">
-                    <Text>Home</Text>
-                </Link>
-                <Link to="/client">
-                    <Text>Client</Text>
-                </Link>
-                <Link to="/cart">
-                    <Text>Cart</Text>
-                </Link>
-                {
-                    tokenState ? 
-                    <Button title="Click to disconnect" onPress={logOut}></Button> :
-                    <Link to="/"><Text>Click to connect</Text></Link>
-                }
-            </View>
-            <Button title="Testing backend" onPress={testBack}/>
+            {navContent === '' ? <Text>{navContent}</Text> : navContent}
         </View>
     );
 }

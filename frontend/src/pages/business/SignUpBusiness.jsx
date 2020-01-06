@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
 import axios from 'axios'
 
@@ -6,24 +6,16 @@ function SignUp() {
     // STYLED
 
     
-    // STATE, USEEFFECT
-    const [first_name, setFirst_name] = useState('')
-    const [last_name, setLast_name] = useState('')
+    // STATE
+    const [companyName, setCompanyName] = useState('')
+    const [location, setLocation] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [rePassword, setRePassword] = useState('')
-    const [sex, setSex] = useState('')
     const [phone, setPhone] = useState('')
     const [connectionMessage, setConnectionMessage] = useState('')
     
     const history = useHistory();
-    const token = localStorage.usertoken
-
-    useEffect(() => {
-        if(token){
-            history.push("/client")
-        }
-    }, []);
 
     // FUNCTIONS
 
@@ -31,11 +23,10 @@ function SignUp() {
         e.preventDefault()
         if (password === rePassword) {
             const newUser = {
-                first_name: first_name,
-                last_name: last_name,
+                companyName: companyName,
+                location: location,
                 email: email,
                 password: password,
-                sex: sex,
                 phone: phone,
             }
             register(newUser)
@@ -46,12 +37,11 @@ function SignUp() {
 
     const register = newUser => {
         return axios
-            .post("http://127.0.0.1:5000/new_user", {
-                first_name: newUser.first_name,
-                last_name: newUser.last_name,
+            .post("http://127.0.0.1:5000/new_company", {
+                company_name: newUser.companyName,
+                location: newUser.location,
                 email: newUser.email,
                 password: newUser.password,
-                sex: newUser.sex,
                 phone: newUser.phone
             })
             .then(response => {
@@ -67,20 +57,22 @@ function SignUp() {
             })
     }
 
+    // What info do we need for company ?
+
     return (
         <div>
             <h1>
-                Sign up
+                Sign up as company
             </h1>
             <div>
                 <form onSubmit={(e) => onSubmit(e)}>
                     <div >
-                        <label htmlFor="first_name">First Name </label>
-                        <input type="text" name="first_name" id="first_name" placeholder="Enter First Name" value={first_name} onChange={(e) => setFirst_name(e.target.value)} />
+                        <label htmlFor="companyName">Company name </label>
+                        <input type="text" name="companyName" id="companyName" placeholder="Enter Company name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
                     </div>
                     <div >
-                        <label htmlFor="last_name">Last Name </label>
-                        <input type="text" name="last_name" id="last_name" placeholder="Enter Last Name" value={last_name} onChange={(e) => setLast_name(e.target.value)} />
+                        <label htmlFor="location">Location </label>
+                        <input type="text" name="location" id="location" placeholder="Enter Location" value={location} onChange={(e) => setLocation(e.target.value)} />
                     </div>
                     <div >
                         <label htmlFor="phone">Phone number </label>
@@ -97,14 +89,6 @@ function SignUp() {
                     <div >
                         <label htmlFor="rePassword">Password again </label>
                         <input  type="Password" name="rePassword" id="rePassword" placeholder="Enter Password again" required value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
-                    </div>
-                    <div >
-                        <input type="radio" name="sex" id="sexM" value="M" required onChange={(e) => setSex(e.target.value)} />
-                        <label htmlFor="sexM">M </label>
-                        <input type="radio" name="sex" id="sexF" value="F" onChange={(e) => setSex(e.target.value)}/>
-                        <label htmlFor="sexF">F </label>
-                        <input type="radio" name="sex" id="sexND" value="ND" onChange={(e) => setSex(e.target.value)}/>
-                        <label htmlFor="sexND">Not Defined </label>
                     </div>
                     <input type="submit" name="signUp" value="Register"/>
                     {connectionMessage}

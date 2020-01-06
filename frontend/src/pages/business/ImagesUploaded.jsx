@@ -3,10 +3,8 @@ import { useHistory } from "react-router-dom";
 import styled from 'styled-components';
 import jwt_decode from 'jwt-decode'
 
-function Cart() {
+function ImagesUploaded() {
     // STYLED
-    const CartDiv = styled.div`
-    `;
 
     const ImgCard = styled.img`
         width : 100px;
@@ -14,10 +12,10 @@ function Cart() {
     `;
 
     // STATE
-    const [cartImageL, setCartImageL] = useState('')
-    const [cartImageSL, setCartImageSL] = useState('')
-    const [first_name, setFirst_name] = useState('')
-    const [last_name, setLast_name] = useState('')
+
+    const [companyImages, setCompanyImages] = useState('')
+    const [companyName, setCompanyName] = useState('')
+    const [location, setLocation] = useState('')
     const [email, setEmail] = useState('')
 
     const token = localStorage.usertoken
@@ -25,7 +23,7 @@ function Cart() {
 
     useEffect(() => {
         if(!token){
-            history.push("/")
+            history.push("/business")
         } else {
             getProfileInfo();
             getCart()
@@ -37,13 +35,13 @@ function Cart() {
     const getProfileInfo = () => {
         try {
             const decoded = jwt_decode(token)
-            setFirst_name(decoded.identity.first_name)
-            setLast_name(decoded.identity.last_name)
+            setCompanyName(decoded.identity.company_name)
+            setLocation(decoded.identity.location)
             setEmail(decoded.identity.email)
         } catch (error) {
             console.log("Not connected");
             localStorage.removeItem('usertoken')
-            history.push("/")
+            history.push("/business")
         }
     }
 
@@ -55,34 +53,25 @@ function Cart() {
                 'Authorization': token
             },
         };
-        const response = await fetch(`http://127.0.0.1:5000/cart`, options)
-        let cart = await response.json()
+        const response = await fetch(`http://127.0.0.1:5000/images_uploaded`, options)
+        let list_images = await response.json()
+
         try {
-            if(!(cart["super_like"].length === 0)) {
-                let super_like = []
-                for (let i = 0; i < cart["super_like"].length; i++) {
-                    super_like.push(await getImage(i + 'SL', cart["super_like"][i]))
+            if(!(list_images["company_list_images"].length === 0)) {
+                let company_images = []
+                for (let i = 0; i < list_images["company_list_images"].length; i++) {
+                    company_images.push(await getImage(i + 'SL', list_images["company_list_images"][i]))
                 }
-                setCartImageSL(super_like)
+                setCompanyImages(company_images)
             } else {
-                setCartImageSL([ <p key="cartSLEmpty">Your didn't super like any image yet</p> ])
+                setCompanyImages([ <p key="productsEmpty">Your didn't like any image yet</p> ])
             }
-            if(!(cart["like"].length === 0)) {
-                let like = []
-                for (let i = 0; i < cart["like"].length; i++) {
-                    like.push(await getImage(i + "L", cart["like"][i]))
-                }
-                setCartImageL(like)
-            } else {
-                setCartImageL([ <p key="cartLEmpty">Your didn't like any image yet</p> ])
-            }
-        } catch(err) {
-            if ("msg" in cart){
+        } catch (err) {
+            if ("msg" in list_images){
                 localStorage.removeItem('usertoken')
-                history.push("/")
+                history.push("/business")
             }
-            setCartImageSL([ <p key="cartSLEmpty">Sorry, an error occurred try again later</p> ])
-            setCartImageL([ <p key="cartLEmpty">Sorry, an error occurred try again later</p> ])
+            setCompanyImages([ <p key="productsEmpty">Sorry, an error occurred try again later</p> ])
         }
     }
     
@@ -112,59 +101,51 @@ function Cart() {
         .then((response) => {
             response.json().then(function () {
                 localStorage.removeItem('usertoken')
-                history.push("/")
+                history.push("/business")
                 return;
             });
         })
     }
 
     return (
-        <CartDiv>
+        <div>
              <div>
-                <h1>PROFILE</h1>
+                <h1>COMPANY PROFILE</h1>
             </div>
             <table>
                 <tbody>
                     <tr>
-                        <td>First Name :</td>
-                        <td>{first_name}</td>
+                        <td>Company Name :</td>
+                        <td>{companyName}</td>
                     </tr>
                     <tr>
-                        <td>Last Name : </td>
-                        <td>{last_name}</td>
+                        <td>Location : </td>
+                        <td>{location}</td>
                     </tr>
                     <tr>
                         <td>Email : </td>
                         <td>{email}</td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                         <td>
                             <button onClick={removeAccount}>
-                                Delete my account
+                                Delete company account
                             </button>
                         </td>
-                    </tr>
+                    </tr> */}
                 </tbody>
             </table>
             <div>
-                <h3>Super like</h3>
+                <h3>Products</h3>
                 <div>
                 {
-                    cartImageSL ? cartImageSL : <p>Loading ...</p>
+                    companyImages ? companyImages : <p>Loading ...</p>
                 }
                 </div>
             </div>
-            <div>
-                <h3>Like</h3>
-                <div>
-                {
-                    cartImageL ? cartImageL : <p>Loading ...</p>
-                }
-                </div>
-            </div>
-        </CartDiv>  
+        </div>  
     );
 }
 
-export default Cart;
+export default ImagesUploaded;
 

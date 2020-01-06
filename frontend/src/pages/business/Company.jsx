@@ -21,7 +21,7 @@ function Company() {
 
     useEffect(() => {
         if(!token){
-            history.push("/")
+            history.push("/business")
         } else {
             checkToken()
         }
@@ -34,6 +34,7 @@ function Company() {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
+                'fromUserType' : 'company',
                 'Authorization': token
             }
         };
@@ -42,7 +43,7 @@ function Company() {
             response.json().then(function (text) {
                 if ("msg" in text) {
                     localStorage.removeItem('usertoken')
-                    history.push("/")
+                    history.push("/business")
                     return;
                 }
             });
@@ -87,7 +88,7 @@ function Company() {
             response.json().then(function (text) {
                 if ("msg" in text) {
                     localStorage.removeItem('usertoken')
-                    history.push("/")
+                    history.push("/business")
                     return;
                 } else if ("valid" in text) {
                     console.log(text["valid"]);

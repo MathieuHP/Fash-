@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios'
-import { View, Text, Button, TextInput } from 'react-native';
+import { View, Text, Button, TextInput, AsyncStorage } from 'react-native';
 import RadioForm from 'react-native-simple-radio-button';
 import { useHistory } from "react-router-native";
 
@@ -26,6 +26,16 @@ function SignUp() {
 	];
 
 	const history = useHistory();
+
+	useEffect(() => {
+        async function asyncFuncForAsyncStorage() {
+            const token = await AsyncStorage.getItem('usertoken')
+            if (token) {
+                history.push("/client")
+            }
+        }
+        asyncFuncForAsyncStorage();
+    }, []);
 
 	// FUNCTIONS
 
