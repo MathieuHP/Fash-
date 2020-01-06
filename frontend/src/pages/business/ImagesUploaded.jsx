@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import styled from 'styled-components';
 import jwt_decode from 'jwt-decode'
 
-function ImagesUploaded() {
+function ImagesUploaded(props) {
     // STYLED
 
     const ImgCard = styled.img`
@@ -26,7 +26,7 @@ function ImagesUploaded() {
             history.push("/business")
         } else {
             getProfileInfo();
-            getCart()
+            getImagesUploaded()
         }
       }, []);
 
@@ -45,7 +45,7 @@ function ImagesUploaded() {
         }
     }
 
-    const getCart = async () => {
+    const getImagesUploaded = async () => {
         const options = {
             method: 'POST',
             headers: {
@@ -57,6 +57,7 @@ function ImagesUploaded() {
         let list_images = await response.json()
 
         try {
+            props.setTokenState(token)
             if(!(list_images["company_list_images"].length === 0)) {
                 let company_images = []
                 for (let i = 0; i < list_images["company_list_images"].length; i++) {
@@ -68,6 +69,7 @@ function ImagesUploaded() {
             }
         } catch (err) {
             if ("msg" in list_images){
+                props.setTokenState('')
                 localStorage.removeItem('usertoken')
                 history.push("/business")
             }

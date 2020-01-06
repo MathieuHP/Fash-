@@ -42,13 +42,13 @@ function App() {
 				<div>
 					<Switch>
 						<Route exact path="/" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
-						<Route exact path="/client" component={Client} />
+						<Route exact path="/client" render={(props) => <Client {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/signup" component={SignUp} />
-						<Route exact path="/cart" component={Cart} />
+						<Route exact path="/cart" render={(props) => <Cart {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/business" render={(props) => <Business {...props} setTokenState={setTokenState} />} />
-						<Route exact path="/business/company" component={Company} />
+						<Route exact path="/business/company" render={(props) => <Company {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/business/signupbusiness" component={SignUpBusiness} />
-						<Route exact path="/business/products" component={ImagesUploaded} />
+						<Route exact path="/business/products" render={(props) => <ImagesUploaded {...props} setTokenState={setTokenState} />} />
 						<Route path="*" component={NotFound}/>
 					</Switch>
 				</div>

@@ -4,8 +4,6 @@ import { Link, useHistory } from "react-router-native";
 import jwt_decode from 'jwt-decode'
 
 function NavClient(props) {
-    console.log("inside Nav client");
-    
     return (
         <View>
             <Text>Normal NAV</Text>
@@ -54,8 +52,6 @@ function Nav(props) {
 
     useEffect(() => {
         if(props.tokenState){
-            console.log("tokenState update");
-            
             const decoded = jwt_decode(props.tokenState)
             if (decoded.identity.userType === "client") {
                 setNavContent([<NavClient key={'navClient'} logOut={logOut} navUserType={"client"} />])

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useHistory } from "react-router-dom";
 
 
-function Company() {
+function Company(props) {
     // STYLED
     
     // STATE
@@ -42,10 +42,12 @@ function Company() {
         .then((response) => {
             response.json().then(function (text) {
                 if ("msg" in text) {
+                    props.setTokenState('')
                     localStorage.removeItem('usertoken')
                     history.push("/business")
                     return;
                 }
+                props.setTokenState(token)
             });
         })
     }

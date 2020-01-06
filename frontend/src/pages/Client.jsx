@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faStar, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { useHistory } from "react-router-dom";
 
-function Client() {
+function Client(props) {
     // STYLED
     const ClientDiv = styled.div`
     `;
@@ -50,10 +50,13 @@ function Client() {
         .then((response) => {
             response.json().then(function (listImageFromBackend) {
                 if ("msg" in listImageFromBackend) {
+                    props.setTokenState('')
                     localStorage.removeItem('usertoken')
                     history.push("/")
                     return;
                 }
+
+                props.setTokenState(token)
                 let iL = imageList.concat(listImageFromBackend)
                 setImageList(iL)
                 if (!imageSrc) {

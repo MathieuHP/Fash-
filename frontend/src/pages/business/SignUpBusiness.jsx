@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import axios from 'axios'
 
@@ -16,6 +16,13 @@ function SignUp() {
     const [connectionMessage, setConnectionMessage] = useState('')
     
     const history = useHistory();
+    const token = localStorage.usertoken
+
+    useEffect(() => {
+        if(token){
+            history.push("/business/company")
+        }
+    }, []);
 
     // FUNCTIONS
 
