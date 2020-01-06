@@ -220,6 +220,13 @@ def login():
         print("No results found")
     return result
 
+    
+    
+@app.route('/getProfileInfo', methods=['POST'])
+@jwt_required
+def getProfileInfo():
+    return ''
+
 
 
 @app.route('/remove_account', methods=['POST'])

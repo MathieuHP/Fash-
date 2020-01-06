@@ -35,6 +35,7 @@ function Cart(props) {
     // FUNCTIONS
 
     const getProfileInfo = () => {
+        // TODO faire la route pour getProfileInfo
         try {
             const decoded = jwt_decode(token)
             setFirst_name(decoded.identity.first_name)

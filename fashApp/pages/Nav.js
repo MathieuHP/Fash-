@@ -44,7 +44,6 @@ function NavLog() {
 function Nav(props) {
      // STYLED
 
-     
      // STATE
      const [navContent, setNavContent] = useState('');
     

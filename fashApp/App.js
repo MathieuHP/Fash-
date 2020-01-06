@@ -37,9 +37,9 @@ function App() {
 			</View>
 			<View style={styles.container}>
 				<Route exact path="/" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
-				<Route exact path="/client" component={Client} />
+				<Route exact path="/client" render={(props) => <Client {...props} setTokenState={setTokenState} />} />
 				<Route exact path="/signup" component={SignUp} />
-				<Route exact path="/cart" component={Cart} />
+				<Route exact path="/cart" render={(props) => <Cart {...props} setTokenState={setTokenState} />} />
 				{/* <Route component={NotFound}/> */}
 			</View>
 		</NativeRouter>

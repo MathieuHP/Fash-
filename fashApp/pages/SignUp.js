@@ -8,7 +8,6 @@ import { useHistory } from "react-router-native";
 function SignUp() {
 	// STYLED
 
-
 	// STATE
 	const [first_name, setFirst_name] = useState('')
 	const [last_name, setLast_name] = useState('')

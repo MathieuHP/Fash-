@@ -4,7 +4,7 @@ import { faTimes, faStar, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { View, Image, Text, TouchableHighlight, AsyncStorage } from 'react-native';
 import { Link, useHistory } from "react-router-native";
 
-function Client() {
+function Client(props) {
 	// STYLED
 
 	// STATE, EFFECT
@@ -49,10 +49,13 @@ function Client() {
 				response.json().then(async function (listImageFromBackend) {
 					if ("msg" in listImageFromBackend) {
 						await AsyncStorage.removeItem('usertoken');
-        				setTokenState('')
+						setTokenState('')
+						props.setTokenState('')
 						history.push("/")
 						return;
 					}
+
+					props.setTokenState(token)
 					let iL = imageList.concat(listImageFromBackend)
 					setImageList(iL)
 					if (!imageSrc) {

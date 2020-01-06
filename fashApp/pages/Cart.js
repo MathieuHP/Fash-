@@ -4,7 +4,7 @@ import jwt_decode from 'jwt-decode'
 import { useHistory } from "react-router-native";
 
 
-function Cart() {
+function Cart(props) {
     // STYLED
 
     // STATE
@@ -57,7 +57,8 @@ function Cart() {
         };
         const response = await fetch(`http://127.0.0.1:5000/cart`, options)
         let cart = await response.json()
-        try {			
+        try {
+            props.setTokenState(token)
             if (!(cart["super_like"].length === 0)) {
                 let super_like = []
                 for (let i = 0; i < cart["super_like"].length; i++) {
@@ -78,6 +79,7 @@ function Cart() {
             }
         } catch (err) {
             if ("msg" in cart) {
+                props.setTokenState('')
                 await AsyncStorage.removeItem('usertoken');
 				setTokenState('')
 				history.push("/")
