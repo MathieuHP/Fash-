@@ -212,7 +212,7 @@ def update_company():
 
             print("company found !")
             
-            x = user.update_one({"_id":company_id},{"$set":{
+            x = company.update_one({"_id":company_id},{"$set":{
                 'company_name':company_name,
                 'location':location,
                 'email': email,
