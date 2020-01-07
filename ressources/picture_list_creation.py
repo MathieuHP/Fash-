@@ -17,8 +17,6 @@ def get_already_rated_pictures(user_id):
         rated_pictures = np.array(rated_pictures[["picture"]])
     except:
         rated_pictures = []
-    print("===== RATED PICTURES =====")
-    print(len(rated_pictures))
     return rated_pictures
 
 
@@ -104,7 +102,6 @@ def create_recommended_pictures_list(user_id, rated_pictures, sex):
 
     collection = db["list_images"]
     results = list(collection.find({"user_id": user_id}))[0]
-    print(f"results => {results}")
 
     if len(results["super_like"]) > 0:
         sup_like = results["super_like"]
@@ -118,7 +115,6 @@ def create_recommended_pictures_list(user_id, rated_pictures, sex):
         list_collab = get_collaborative_recommended_picture(user_id, rated_pictures)
         if len(list_collab) < 5:
             collab_on = False
-            print("============ collaborative list too short ============")
 
     list_final = []
 
@@ -162,15 +158,12 @@ def get_recommended_picture_list(user_id):
 
         if len(list_image) < 8 and type(pictures_list)== list:
             pictures_list = list_image.extend(create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex))
-            print(f"picture list => {pictures_list}")
 
         else:
             pictures_list = list_image
-            print(f"picture list => {pictures_list}")
 
     except:
         pictures_list = create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex)
-        print(f"picture list => {pictures_list}")
     final_list = [pic for pic in pictures_list if pic not in rated_pictures]
 
 
