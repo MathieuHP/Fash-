@@ -1,6 +1,9 @@
 import React, { useState, useEffect} from 'react';
 import { useHistory } from "react-router-dom";
 import styled from 'styled-components';
+import axios from 'axios'
+
+import {tofrontendTitle} from '../../utils/convertTitles'
 
 function ImagesUploaded(props) {
     // STYLED
@@ -13,6 +16,8 @@ function ImagesUploaded(props) {
     // STATE
 
     const [companyImages, setCompanyImages] = useState('')
+    const [modifyInfos, setModifyInfos] = useState(false);
+    const [hasBeenChanged, setHasBeenChanged] = useState(false);
     const [objInfo, setObjInfo] = useState({})
 
     const token = localStorage.usertoken
@@ -41,31 +46,12 @@ function ImagesUploaded(props) {
             fetch(`http://127.0.0.1:5000/getProfileInfo`, options)
             .then((response) => {
                 response.json().then(function (res) {
-                    let infos = {}
-                    for (let key in res){
-                        switch (key) {
-                            case 'company_name':
-                                infos["Company Name"] = res[key]
-                                break;
-                            
-                            case 'location':
-                                infos["Location"] = res[key]
-                                break;
-                            
-                            case 'email':
-                                infos["Email"] = res[key]
-                                break;
-
-                            case 'phone':
-                                infos["Phone"] = res[key]
-                                break;
-                        }
-                    }
-                    setObjInfo(infos)
+                    setObjInfo(res)
                 });
             })
         } catch (error) {
             localStorage.removeItem('usertoken')
+            props.setTokenState('')
             history.push("/")
         }
     }
@@ -90,7 +76,7 @@ function ImagesUploaded(props) {
                 }
                 setCompanyImages(company_images)
             } else {
-                setCompanyImages([ <p key="productsEmpty">Your didn't like any image yet</p> ])
+                setCompanyImages([ <p key="productsEmpty">You didn't post any image yet</p> ])
             }
         } catch (err) {
             if ("msg" in list_images){
@@ -134,6 +120,36 @@ function ImagesUploaded(props) {
         })
     }
 
+    const modifyInfo = () => {
+        return axios
+            .post("http://127.0.0.1:5000/update_info", objInfo, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': token
+                }
+            })
+            .then(response => {
+                if ('valid' in response.data) {
+                    console.log("Informations has changed")
+                    setModifyInfos(false)
+                    setHasBeenChanged('Your informations has been updated')
+                } else if ('msg' in response.data) {
+                    setHasBeenChanged('An error occured. Try again later please')
+                    props.setTokenState('')
+                    localStorage.removeItem('usertoken')
+                    history.push("/")
+                }
+            })
+            .catch(error => {
+                console.log(error.response)
+            });
+    }
+    
+    const handleInputChange = (e) => {
+        const {name, value} = e.target
+        setObjInfo({...objInfo, [name]: value})
+    }
+
     return (
         <div>
              <div>
@@ -142,17 +158,45 @@ function ImagesUploaded(props) {
             <table>
                 <tbody>
                     {
-                        Object.keys(objInfo).map((item, i) => (
-                            <tr key={'tr' + i}>
-                                <td key={'td' + item}>
-                                    {item} : 
-                                </td>
-                                <td key={'td' + objInfo[item]}>
-                                    {objInfo[item]}
-                                </td>
-                            </tr>
-                        ))
+                        modifyInfos ?
+                            Object.keys(objInfo).map((item, i) => {
+                                let itemFront = tofrontendTitle(item)
+                                return (
+                                    <tr key={'tr' + i}>
+                                        <td key={'tdTitle' + item}>
+                                            {itemFront} : 
+                                        </td>
+                                        <td key={'tdInput' + item}>
+                                            <input key={'input' + item} type="text" name={item} id={item} placeholder="testing" value={objInfo[item]} onFocus={(e) => e.target.select()} onChange={(e) => handleInputChange(e)} />
+                                        </td>
+                                    </tr>
+                                )
+                            })
+                        :
+                            Object.keys(objInfo).map((item, i) => {
+                                let itemFront = tofrontendTitle(item)
+                                return (    
+                                    <tr key={'tr' + i}>
+                                        <td key={'td' + itemFront}>
+                                            {itemFront} : 
+                                        </td>
+                                        <td key={'td' + objInfo[item]}>
+                                            {objInfo[item]}
+                                        </td>
+                                    </tr>
+                                )
+                            })
                     }
+                    <tr>
+                        <td>
+                            {
+                                modifyInfos ?
+                                    <button onClick={() => modifyInfo()}>Submit changes</button>
+                                :
+                                    <button onClick={() => setModifyInfos(true)}>Change informations</button>
+                            }
+                        </td>
+                    </tr>
                     {/* <tr>
                         <td>
                             <button onClick={removeAccount}>
@@ -162,6 +206,11 @@ function ImagesUploaded(props) {
                     </tr> */}
                 </tbody>
             </table>
+            <div>
+                <p>
+                    {hasBeenChanged}
+                </p>
+            </div>
             <div>
                 <h3>Products</h3>
                 <div>

@@ -8,6 +8,7 @@ import SignUp from './pages/SignUp'
 import Client from './pages/Client'
 import Cart from './pages/Cart'
 import NotFound from './pages/NotFound'
+import { ScrollView } from 'react-native-gesture-handler';
 
 function App() {
 	// STYLED
@@ -31,16 +32,18 @@ function App() {
 
 	return (
 		<NativeRouter>
-			<Button onPress={testBack} title="Testing backend" />
-			<View style={styles.navbar}>
-				<Nav tokenState={tokenState}/>
-			</View>
-			<View style={styles.container}>
-				<Route exact path="/" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
-				<Route exact path="/client" render={(props) => <Client {...props} setTokenState={setTokenState} />} />
-				<Route exact path="/signup" component={SignUp} />
-				<Route exact path="/cart" render={(props) => <Cart {...props} setTokenState={setTokenState} />} />
-				{/* <Route component={NotFound}/> */}
+			<View style={{flex: 1}}>
+				<View style={styles.navbar}>
+					<Button onPress={testBack} title="Testing backend" />
+					<Nav tokenState={tokenState}/>
+				</View>
+				<ScrollView style={styles.container}>
+					<Route exact path="/" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
+					<Route exact path="/client" render={(props) => <Client {...props} setTokenState={setTokenState} />} />
+					<Route exact path="/signup" component={SignUp} />
+					<Route exact path="/cart" render={(props) => <Cart {...props} setTokenState={setTokenState} />} />
+					{/* <Route component={NotFound}/> */}
+				</ScrollView>
 			</View>
 		</NativeRouter>
 	);
@@ -54,7 +57,7 @@ const styles = StyleSheet.create({
 		// justifyContent: 'center',
 	},
 	navbar: {
-		marginTop: 100
+		marginTop: 20
 	},
 });
 

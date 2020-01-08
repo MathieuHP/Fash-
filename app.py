@@ -157,84 +157,23 @@ def new_user():
     except:
         return ''
 
-@app.route('/update_user', methods=["POST"])
+@app.route('/update_info', methods=["POST"])
 @jwt_required
-def update_user():
-
+def update_info():
     try:
-        user = db.user_info
-        first_name = request.get_json()['first_name']
-        last_name = request.get_json()['last_name']
-        email = request.get_json()['email']
-        phone = request.get_json()['phone']
-        sex = request.get_json()['sex']
-        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
-
-        print(user_id)
-
+        current_user = get_jwt_identity()
+        user_id = ObjectId(current_user["_id"])
+        user = db.user_info if current_user["userType"] == 'client' else db.company_info
         res = user.find_one({"_id":user_id})
-
-        print("user check")
-        print(res)
-
+        
         if res:
-
-            print("user found !")
-
-            x = user.update_one({"_id":temp_id},{"$set":{
-                'first_name': first_name,
-                'last_name': last_name,
-                'email': email,
-                'password': password,
-                "sex" : sex,
-                'phone' : phone
-            }})
-
-            return 'user informations updated !'
+            x = user.update_one({"_id":user_id},{"$set":request.get_json()})
+            return jsonify({'valid' : 'User informations updated !'})
         else:
-            print("user not found")
+            return jsonify({'msg' : 'User not found'})
     except:  
-        return 'something went wrong'
-
-
-@app.route('/update_company', methods=["POST"])
-@jwt_required
-def update_company():
-
-    try:
-
-        company = db.company_info
-        company_name = request.get_json()['company_name']
-        location = request.get_json()["location"]
-        email = request.get_json()['email']
-        phone = str(request.get_json()['phone'])
-        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
-
-
-        print(user_id)
-
-        res = company.find_one({"_id":company_id})
-
-        print("company check")
-        print(res)
-
-        if res:
-
-            print("company found !")
-            
-            x = company.update_one({"_id":company_id},{"$set":{
-                'company_name':company_name,
-                'location':location,
-                'email': email,
-                'password': password,
-                'phone' : phone
-            }})
-
-            return 'company informations updated !'
-        else:
-            print("company not found")
-    except:  
-        return 'something went wrong'
+        print('error')
+        return jsonify({'msg' : 'Something went wrong'})
 
 
 @app.route('/new_company', methods=["POST"])
@@ -365,8 +304,6 @@ def remove_account():
 @jwt_required
 def load_image_for_rating():
     current_user = get_jwt_identity()
-    
-    print(current_user["userType"])
     
     if current_user["userType"] != 'client' :
         return jsonify({"msg" : "Wrong type of user"})

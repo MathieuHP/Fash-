@@ -7,8 +7,6 @@ import {tofrontendTitle} from '../utils/convertTitles'
 
 function Cart(props) {
     // STYLED
-    const CartDiv = styled.div`
-    `;
 
     const ImgCard = styled.img`
         width : 100px;
@@ -77,7 +75,7 @@ function Cart(props) {
                 }
                 setCartImageSL(super_like)
             } else {
-                setCartImageSL([ <p key="cartSLEmpty">Your didn't super like any image yet</p> ])
+                setCartImageSL([ <p key="cartSLEmpty">You didn't super like any image yet</p> ])
             }
             if(!(cart["like"].length === 0)) {
                 let like = []
@@ -86,7 +84,7 @@ function Cart(props) {
                 }
                 setCartImageL(like)
             } else {
-                setCartImageL([ <p key="cartLEmpty">Your didn't like any image yet</p> ])
+                setCartImageL([ <p key="cartLEmpty">You didn't like any image yet</p> ])
             }
         } catch(err) {
             if ("msg" in cart){
@@ -134,19 +132,27 @@ function Cart(props) {
 
     const modifyInfo = () => {
         return axios
-            .post("http://127.0.0.1:5000/update_user", objInfo)
+            .post("http://127.0.0.1:5000/update_info", objInfo, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': token
+                }
+            })
             .then(response => {
-                if (response.data === "ok") {
+                if ('valid' in response.data) {
                     console.log("Informations has changed")
                     setModifyInfos(false)
-                    setHasBeenChanged('Your informations have been updated')
-                } else {
+                    setHasBeenChanged('Your informations has been updated')
+                } else if ('msg' in response.data) {
                     setHasBeenChanged('An error occured. Try again later please')
                     props.setTokenState('')
                     localStorage.removeItem('usertoken')
                     history.push("/")
                 }
             })
+            .catch(error => {
+                console.log(error.response)
+            });
     }
     
     const handleInputChange = (e) => {
@@ -211,13 +217,6 @@ function Cart(props) {
                     }
                     <tr>
                         <td>
-                            <p>
-                                {hasBeenChanged}
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
                             {
                                 modifyInfos ?
                                     <button onClick={() => modifyInfo()}>Submit changes</button>
@@ -235,6 +234,11 @@ function Cart(props) {
                     </tr>
                 </tbody>
             </table>
+            <div>
+                <p>
+                    {hasBeenChanged}
+                </p>
+            </div>
             <div>
                 <h3>Super like</h3>
                 <div>

@@ -18,7 +18,7 @@ function SignUp() {
 	const [phone, setPhone] = useState('')
 	const [connectionMessage, setConnectionMessage] = useState('')
 
-	var radio_props = [
+	const radio_props = [
 		{label: 'M', value: "M" },
 		{label: 'F', value: "F" },
 		{label: 'ND', value: "ND" }
@@ -84,7 +84,7 @@ function SignUp() {
 		    </Text>
 		    <View>
 				<View >	
-					<TextInput placeholder="First Name" autoCapitalize="none" autoCapitalize="none" value={first_name} onChangeText={text => setFirst_name(text)} />
+					<TextInput placeholder="First Name" autoCapitalize="none" value={first_name} onChangeText={text => setFirst_name(text)} />
 				</View>
 				<View >
 					<TextInput placeholder="Last Name" autoCapitalize="none" onChangeText={text => setLast_name(text)} />
