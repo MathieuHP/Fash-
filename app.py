@@ -157,6 +157,86 @@ def new_user():
     except:
         return ''
 
+@app.route('/update_user', methods=["POST"])
+@jwt_required
+def update_user():
+
+    try:
+        user = db.user_info
+        first_name = request.get_json()['first_name']
+        last_name = request.get_json()['last_name']
+        email = request.get_json()['email']
+        phone = request.get_json()['phone']
+        sex = request.get_json()['sex']
+        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+
+        print(user_id)
+
+        res = user.find_one({"_id":user_id})
+
+        print("user check")
+        print(res)
+
+        if res:
+
+            print("user found !")
+
+            x = user.update_one({"_id":temp_id},{"$set":{
+                'first_name': first_name,
+                'last_name': last_name,
+                'email': email,
+                'password': password,
+                "sex" : sex,
+                'phone' : phone
+            }})
+
+            return 'user informations updated !'
+        else:
+            print("user not found")
+    except:  
+        return 'something went wrong'
+
+
+@app.route('/update_company', methods=["POST"])
+@jwt_required
+def update_company():
+
+    try:
+
+        company = db.company_info
+        company_name = request.get_json()['company_name']
+        location = request.get_json()["location"]
+        email = request.get_json()['email']
+        phone = str(request.get_json()['phone'])
+        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+
+
+        print(user_id)
+
+        res = company.find_one({"_id":company_id})
+
+        print("company check")
+        print(res)
+
+        if res:
+
+            print("company found !")
+            
+            x = company.update_one({"_id":company_id},{"$set":{
+                'company_name':company_name,
+                'location':location,
+                'email': email,
+                'password': password,
+                'phone' : phone
+            }})
+
+            return 'company informations updated !'
+        else:
+            print("company not found")
+    except:  
+        return 'something went wrong'
+
+
 @app.route('/new_company', methods=["POST"])
 def new_company():
     try:
