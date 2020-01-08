@@ -151,6 +151,7 @@ function Cart(props) {
                 response.json().then(async function (text) {
                     if ("msg" in text) {
                         await AsyncStorage.removeItem('usertoken');
+                        props.setTokenState('')
 						setTokenState('')
                         history.push("/")
                         return;

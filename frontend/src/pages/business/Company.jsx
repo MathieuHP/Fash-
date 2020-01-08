@@ -89,6 +89,7 @@ function Company(props) {
         .then((response) => {
             response.json().then(function (text) {
                 if ("msg" in text) {
+                    props.setTokenState('')
                     localStorage.removeItem('usertoken')
                     history.push("/business")
                     return;

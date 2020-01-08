@@ -22,16 +22,20 @@ function Client(props) {
 	const [tokenState, setTokenState] = useState('')
 
     useEffect(() => {
-        async function asyncFuncForAsyncStorage() {
-            const token = await AsyncStorage.getItem('usertoken')
-            setTokenState(token)
-            if(!token){
-                history.push("/")
-            } else {
-                getListImages(token);
-            }
+		let mounted = true;
+        async function asyncFuncForAsyncStorage(mounted) {
+			const token = await AsyncStorage.getItem('usertoken')
+			if (mounted) {
+				setTokenState(token)
+				if(!token){
+					history.push("/")
+				} else {
+					getListImages(token);
+				}
+			}
         }
-        asyncFuncForAsyncStorage();
+		asyncFuncForAsyncStorage(mounted);
+		return () => mounted = false;
     }, []);
 
 	// FUNCTIONS
@@ -103,6 +107,7 @@ function Client(props) {
 					response.json().then(async function (resText) {
 						if ("msg" in resText) {
 							await AsyncStorage.removeItem('usertoken');
+							props.setTokenState('')
 							setTokenState('')
 							history.push("/")
 							return;
@@ -115,7 +120,7 @@ function Client(props) {
 			if (iL.length === 0) {
 				console.log("Loading new images...")
 			} else if (iL.length < 7) {
-				getListImages()
+				getListImages(tokenState)
 				showImage(iL[0])
 				setImageList(iL)
 			} else {

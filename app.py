@@ -286,6 +286,8 @@ def remove_account():
 def load_image_for_rating():
     current_user = get_jwt_identity()
     
+    print(current_user["userType"])
+    
     if current_user["userType"] != 'client' :
         return jsonify({"msg" : "Wrong type of user"})
 
@@ -366,6 +368,7 @@ def rate_image():
             push_db = coll.update_one({"_id":res["_id"]},{"$set":{"list_image":list_pic[1:]}})
     
     return jsonify({"valid" : "Cloth has been rated"})
+
 
 
 @app.route("/cart", methods=["POST"])

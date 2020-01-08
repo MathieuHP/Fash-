@@ -1,6 +1,9 @@
 import React, { useState, useEffect} from 'react';
 import { useHistory } from "react-router-dom";
 import styled from 'styled-components';
+import axios from 'axios'
+
+import {tofrontendTitle} from '../utils/convertTitles'
 
 function Cart(props) {
     // STYLED
@@ -15,6 +18,8 @@ function Cart(props) {
     // STATE
     const [cartImageL, setCartImageL] = useState('')
     const [cartImageSL, setCartImageSL] = useState('')
+    const [modifyInfos, setModifyInfos] = useState(false);
+    const [hasBeenChanged, setHasBeenChanged] = useState(false);
     const [objInfo, setObjInfo] = useState({})
 
     const token = localStorage.usertoken
@@ -43,34 +48,11 @@ function Cart(props) {
             fetch(`http://127.0.0.1:5000/getProfileInfo`, options)
             .then((response) => {
                 response.json().then(function (res) {
-                    let infos = {}
-                    for (let key in res){
-                        switch (key) {
-                            case 'first_name':
-                                infos["First Name"] = res[key]
-                                break;
-                            
-                            case 'last_name':
-                                infos["Last Name"] = res[key]
-                                break;
-                            
-                            case 'email':
-                                infos["Email"] = res[key]
-                                break;
-
-                            case 'sex':
-                                infos["Sex"] = res[key]
-                                break;
-
-                            case 'phone':
-                                infos["Phone"] = res[key]
-                                break;
-                        }
-                    }
-                    setObjInfo(infos)
+                    setObjInfo(res)
                 });
             })
         } catch (error) {
+            props.setTokenState('')
             localStorage.removeItem('usertoken')
             history.push("/")
         }
@@ -142,6 +124,7 @@ function Cart(props) {
         fetch(`http://127.0.0.1:5000/remove_account`, options)
         .then((response) => {
             response.json().then(function () {
+                props.setTokenState('')
                 localStorage.removeItem('usertoken')
                 history.push("/")
                 return;
@@ -149,25 +132,100 @@ function Cart(props) {
         })
     }
 
+    const modifyInfo = () => {
+        return axios
+            .post("http://127.0.0.1:5000/update_user", objInfo)
+            .then(response => {
+                if (response.data === "ok") {
+                    console.log("Informations has changed")
+                    setModifyInfos(false)
+                    setHasBeenChanged('Your informations have been updated')
+                } else {
+                    setHasBeenChanged('An error occured. Try again later please')
+                    props.setTokenState('')
+                    localStorage.removeItem('usertoken')
+                    history.push("/")
+                }
+            })
+    }
+    
+    const handleInputChange = (e) => {
+        const {name, value} = e.target
+        setObjInfo({...objInfo, [name]: value})
+    }
+
     return (
-        <CartDiv>
+        <div>
              <div>
                 <h1>PROFILE</h1>
             </div>
             <table>
                 <tbody>
                     {
-                        Object.keys(objInfo).map((item, i) => (
-                            <tr key={'tr' + i}>
-                                <td key={'td' + item}>
-                                    {item} : 
-                                </td>
-                                <td key={'td' + objInfo[item]}>
-                                    {objInfo[item]}
-                                </td>
-                            </tr>
-                        ))
+                        modifyInfos ?
+                            Object.keys(objInfo).map((item, i) => {
+                                let itemFront = tofrontendTitle(item)
+                                if (item === 'sex') {
+                                    return (
+                                        <tr key={'tr' + i}>
+                                            <td key={'td' + itemFront}>
+                                                {itemFront} : 
+                                            </td>
+                                            <td key={'td' + objInfo[item]}>
+                                                <input type="radio" name="sex" id="sexM" value="M" checked={objInfo['sex'] === 'M' ? true : false}  onChange={(e) => handleInputChange(e)} />
+                                                <label htmlFor="sexM">M </label>
+                                                <input type="radio" name="sex" id="sexF" value="F" checked={objInfo['sex'] === 'F' ? true : false} onChange={(e) => handleInputChange(e)}/>
+                                                <label htmlFor="sexF">F </label>
+                                                <input type="radio" name="sex" id="sexND" value="ND" checked={objInfo['sex'] === 'ND' ? true : false} onChange={(e) => handleInputChange(e)}/>
+                                                <label htmlFor="sexND">Not Defined </label>
+                                            </td>
+                                        </tr>
+                                    )
+                                } else {
+                                    return (
+                                        <tr key={'tr' + i}>
+                                            <td key={'tdTitle' + item}>
+                                                {itemFront} : 
+                                            </td>
+                                            <td key={'tdInput' + item}>
+                                                <input key={'input' + item} type="text" name={item} id={item} placeholder="testing" value={objInfo[item]} onFocus={(e) => e.target.select()} onChange={(e) => handleInputChange(e)} />
+                                            </td>
+                                        </tr>
+                                    )
+                                }
+                            })
+                        :
+                            Object.keys(objInfo).map((item, i) => {
+                                let itemFront = tofrontendTitle(item)
+                                return (    
+                                    <tr key={'tr' + i}>
+                                        <td key={'td' + itemFront}>
+                                            {itemFront} : 
+                                        </td>
+                                        <td key={'td' + objInfo[item]}>
+                                            {objInfo[item]}
+                                        </td>
+                                    </tr>
+                                )
+                            })
                     }
+                    <tr>
+                        <td>
+                            <p>
+                                {hasBeenChanged}
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {
+                                modifyInfos ?
+                                    <button onClick={() => modifyInfo()}>Submit changes</button>
+                                :
+                                    <button onClick={() => setModifyInfos(true)}>Change informations</button>
+                            }
+                        </td>
+                    </tr>
                     <tr>
                         <td>
                             <button onClick={removeAccount}>
@@ -193,7 +251,7 @@ function Cart(props) {
                 }
                 </div>
             </div>
-        </CartDiv>  
+        </div>  
     );
 }
 

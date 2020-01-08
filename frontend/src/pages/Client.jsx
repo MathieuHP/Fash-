@@ -103,6 +103,7 @@ function Client(props) {
             .then((response) => {
                 response.json().then(function(resText) {
                     if ("msg" in resText) {
+                    props.setTokenState('')
                     localStorage.removeItem('usertoken')
                     history.push("/")
                     return;

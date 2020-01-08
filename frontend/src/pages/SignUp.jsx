@@ -92,11 +92,11 @@ function SignUp() {
                     </div>
                     <div >
                         <label htmlFor="password">Password </label>
-                        <input  type="password" name="password" id="password" placeholder="Enter Password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                        <input type="password" name="password" id="password" placeholder="Enter Password" required value={password} onChange={(e) => setPassword(e.target.value)} />
                     </div>
                     <div >
                         <label htmlFor="rePassword">Password again </label>
-                        <input  type="Password" name="rePassword" id="rePassword" placeholder="Enter Password again" required value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
+                        <input type="Password" name="rePassword" id="rePassword" placeholder="Enter Password again" required value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
                     </div>
                     <div >
                         <input type="radio" name="sex" id="sexM" value="M" required onChange={(e) => setSex(e.target.value)} />
