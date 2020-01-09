@@ -9,6 +9,7 @@ import Client from './pages/Client'
 import Cart from './pages/Cart'
 import NotFound from './pages/NotFound'
 import { ScrollView } from 'react-native-gesture-handler';
+import ChangePwd from './pages/ChangePwd';
 
 function App() {
 	// STYLED
@@ -40,6 +41,7 @@ function App() {
 				<ScrollView style={styles.container}>
 					<Route exact path="/" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
 					<Route exact path="/client" render={(props) => <Client {...props} setTokenState={setTokenState} />} />
+					<Route exact path="/changepwd" render={(props) => <ChangePwd {...props} tokenState={tokenState} setTokenState={setTokenState} />} />
 					<Route exact path="/signup" component={SignUp} />
 					<Route exact path="/cart" render={(props) => <Cart {...props} setTokenState={setTokenState} />} />
 					{/* <Route component={NotFound}/> */}

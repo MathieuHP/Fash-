@@ -9,6 +9,7 @@ import Business from './pages/Business'
 import Company from './pages/business/Company'
 import SignUpBusiness from './pages/business/SignUpBusiness'
 import ImagesUploaded from "./pages/business/ImagesUploaded"
+import ChangePwd from './pages/ChangePwd'
 import NotFound from './pages/NotFound'
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
 					<Switch>
 						<Route exact path="/" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/client" render={(props) => <Client {...props} setTokenState={setTokenState} />} />
+						<Route exact path="/changepwd" render={(props) => <ChangePwd tokenState={tokenState} {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/signup" component={SignUp} />
 						<Route exact path="/cart" render={(props) => <Cart {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/business" render={(props) => <Business {...props} setTokenState={setTokenState} />} />

@@ -71,8 +71,6 @@ function NavLog() {
 
 function Nav(props) {
      // STYLED
-    const NavDiv = styled.div`
-    `;
     
     // STATE, USEFFECT, HISTORY, TOKEN
     const [navContent, setNavContent] = useState('');
@@ -121,9 +119,9 @@ function Nav(props) {
     }
 
     return (
-        <NavDiv>
+        <div>
             {navContent}
-        </NavDiv>  
+        </div>  
     );
 }
 

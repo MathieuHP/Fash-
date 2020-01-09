@@ -157,6 +157,7 @@ def new_user():
     except:
         return ''
 
+
 @app.route('/update_info', methods=["POST"])
 @jwt_required
 def update_info():
@@ -173,6 +174,29 @@ def update_info():
             return jsonify({'msg' : 'User not found'})
     except:  
         print('error')
+        return jsonify({'msg' : 'Something went wrong'})
+    
+    
+@app.route('/change_pwd', methods=["POST"])
+@jwt_required
+def change_pwd():
+    try:
+        current_user = get_jwt_identity()
+        user_id = ObjectId(current_user["_id"])
+        user = db.user_info if current_user["userType"] == 'client' else db.company_info
+        res = user.find_one({"_id":user_id})
+        
+        if res:
+            old_password = request.get_json()['old_password']
+            if bcrypt.check_password_hash(res['password'], old_password):
+                new_password = bcrypt.generate_password_hash(request.get_json()['new_password']).decode('utf-8')
+                x = user.update_one({"_id":user_id},{"$set":{'password': new_password}})
+                return jsonify({'valid' : 'User pwd updated !'})
+            else:
+                return jsonify({'info' : 'Invalid old password'})                
+        else:
+            return jsonify({'msg' : 'User not found'})
+    except:
         return jsonify({'msg' : 'Something went wrong'})
 
 
@@ -210,7 +234,6 @@ def new_company():
         return 'ok'
     except:
         return ''
-
 
 
 @app.route('/login', methods=['POST'])

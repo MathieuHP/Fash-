@@ -11,7 +11,8 @@ function SignUp() {
 	// STATE
 	const [first_name, setFirst_name] = useState('')
 	const [last_name, setLast_name] = useState('')
-	const [email, setEmail] = useState('')
+	const [email, setEmail] = useState('')	
+	const [reEmail, setReEmail] = useState('')	
 	const [password, setPassword] = useState('')
 	const [rePassword, setRePassword] = useState('')
 	const [sex, setSex] = useState('')
@@ -39,7 +40,7 @@ function SignUp() {
 	// FUNCTIONS
 
 	const onSubmit = () => {
-	    if (password === rePassword) {
+	    if (password === rePassword && reEmail === email) {
 	        const newUser = {
 	            first_name: first_name,
 	            last_name: last_name,
@@ -50,7 +51,7 @@ function SignUp() {
 	        }
 	        register(newUser)
 	    } else {
-	        setConnectionMessage(<Text>Passwords are different</Text>)
+	        setConnectionMessage(<Text>Passwords or emails are differents</Text>)
 	    }
 	}
 
@@ -94,6 +95,9 @@ function SignUp() {
 				</View>
 				<View >
 					<TextInput placeholder="Email Address" autoCapitalize="none" onChangeText={text => setEmail(text)} />
+				</View>
+				<View >
+					<TextInput placeholder="Email Address again" autoCapitalize="none" onChangeText={text => setReEmail(text)} />
 				</View>
 				<View >
 					<TextInput placeholder="Password" secureTextEntry={true} autoCapitalize="none" onChangeText={text => setPassword(text)} />

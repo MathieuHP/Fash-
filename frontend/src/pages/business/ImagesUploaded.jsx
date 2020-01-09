@@ -19,6 +19,7 @@ function ImagesUploaded(props) {
     const [modifyInfos, setModifyInfos] = useState(false);
     const [hasBeenChanged, setHasBeenChanged] = useState(false);
     const [objInfo, setObjInfo] = useState({})
+    const [reEmail, setReEmail] = useState('');
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -47,6 +48,7 @@ function ImagesUploaded(props) {
             .then((response) => {
                 response.json().then(function (res) {
                     setObjInfo(res)
+                    setReEmail(res['email'])
                 });
             })
         } catch (error) {
@@ -121,28 +123,32 @@ function ImagesUploaded(props) {
     }
 
     const modifyInfo = () => {
-        return axios
-            .post("http://127.0.0.1:5000/update_info", objInfo, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': token
-                }
-            })
-            .then(response => {
-                if ('valid' in response.data) {
-                    console.log("Informations has changed")
-                    setModifyInfos(false)
-                    setHasBeenChanged('Your informations has been updated')
-                } else if ('msg' in response.data) {
-                    setHasBeenChanged('An error occured. Try again later please')
-                    props.setTokenState('')
-                    localStorage.removeItem('usertoken')
-                    history.push("/")
-                }
-            })
-            .catch(error => {
-                console.log(error.response)
-            });
+        if (objInfo['email'] === reEmail) {
+            return axios
+                .post("http://127.0.0.1:5000/update_info", objInfo, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': token
+                    }
+                })
+                .then(response => {
+                    if ('valid' in response.data) {
+                        console.log("Informations has changed")
+                        setModifyInfos(false)
+                        setHasBeenChanged('Your informations has been updated')
+                    } else if ('msg' in response.data) {
+                        setHasBeenChanged('An error occured. Try again later please')
+                        props.setTokenState('')
+                        localStorage.removeItem('usertoken')
+                        history.push("/")
+                    }
+                })
+                .catch(error => {
+                    console.log(error.response)
+                });
+        } else {
+            setHasBeenChanged('Emails are different')
+        }
     }
     
     const handleInputChange = (e) => {
@@ -161,16 +167,35 @@ function ImagesUploaded(props) {
                         modifyInfos ?
                             Object.keys(objInfo).map((item, i) => {
                                 let itemFront = tofrontendTitle(item)
-                                return (
-                                    <tr key={'tr' + i}>
-                                        <td key={'tdTitle' + item}>
-                                            {itemFront} : 
-                                        </td>
-                                        <td key={'tdInput' + item}>
-                                            <input key={'input' + item} type="text" name={item} id={item} placeholder="testing" value={objInfo[item]} onFocus={(e) => e.target.select()} onChange={(e) => handleInputChange(e)} />
-                                        </td>
-                                    </tr>
-                                )
+                                if (item === 'email') {
+                                    return (
+                                        <tr key={'tr' + i}>
+                                            <td key={'tdTitle' + item}>
+                                                {itemFront} : 
+                                            </td>
+                                            <td key={'tdInput' + item}>
+                                                <input key={'input' + item} type="text" name={item} id={item} placeholder={"Insert " + item} value={objInfo[item]} onFocus={(e) => e.target.select()} onChange={(e) => handleInputChange(e)} />
+                                            </td>
+                                            <td key={'tdTitle' + 're' + item}>
+                                                Email again : 
+                                            </td>
+                                            <td key={'tdInput' + 're' + item}>
+                                                <input key={'input' + 're' + item} type="text" name='reEmail' id={'reEmail'} placeholder={"Insert " + item + ' again'} value={reEmail} onFocus={(e) => e.target.select()} onChange={(e) => setReEmail(e.target.value)} />
+                                            </td>
+                                        </tr>
+                                    )
+                                } else {
+                                    return (
+                                        <tr key={'tr' + i}>
+                                            <td key={'tdTitle' + item}>
+                                                {itemFront} : 
+                                            </td>
+                                            <td key={'tdInput' + item}>
+                                                <input key={'input' + item} type="text" name={item} id={item} placeholder={"Insert " + item} value={objInfo[item]} onFocus={(e) => e.target.select()} onChange={(e) => handleInputChange(e)} />
+                                            </td>
+                                        </tr>
+                                    )
+                                }
                             })
                         :
                             Object.keys(objInfo).map((item, i) => {
@@ -195,6 +220,13 @@ function ImagesUploaded(props) {
                                 :
                                     <button onClick={() => setModifyInfos(true)}>Change informations</button>
                             }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button onClick={() => {history.push("/changepwd")}}>
+                                Change password
+                            </button>
                         </td>
                     </tr>
                     {/* <tr>

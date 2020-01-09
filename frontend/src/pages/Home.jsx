@@ -63,11 +63,11 @@ function Home(props) {
                 <form onSubmit={(e) => onSubmit(e)}>
                     <div>
                         <label htmlFor="email">Email Address</label>
-                        <input type="email" name="email" id="email" placeholder="Enter Email" required value={email} onChange={(e) => setEmail(e.target.value)}/>
+                        <input type="email" name="email" id="email" placeholder="Insert Email" required value={email} onChange={(e) => setEmail(e.target.value)}/>
                     </div>
                     <div>
                         <label htmlFor="password">Password </label>
-                        <input type="password" name="password" id="password" placeholder="Enter Password" required value={password} onChange={(e) => setPassword(e.target.value)}/>
+                        <input type="password" name="password" id="password" placeholder="Insert Password" required value={password} onChange={(e) => setPassword(e.target.value)}/>
                     </div>
                     <div>
                         <input type="submit" name="login" value="Log in"/>

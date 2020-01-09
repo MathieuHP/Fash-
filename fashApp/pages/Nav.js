@@ -77,14 +77,10 @@ function Nav(props) {
             }
         };
         fetch(`http://127.0.0.1:5000/logout`, options)
-        .then((response) => {
-            response.json().then(async function(resText) {
-                if ("msg" in resText) {
-                    await AsyncStorage.removeItem('usertoken');
-                    history.push(pushTo)
-                    return;
-                }
-            });
+        .then(async (response) => {
+            await AsyncStorage.removeItem('usertoken');
+            history.push(pushTo)
+            return;
         })
     }
  

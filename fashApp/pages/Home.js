@@ -62,12 +62,12 @@ function Home(props) {
             <Text>Home</Text>
             <View>
                 <TextInput
-                    placeholder="Enter Email"
+                    placeholder="Insert Email"
                     onChangeText={text => setEmail(text)}
                     autoCapitalize="none"
                 />
                 <TextInput
-                    placeholder="Enter Password"
+                    placeholder="Insert Password"
                     onChangeText={text => setPassword(text)}
                     secureTextEntry={true}
                     autoCapitalize="none"

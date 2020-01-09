@@ -103,9 +103,9 @@ function Client(props) {
             .then((response) => {
                 response.json().then(function(resText) {
                     if ("msg" in resText) {
-                    props.setTokenState('')
-                    localStorage.removeItem('usertoken')
-                    history.push("/")
+                        props.setTokenState('')
+                        localStorage.removeItem('usertoken')
+                        history.push("/")
                     return;
                 } else if ("valid" in resText)
                     console.log(resText["valid"]);   
