@@ -78,10 +78,6 @@ function Home(props) {
             <div>
                 <Link to="/signup">Sign up</Link>
             </div>
-            <div>
-                <br/>
-                <Link to="/business">Business mode</Link>
-            </div>
         </div>  
     );
 }

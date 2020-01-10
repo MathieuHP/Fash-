@@ -13,7 +13,6 @@ function ChangePwd(props) {
     const [newPassword, setNewPassword] = useState('')
     const [rePassword, setRePassword] = useState('')
     const [infoMsg, setInfoMsg] = useState(<Text></Text>);
-    
     const history = useHistory();
 
     useEffect(() => {

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import axios from 'axios'
 
 import {tofrontendTitle} from '../utils/convertTitles'
+import {isEquivalent} from '../utils/isEquivalent'
 
 function Cart(props) {
     // STYLED
@@ -19,6 +20,7 @@ function Cart(props) {
     const [modifyInfos, setModifyInfos] = useState(false);
     const [hasBeenChanged, setHasBeenChanged] = useState(false);
     const [objInfo, setObjInfo] = useState({})
+    const [objInfoBeforeChanges, setObjInfoBeforeChanges] = useState({});
     const [reEmail, setReEmail] = useState('');
 
     const token = localStorage.usertoken
@@ -47,6 +49,7 @@ function Cart(props) {
             fetch(`http://127.0.0.1:5000/getProfileInfo`, options)
             .then((response) => {
                 response.json().then(function (res) {
+                    setObjInfoBeforeChanges(res)
                     setObjInfo(res)
                     setReEmail(res['email'])
                 });
@@ -134,28 +137,33 @@ function Cart(props) {
 
     const modifyInfo = () => {
         if (objInfo['email'] === reEmail) {
-            return axios
-                .post("http://127.0.0.1:5000/update_info", objInfo, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': token
-                    }
-                })
-                .then(response => {
-                    if ('valid' in response.data) {
-                        console.log("Informations has changed")
-                        setModifyInfos(false)
-                        setHasBeenChanged('Your informations has been updated')
-                    } else if ('msg' in response.data) {
-                        setHasBeenChanged('An error occured. Try again later please')
-                        props.setTokenState('')
-                        localStorage.removeItem('usertoken')
-                        history.push("/")
-                    }
-                })
-                .catch(error => {
-                    console.log(error.response)
-                });
+            if (isEquivalent(objInfoBeforeChanges, objInfo)) {
+                setModifyInfos(false)
+                setHasBeenChanged('No changes detected')
+            } else {
+                return axios
+                    .post("http://127.0.0.1:5000/update_info", objInfo, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Authorization': token
+                        }
+                    })
+                    .then(response => {
+                        if ('valid' in response.data) {
+                            console.log("Informations has changed")
+                            setModifyInfos(false)
+                            setHasBeenChanged('Your informations has been updated')
+                        } else if ('msg' in response.data) {
+                            setHasBeenChanged('An error occured. Try again later please')
+                            props.setTokenState('')
+                            localStorage.removeItem('usertoken')
+                            history.push("/")
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.response)
+                    });
+            }
         } else {
             setHasBeenChanged('Emails are different')
         }

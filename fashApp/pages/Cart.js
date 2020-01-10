@@ -5,6 +5,7 @@ import RadioForm from 'react-native-simple-radio-button';
 import axios from 'axios'
 
 import {tofrontendTitle} from '../utils/convertTitles'
+import {isEquivalent} from '../utils/isEquivalent'
 import { TextInput } from 'react-native-gesture-handler';
 
 
@@ -18,6 +19,7 @@ function Cart(props) {
     const [modifyInfos, setModifyInfos] = useState(false);
     const [hasBeenChanged, setHasBeenChanged] = useState(false);
     const [objInfo, setObjInfo] = useState({})
+    const [objInfoBeforeChanges, setObjInfoBeforeChanges] = useState({});
 
     const [first_name, setFirst_name] = useState([])
 	const [last_name, setLast_name] = useState([])
@@ -61,6 +63,7 @@ function Cart(props) {
             fetch(`http://127.0.0.1:5000/getProfileInfo`, options)
             .then((response) => {
                 response.json().then(function (res) {
+                    setObjInfoBeforeChanges(res)
                     setFirst_name([res['first_name'], false])
                     setLast_name([res['last_name'], false])
                     setEmail([res['email'], false])
@@ -166,39 +169,44 @@ function Cart(props) {
 
     const modifyInfo = () => {
         if (objInfo['email'] === reEmail[0]) {
-            return axios
-                .post("http://127.0.0.1:5000/update_info", objInfo, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': tokenState
-                    }
-                })
-                .then(response => {
-                    if ('valid' in response.data) {
-                        console.log("Informations has changed")
-                        setModifyInfos(false)
-                        setHasBeenChanged('Your informations has been updated')
-                        setFirst_name([objInfo['first_name'],false])
-                        setLast_name([objInfo['last_name'],false])
-                        setEmail([objInfo['email'],false])
-                        setReEmail([objInfo['email'],false])
-                        setPhone([objInfo['phone'],false])
-                    } else if ('msg' in response.data) {
+            if (isEquivalent(objInfoBeforeChanges, objInfo)) {
+                setModifyInfos(false)
+                setHasBeenChanged('No changes detected')
+            } else {
+                return axios
+                    .post("http://127.0.0.1:5000/update_info", objInfo, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Authorization': tokenState
+                        }
+                    })
+                    .then(response => {
+                        if ('valid' in response.data) {
+                            console.log("Informations has changed")
+                            setModifyInfos(false)
+                            setHasBeenChanged('Your informations has been updated')
+                            setFirst_name([objInfo['first_name'],false])
+                            setLast_name([objInfo['last_name'],false])
+                            setEmail([objInfo['email'],false])
+                            setReEmail([objInfo['email'],false])
+                            setPhone([objInfo['phone'],false])
+                        } else if ('msg' in response.data) {
+                            setHasBeenChanged('An error occured. Try again later please')
+                            props.setTokenState('')
+                            setTokenState('')
+                            localStorage.removeItem('usertoken')
+                            history.push("/")
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error.response)
                         setHasBeenChanged('An error occured. Try again later please')
                         props.setTokenState('')
                         setTokenState('')
                         localStorage.removeItem('usertoken')
                         history.push("/")
-                    }
-                })
-                .catch(error => {
-                    console.log(error.response)
-                    setHasBeenChanged('An error occured. Try again later please')
-                    props.setTokenState('')
-                    setTokenState('')
-                    localStorage.removeItem('usertoken')
-                    history.push("/")
-                });
+                    });
+            }
         } else {
             setHasBeenChanged('Emails are different')
         }

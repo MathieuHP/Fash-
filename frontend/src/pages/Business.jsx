@@ -78,10 +78,6 @@ function Business(props) {
             <div>
                 <Link to="/business/signupbusiness">Sign up as company</Link>
             </div>
-            <div>
-                <br/>
-                <Link to="/">Normal mode</Link>
-            </div>
         </div>  
     );
 }
