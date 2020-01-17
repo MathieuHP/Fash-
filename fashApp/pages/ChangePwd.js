@@ -1,18 +1,41 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from "react-router-native";
 import axios from 'axios'
-import { View, Text, Image, TextInput, Button, AsyncStorage } from 'react-native';
+import { View, Image, TextInput, AsyncStorage, StyleSheet } from 'react-native';
+
+// UI KITTEN
+import {
+    Layout,
+    Text,
+    Input,
+    Button,
+	Icon,
+	Select,
+	List,
+	ListItem,
+	ButtonGroup,
+	Card
+} from '@ui-kitten/components';
 
 
 function ChangePwd(props) {
     // STYLED
 
+    const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+
+    const onIconPress = () => {
+        setSecureTextEntry(!secureTextEntry);
+      };
+    
+      const renderIcon = (style) => (
+        <Icon {...style} name={secureTextEntry ? 'eye-off' : 'eye'}/>
+      );
     
     // STATE, USEEFFECT
     const [oldPassword, setOldPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [rePassword, setRePassword] = useState('')
-    const [infoMsg, setInfoMsg] = useState(<Text></Text>);
+    const [infoMsg, setInfoMsg] = useState('');
     const history = useHistory();
 
     useEffect(() => {
@@ -63,15 +86,15 @@ function ChangePwd(props) {
             })
             .then(response => {
                 if ("valid" in response.data) {
-                    setInfoMsg(<Text>Password has been updated</Text>)
+                    setInfoMsg('Password has been updated')
                     history.push("/cart")
                 } else if ("msg" in response.data){
-                    setInfoMsg(<Text>This email address already exists</Text>)
+                    setInfoMsg('This email address already exists')
                     props.setTokenState('')
                     localStorage.removeItem('usertoken')
                     history.push('/')
                 } else if ("info" in response.data){
-                    setInfoMsg(<Text>Old password is wrong</Text>)
+                    setInfoMsg('Old password is wrong')
                 } else {
                     props.setTokenState('')
                     localStorage.removeItem('usertoken')
@@ -79,25 +102,75 @@ function ChangePwd(props) {
                 }
             })
         } else {
-            setInfoMsg(<Text>Passwords are different</Text>)
+            setInfoMsg('Passwords are different')
         }
     }
 
     return (
         <View>
                 <View >
-                    <TextInput placeholder="Old password" secureTextEntry={true} autoCapitalize="none" value={oldPassword} onChangeText={text => setOldPassword(text)} />
+                    <Input
+                        style={styles.inputPassword}
+                        value={oldPassword}
+                        placeholder="Insert old password"
+                        onChangeText={text => setOldPassword(text)}
+                        secureTextEntry={secureTextEntry}
+                        onIconPress={onIconPress}
+                        autoCapitalize="none"
+                        icon={renderIcon}
+                        label='Old Password'
+                    />
+                    {/* <TextInput placeholder="Old password" secureTextEntry={true} autoCapitalize="none" value={oldPassword} onChangeText={text => setOldPassword(text)} /> */}
                 </View>
                 <View >
-                    <TextInput placeholder="New password" secureTextEntry={true} autoCapitalize="none" value={newPassword} onChangeText={text => setNewPassword(text)} />
+                    <Input
+                        style={styles.inputPassword}
+                        value={newPassword}
+                        placeholder="Insert new password"
+                        onChangeText={text => setNewPassword(text)}
+                        secureTextEntry={secureTextEntry}
+                        onIconPress={onIconPress}
+                        autoCapitalize="none"
+                        icon={renderIcon}
+                        label='New Password'
+                    />
+                    {/* <TextInput placeholder="New password" secureTextEntry={true} autoCapitalize="none" value={newPassword} onChangeText={text => setNewPassword(text)} /> */}
                 </View>
                 <View >
-                    <TextInput placeholder="New password again" secureTextEntry={true} autoCapitalize="none" value={rePassword} onChangeText={text => setRePassword(text)} />
+                    <Input
+                        style={styles.inputPassword}
+                        value={rePassword}
+                        placeholder="Insert new password again"
+                        onChangeText={text => setRePassword(text)}
+                        secureTextEntry={secureTextEntry}
+                        onIconPress={onIconPress}
+                        autoCapitalize="none"
+                        icon={renderIcon}
+                        label='New Password again'
+                    />
+                    {/* <TextInput placeholder="New password again" secureTextEntry={true} autoCapitalize="none" value={rePassword} onChangeText={text => setRePassword(text)} /> */}
                 </View>
-                {infoMsg}
-                <Button title="Change password" onPress={() => onSubmit()} />
+                <Button style={styles.button} onPress={() => onSubmit()}>
+                Change password
+                </Button>
+                <Text style={styles.text}>
+                    {infoMsg}
+                </Text>
         </View>
     )
 }
 
 export default ChangePwd
+
+const styles = StyleSheet.create({
+    inputPassword: {
+        width: 300
+    },
+    text : {
+        margin: 8
+    },
+    button:{
+        marginTop: 8,
+        marginBottom: 8
+    }
+})

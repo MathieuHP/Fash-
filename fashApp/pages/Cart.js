@@ -1,13 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Button, AsyncStorage } from 'react-native';
+import { View, Image, AsyncStorage, StyleSheet } from 'react-native';
 import { useHistory } from "react-router-native";
 import RadioForm from 'react-native-simple-radio-button';
 import axios from 'axios'
 
 import {tofrontendTitle} from '../utils/convertTitles'
 import {isEquivalent} from '../utils/isEquivalent'
-import { TextInput } from 'react-native-gesture-handler';
+import { TextInput, ScrollView } from 'react-native-gesture-handler';
 
+import Nav from './Nav'
+
+// UI KITTEN
+import {
+    Layout,
+    Text,
+    Input,
+    Button,
+	Icon,
+	Select,
+	List,
+	ListItem,
+	ButtonGroup,
+	Card
+} from '@ui-kitten/components';
 
 function Cart(props) {
     // STYLED
@@ -27,10 +42,10 @@ function Cart(props) {
 	const [reEmail, setReEmail] = useState([])
     const [phone, setPhone] = useState([])
     
-    const radio_props = [
-		{label: 'M', value: "M" },
-		{label: 'F', value: "F" },
-		{label: 'ND', value: "ND" }
+    const data = [
+		{ text: 'Male', value: "M"},
+		{ text: 'Female',  value: "F"},
+		{ text: 'Not defined',  value: "ND" },
 	];
 
     const history = useHistory();
@@ -133,7 +148,9 @@ function Cart(props) {
         var urlCreator = window.URL || window.webkitURL;
         let imageUrl = urlCreator.createObjectURL(imageBlob);
 
-        return <Image style={{ width: 50, height: 50 }} source={{ uri: imageUrl }} key={key} />
+        return (
+            <Image style={styles.imageCart} source={{ uri: imageUrl }} key={key} />
+        )
     }
 
 
@@ -218,125 +235,137 @@ function Cart(props) {
     }
 
     return (
-        <View>
+        <ScrollView style={{width: 300}}>
             <View>
-                <Text>PROFILE</Text>
+                <View style={styles.info}>
+                    {
+                        modifyInfos ?
+                        <View>
+                            <View>
+                                <Input
+                                style={styles.inputPassword}
+                                value={email[0] === objInfo['email'] && !email[1] ? '' : objInfo['email']}
+                                label='Email'
+                                placeholder={email[0] ? 'Current Email: ' + email[0] : 'Insert Email'}
+                                onChangeText={text => handleChanges('email', text, setEmail)}
+                                autoCapitalize="none"
+                            />
+                            </View>
+                            <View>
+                                <Input
+                                    style={styles.inputPassword}
+                                    value={reEmail[0] === objInfo['email'] && !reEmail[1] ? '' : reEmail[0]}
+                                    label='Email again'
+                                    placeholder={reEmail[0] && email[0] ? 'Current Email: ' + reEmail[0] : 'Insert Email again'}
+                                    onChangeText={text => setReEmail([text, true])}
+                                    autoCapitalize="none"
+                                />
+                            </View>
+                            <View>
+                                <Input
+                                    style={styles.inputPassword}
+                                    value={first_name[0] === objInfo['first_name'] && !first_name[1] ? '' : objInfo['first_name']}
+                                    label='First Name'
+                                    placeholder={first_name[0] ? 'Current First Name: ' + first_name[0] : 'Insert First Name'}
+                                    onChangeText={text => handleChanges('first_name', text, setFirst_name)}
+                                />
+                            </View>
+                            <View>
+                                <Input
+                                    style={styles.inputPassword}
+                                    value={last_name[0] === objInfo['last_name'] && !last_name[1] ? '' : objInfo['last_name']}
+                                    label='Last Name'
+                                    placeholder={last_name[0] ? 'Current Last Name: ' + last_name[0] : 'Insert Last Name'}
+                                    onChangeText={text => handleChanges('last_name', text, setLast_name)}
+                                />
+                            </View>
+                            <View>
+                                <Input
+                                    style={styles.inputPassword}
+                                    value={phone[0] === objInfo['phone'] && !phone[1] ? '' : objInfo['phone']}
+                                    label='Phone number'
+                                    placeholder={phone[0] ? 'Current Phone: ' + phone[0] : 'Insert Phone'}
+                                    onChangeText={text => handleChanges('phone', text, setPhone)}
+                                    autoCapitalize="none"
+                                />
+                            </View>
+                            <View>
+                                <Select
+                                    label='Gender'
+                                    style={styles.inputPassword}
+                                    data={data}
+                                    selectedOption={objInfo['sex'] === 'M' ? data[0] : objInfo['sex'] === 'F' ? data[1] : data[2]}
+                                    onSelect={(value) => setObjInfo({...objInfo, ['sex']: value.value})}
+                                />
+                            </View>
+                        </View>
+                        :
+                            Object.keys(objInfo).map((item) => {
+                                let itemFront = tofrontendTitle(item)
+                                return (    
+                                    <View key={'tr' + item}>
+                                        <Text appearance='hint' key={itemFront + 'Title'}>{itemFront} : </Text>
+                                        <Text key={objInfo[item] +'Value'}>{objInfo[item]}</Text>
+                                    </View>
+                                )
+                            })
+                    }
+                </View>
+                <ButtonGroup size='small' appearance='outline' status='primary' style={styles.buttonGroup}>
+                    {
+                        modifyInfos ?
+                            <Button onPress={() => modifyInfo()}>Submit changes</Button>
+                        :
+                            <Button onPress={() => setModifyInfos(true)}>Change informations</Button>
+                    }
+                    <Button onPress={() => {history.push("/changepwd")}}>Change password</Button>
+                    <Button onPress={() => removeAccount()}>Delete my account</Button>
+                </ButtonGroup>
             </View>
             <View>
-                {
-                    modifyInfos ?
-                    <View>
-                        <View>
-                            <Text>Email: </Text>
-                            <TextInput
-                                placeholder={email[0] ? 'Current Email: ' + email[0] : 'Insert Email'}
-                                autoCapitalize="none"
-                                value={email[0] === objInfo['email'] && !email[1] ? '' : objInfo['email']}
-                                onChangeText={text => handleChanges('email', text, setEmail)}
-                            />
-                        </View>
-                        <View>
-                            <Text>Email again: </Text>
-                            <TextInput
-                                placeholder={reEmail[0] && email[0] ? 'Current Email: ' + reEmail[0] : 'Insert Email again'}
-                                selectTextOnFocus
-                                autoCapitalize="none"
-                                value={reEmail[0] === objInfo['email'] && !reEmail[1] ? '' : reEmail[0]}
-                                onChangeText={text => setReEmail([text, true])}
-                            />
-                        </View>
-                        <View>
-                            <Text>First Name: </Text>
-                            <TextInput
-                                placeholder={first_name[0] ? 'Current First Name: ' + first_name[0] : 'Insert First Name'}
-                                autoCapitalize="none"
-                                value={first_name[0] === objInfo['first_name'] && !first_name[1] ? '' : objInfo['first_name']}
-                                onChangeText={text => handleChanges('first_name', text, setFirst_name)}
-                            />
-                        </View>
-                        <View>
-                            <Text>Last Name: </Text>
-                            <TextInput
-                                placeholder={last_name[0] ? 'Current Last Name: ' + last_name[0] : 'Insert Last Name'}
-                                autoCapitalize="none"
-                                value={last_name[0] === objInfo['last_name'] && !last_name[1] ? '' : objInfo['last_name']}
-                                onChangeText={text => handleChanges('last_name', text, setLast_name)}
-                            />
-                        </View>
-                        <View>
-                            <Text>Phone: </Text>
-                            <TextInput
-                                placeholder={phone[0] ? 'Current Phone: ' + phone[0] : 'Insert Phone'}
-                                autoCapitalize="none"
-                                value={phone[0] === objInfo['phone'] && !phone[1] ? '' : objInfo['phone']}
-                                onChangeText={text => handleChanges('phone', text, setPhone)}
-                            />
-                        </View>
-                        <View>
-                            <Text>Sex: </Text>
-                            <RadioForm
-                                radio_props={radio_props}
-                                initial={objInfo['sex'] === 'M' ? 0 : objInfo['sex'] === 'F' ? 1 : 2 }
-                                onPress={(value) => setObjInfo({...objInfo, ['sex']: value})}
-                            />
-                        </View>
-                    </View>
-                    :
-                        Object.keys(objInfo).map((item) => {
-                            let itemFront = tofrontendTitle(item)
-                            return (    
-                                <View key={'tr' + item}>
-                                    <Text key={itemFront + 'Title'}>{itemFront} : </Text>
-                                    <Text key={objInfo[item] +'Value'}>{objInfo[item]}</Text>
-                                </View>
-                            )
-                        })
-                }
+                <Text style={styles.text}>
+                    {hasBeenChanged}
+                </Text>
+            </View>
                 <View>
+                    <Text style={styles.text} category='h4'>Super like</Text>
                     <View>
                         {
-                            modifyInfos ?
-                                <Button title='Submit changes' onPress={() => modifyInfo()}/>
-                            :
-                                <Button title='Change informations' onPress={() => setModifyInfos(true)}/>
+                            cartImageSL ? cartImageSL : <Text>Loading ...</Text>
                         }
                     </View>
                 </View>
                 <View>
+                    <Text style={styles.text} category='h4'>Like</Text>
                     <View>
-                        <Button title="Change password" onPress={() => {history.push("/changepwd")}}/>
+                        {
+                            cartImageL ? cartImageL : <Text>Loading ...</Text>
+                        }
                     </View>
                 </View>
-				<View>
-					<View>
-						<Button title="Delete my account" onPress={() => removeAccount()} />
-					</View>
-				</View>
-            </View>
-            <View>
-                <Text>
-                    {hasBeenChanged}
-                </Text>
-            </View>
-            <View>
-                <Text>Super like</Text>
-                <View>
-                    {
-                        cartImageSL ? cartImageSL : <Text>Loading ...</Text>
-                    }
-                </View>
-            </View>
-            <View>
-                <Text>Like</Text>
-                <View>
-                    {
-                        cartImageL ? cartImageL : <Text>Loading ...</Text>
-                    }
-                </View>
-            </View>
-        </View>
+        </ScrollView>
     );
 }
 
 export default Cart;
 
+const styles = StyleSheet.create({
+    text : {
+        margin: 8
+    },
+    buttonGroup: {
+        flexDirection: 'column'
+    },
+    imageCart: {
+        width: 300,
+        height: 300,
+        borderRadius: 3,
+        marginTop: 30,
+    },
+    info: {
+        marginBottom: 30
+    },
+    inputPassword: {
+        width: 300
+    },
+});

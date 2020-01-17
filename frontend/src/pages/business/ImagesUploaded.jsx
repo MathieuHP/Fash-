@@ -6,13 +6,74 @@ import axios from 'axios'
 import {tofrontendTitle} from '../../utils/convertTitles'
 import {isEquivalent} from '../../utils/isEquivalent'
 
+//MATERIAL UI 
+
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardMedia from '@material-ui/core/CardMedia';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import TextField from '@material-ui/core/TextField';
+
 function ImagesUploaded(props) {
     // STYLED
+
+    const useStyles = makeStyles(theme => ({
+        icon: {
+            marginRight: theme.spacing(2),
+        },
+        heroContent: {
+            backgroundColor: theme.palette.background.paper,
+            padding: theme.spacing(8, 0, 6),
+        },
+        heroButtons: {
+            marginTop: theme.spacing(4),
+        },
+        cardGrid: {
+            paddingTop: theme.spacing(8),
+            paddingBottom: theme.spacing(8),
+        },
+        card: {
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+        },
+        cardMedia: {
+            paddingTop: '56.25%', // 16:9
+        },
+        cardContent: {
+            flexGrow: 1,
+        },
+        footer: {
+            backgroundColor: theme.palette.background.paper,
+            padding: theme.spacing(6),
+        },
+        titleLike: {
+            paddingBottom: theme.spacing(4),
+        },
+        root: {
+            width: '100%',
+            maxWidth: 360,
+            backgroundColor: theme.palette.background.paper,
+        },
+        formControl: {
+            margin: theme.spacing(1),
+            minWidth: 120,
+        },
+    }));
 
     const ImgCard = styled.img`
         width : 100px;
         height : 100px;
     `;
+
+    const classes = useStyles();
+
 
     // STATE
 
@@ -81,7 +142,7 @@ function ImagesUploaded(props) {
                 }
                 setCompanyImages(company_images)
             } else {
-                setCompanyImages([ <p key="productsEmpty">You didn't post any image yet</p> ])
+                setCompanyImages([ <Typography variant="subtitle1" align="center" color="textSecondary" component="p" key="productsEmpty">You didn't post any image yet</Typography>])
             }
         } catch (err) {
             if ("msg" in list_images){
@@ -89,7 +150,7 @@ function ImagesUploaded(props) {
                 localStorage.removeItem('usertoken')
                 history.push("/business")
             }
-            setCompanyImages([ <p key="productsEmpty">Sorry, an error occurred try again later</p> ])
+            setCompanyImages([ <Typography variant="subtitle1" align="center" color="textSecondary" component="p" key="productsEmpty">Sorry, an error occurred try again later</Typography> ])
         }
     }
     
@@ -103,7 +164,20 @@ function ImagesUploaded(props) {
         var urlCreator = window.URL || window.webkitURL;
         let imageUrl = urlCreator.createObjectURL(imageBlob);
         
-        return <ImgCard key={key} src={imageUrl} alt="image"/>
+        // return <ImgCard key={key} src={imageUrl} alt="image"/>
+        return (
+            <Grid key={key + 'grid'} item xs={12} sm={6} md={3}>
+                <Card key={key + 'card'} className={classes.card}>
+                    <CardMedia
+                        key={key + 'img'}
+                        style={{ height: "300px" }}
+                        className={classes.cardMedia}
+                        image={imageUrl}
+                        title="Fash img"
+                    />
+                </Card>
+            </Grid>
+        )
     }
 
 
@@ -166,98 +240,139 @@ function ImagesUploaded(props) {
 
     return (
         <div>
-             <div>
-                <h1>COMPANY PROFILE</h1>
-            </div>
-            <table>
-                <tbody>
-                    {
-                        modifyInfos ?
-                            Object.keys(objInfo).map((item, i) => {
-                                let itemFront = tofrontendTitle(item)
-                                if (item === 'email') {
-                                    return (
-                                        <tr key={'tr' + i}>
-                                            <td key={'tdTitle' + item}>
-                                                {itemFront} : 
-                                            </td>
-                                            <td key={'tdInput' + item}>
-                                                <input key={'input' + item} type="text" name={item} id={item} placeholder={"Insert " + item} value={objInfo[item]} onFocus={(e) => e.target.select()} onChange={(e) => handleInputChange(e)} />
-                                            </td>
-                                            <td key={'tdTitle' + 're' + item}>
-                                                Email again : 
-                                            </td>
-                                            <td key={'tdInput' + 're' + item}>
-                                                <input key={'input' + 're' + item} type="text" name='reEmail' id={'reEmail'} placeholder={"Insert " + item + ' again'} value={reEmail} onFocus={(e) => e.target.select()} onChange={(e) => setReEmail(e.target.value)} />
-                                            </td>
-                                        </tr>
-                                    )
-                                } else {
-                                    return (
-                                        <tr key={'tr' + i}>
-                                            <td key={'tdTitle' + item}>
-                                                {itemFront} : 
-                                            </td>
-                                            <td key={'tdInput' + item}>
-                                                <input key={'input' + item} type="text" name={item} id={item} placeholder={"Insert " + item} value={objInfo[item]} onFocus={(e) => e.target.select()} onChange={(e) => handleInputChange(e)} />
-                                            </td>
-                                        </tr>
-                                    )
-                                }
-                            })
-                        :
-                            Object.keys(objInfo).map((item, i) => {
-                                let itemFront = tofrontendTitle(item)
-                                return (    
-                                    <tr key={'tr' + i}>
-                                        <td key={'td' + itemFront}>
-                                            {itemFront} : 
-                                        </td>
-                                        <td key={'td' + objInfo[item]}>
-                                            {objInfo[item]}
-                                        </td>
-                                    </tr>
-                                )
-                            })
-                    }
-                    <tr>
-                        <td>
-                            {
-                                modifyInfos ?
-                                    <button onClick={() => modifyInfo()}>Submit changes</button>
-                                :
-                                    <button onClick={() => setModifyInfos(true)}>Change informations</button>
-                            }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <button onClick={() => {history.push("/changepwd")}}>
-                                Change password
-                            </button>
-                        </td>
-                    </tr>
-                    {/* <tr>
-                        <td>
-                            <button onClick={removeAccount}>
-                                Delete company account
-                            </button>
-                        </td>
-                    </tr> */}
-                </tbody>
-            </table>
-            <div>
-                <p>
-                    {hasBeenChanged}
-                </p>
-            </div>
-            <div>
-                <h3>Products</h3>
+            <Container component="main">
                 <div>
-                {
-                    companyImages ? companyImages : <p>Loading ...</p>
-                }
+                    <Typography variant="h3"color="primary" component="h1">
+                        COMPANY PROFILE
+                    </Typography>
                 </div>
+                <div className={classes.root}>
+                    <div>
+                        {
+                            modifyInfos ?
+                                Object.keys(objInfo).map((item, i) => {
+                                    let itemFront = tofrontendTitle(item)
+                                    if (item === 'email') {
+                                        return (
+                                            <div key={'div' + i}>
+                                                <Grid key={'grid' + i}>
+                                                    <TextField
+                                                        key={'TextField' + i}
+                                                        id="email"
+                                                        label="Email Address"
+                                                        name="email"
+                                                        autoComplete="email"
+                                                        value={objInfo[item]}
+                                                        onFocus={(e) => e.target.select()}
+                                                        onChange={(e) => handleInputChange(e)}
+                                                    />
+                                                    <TextField
+                                                        key={'input' + 're' + item}
+                                                        id="reEmail"
+                                                        label="Email Address again"
+                                                        name="reEmail"
+                                                        autoComplete="reEmail"
+                                                        value={reEmail}
+                                                        onFocus={(e) => e.target.select()}
+                                                        onChange={(e) => setReEmail(e.target.value)}
+                                                    />
+                                                </Grid>
+                                            </div>
+                                        )
+                                    } else {
+                                        return (
+                                            <div key={'div' + i}>
+                                                <TextField
+                                                    key={'TextField' + i}
+                                                    id={item}
+                                                    label={itemFront}
+                                                    name={item}
+                                                    autoComplete={item}
+                                                    value={objInfo[item]}
+                                                    onFocus={(e) => e.target.select()}
+                                                    onChange={(e) => handleInputChange(e)}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                })
+                            :
+                                Object.keys(objInfo).map((item, i) => {
+                                    let itemFront = tofrontendTitle(item)
+                                    return (
+                                        <ListItem key={'tr' + i}>
+                                            <ListItemText key={'td' + itemFront} secondary={itemFront + ': '} />
+                                            <ListItemText key={'td' + objInfo[item]} primary={objInfo[item]} />
+                                        </ListItem>
+                                    )
+                                })
+                        }
+                    </div>
+                    <ButtonGroup
+                        orientation="vertical"
+                        color="primary"
+                        aria-label="vertical outlined primary button group"
+                        className={classes.heroButtons}
+                    >
+                        {
+                            modifyInfos ?
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                    name="signUp"
+                                    className={classes.submit}
+                                    onClick={() => modifyInfo()}
+                                >
+                                    Submit changes
+                                </Button>
+                            :
+                                <Button
+                                    type="submit"
+                                    color="primary"
+                                    name="signUp"
+                                    className={classes.submit}
+                                    onClick={() => setModifyInfos(true)}
+                                >
+                                    Change informations
+                                </Button>
+                        }
+                        <Button
+                            type="submit"
+                            color="primary"
+                            name="signUp"
+                            className={classes.submit}
+                            onClick={() => { history.push("/changepwd") }}
+                        >
+                            Change password
+                        </Button>
+                        <Button
+                            disabled
+                            type="submit"
+                            color="primary"
+                            name="signUp"
+                            className={classes.submit}
+                            onClick={removeAccount}
+                        >
+                            Delete my account
+                        </Button>
+                    </ButtonGroup>
+                </div>
+                <div>
+                    <Typography variant="subtitle1" color="textSecondary" component="p" className={classes.heroButtons}>
+                        {hasBeenChanged}
+                    </Typography>
+                </div>
+            </Container>
+            <div>
+                <Container className={classes.cardGrid} maxWidth="lg">
+                    <Typography className={classes.titleLike} gutterBottom variant="h5" component="h2">Products</Typography>
+                    <Grid container spacing={4}>
+                        {
+                            companyImages ? companyImages : <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Loading ...</Typography>
+                        }
+                    </Grid>
+                </Container>
             </div>
         </div>  
     );

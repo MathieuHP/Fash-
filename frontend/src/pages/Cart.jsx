@@ -1,18 +1,85 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import styled from 'styled-components';
 import axios from 'axios'
 
-import {tofrontendTitle} from '../utils/convertTitles'
-import {isEquivalent} from '../utils/isEquivalent'
+import { tofrontendTitle } from '../utils/convertTitles'
+import { isEquivalent } from '../utils/isEquivalent'
+
+//MATERIAL UI
+
+import Button from '@material-ui/core/Button';
+import Card from '@material-ui/core/Card';
+import CardMedia from '@material-ui/core/CardMedia';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Divider from '@material-ui/core/Divider';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+
+
 
 function Cart(props) {
     // STYLED
+
+    const useStyles = makeStyles(theme => ({
+        icon: {
+            marginRight: theme.spacing(2),
+        },
+        heroContent: {
+            backgroundColor: theme.palette.background.paper,
+            padding: theme.spacing(8, 0, 6),
+        },
+        heroButtons: {
+            marginTop: theme.spacing(4),
+        },
+        cardGrid: {
+            paddingTop: theme.spacing(8),
+            paddingBottom: theme.spacing(8),
+        },
+        card: {
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+        },
+        cardMedia: {
+            paddingTop: '56.25%', // 16:9
+        },
+        cardContent: {
+            flexGrow: 1,
+        },
+        footer: {
+            backgroundColor: theme.palette.background.paper,
+            padding: theme.spacing(6),
+        },
+        titleLike: {
+            paddingBottom: theme.spacing(4),
+        },
+        root: {
+            width: '100%',
+            maxWidth: 360,
+            backgroundColor: theme.palette.background.paper,
+        },
+        formControl: {
+            margin: theme.spacing(1),
+            minWidth: 120,
+        },
+    }));
 
     const ImgCard = styled.img`
         width : 100px;
         height : 100px;
     `;
+
+    const classes = useStyles();
 
     // STATE
     const [cartImageL, setCartImageL] = useState('')
@@ -27,13 +94,13 @@ function Cart(props) {
     const history = useHistory();
 
     useEffect(() => {
-        if(!token){
+        if (!token) {
             history.push("/")
         } else {
             getProfileInfo();
             getCart()
         }
-      }, []);
+    }, []);
 
     // FUNCTIONS
 
@@ -47,13 +114,13 @@ function Cart(props) {
                 }
             };
             fetch(`http://127.0.0.1:5000/getProfileInfo`, options)
-            .then((response) => {
-                response.json().then(function (res) {
-                    setObjInfoBeforeChanges(res)
-                    setObjInfo(res)
-                    setReEmail(res['email'])
-                });
-            })
+                .then((response) => {
+                    response.json().then(function (res) {
+                        setObjInfoBeforeChanges(res)
+                        setObjInfo(res)
+                        setReEmail(res['email'])
+                    });
+                })
         } catch (error) {
             props.setTokenState('')
             localStorage.removeItem('usertoken')
@@ -73,35 +140,35 @@ function Cart(props) {
         let cart = await response.json()
         try {
             props.setTokenState(token)
-            if(!(cart["super_like"].length === 0)) {
+            if (!(cart["super_like"].length === 0)) {
                 let super_like = []
                 for (let i = 0; i < cart["super_like"].length; i++) {
                     super_like.push(await getImage(i + 'SL', cart["super_like"][i]))
                 }
                 setCartImageSL(super_like)
             } else {
-                setCartImageSL([ <p key="cartSLEmpty">You didn't super like any image yet</p> ])
+                setCartImageSL([<Typography variant="subtitle1" align="center" color="textSecondary" component="p" key="cartSLEmpty">You didn't super like any image yet</Typography>])
             }
-            if(!(cart["like"].length === 0)) {
+            if (!(cart["like"].length === 0)) {
                 let like = []
                 for (let i = 0; i < cart["like"].length; i++) {
                     like.push(await getImage(i + "L", cart["like"][i]))
                 }
                 setCartImageL(like)
             } else {
-                setCartImageL([ <p key="cartLEmpty">You didn't like any image yet</p> ])
+                setCartImageL([<Typography variant="subtitle1" align="center" color="textSecondary" component="p" key="cartSLEmpty">You didn't super like any image yet</Typography>])
             }
-        } catch(err) {
-            if ("msg" in cart){
+        } catch (err) {
+            if ("msg" in cart) {
                 props.setTokenState('')
                 localStorage.removeItem('usertoken')
                 history.push("/")
             }
-            setCartImageSL([ <p key="cartSLEmpty">Sorry, an error occurred try again later</p> ])
-            setCartImageL([ <p key="cartLEmpty">Sorry, an error occurred try again later</p> ])
+            setCartImageSL([<Typography variant="subtitle1" align="center" color="textSecondary" component="p" key="cartSLEmpty">Sorry, an error occurred try again later</Typography>])
+            setCartImageL([<Typography variant="subtitle1" align="center" color="textSecondary" component="p" key="cartLEmpty">Sorry, an error occurred try again later</Typography>])
         }
     }
-    
+
     const getImage = async (key, imageName) => {
         const options = {
             method: 'POST',
@@ -111,8 +178,20 @@ function Cart(props) {
         const imageBlob = await response.blob()
         var urlCreator = window.URL || window.webkitURL;
         let imageUrl = urlCreator.createObjectURL(imageBlob);
-        
-        return <ImgCard key={key} src={imageUrl} alt="image"/>
+
+        return (
+            <Grid key={key + 'grid'} item xs={12} sm={6} md={3}>
+                <Card key={key + 'card'} className={classes.card}>
+                    <CardMedia
+                        key={key + 'img'}
+                        style={{ height: "300px" }}
+                        className={classes.cardMedia}
+                        image={imageUrl}
+                        title="Fash img"
+                    />
+                </Card>
+            </Grid>
+        )
     }
 
 
@@ -125,14 +204,14 @@ function Cart(props) {
             }
         };
         fetch(`http://127.0.0.1:5000/remove_account`, options)
-        .then((response) => {
-            response.json().then(function () {
-                props.setTokenState('')
-                localStorage.removeItem('usertoken')
-                history.push("/")
-                return;
-            });
-        })
+            .then((response) => {
+                response.json().then(function () {
+                    props.setTokenState('')
+                    localStorage.removeItem('usertoken')
+                    history.push("/")
+                    return;
+                });
+            })
     }
 
     const modifyInfo = () => {
@@ -168,132 +247,179 @@ function Cart(props) {
             setHasBeenChanged('Emails are different')
         }
     }
-    
+
     const handleInputChange = (e) => {
-        const {name, value} = e.target
-        setObjInfo({...objInfo, [name]: value})
+        const { name, value } = e.target
+        setObjInfo({ ...objInfo, [name]: value })
     }
 
     return (
         <div>
-             <div>
-                <h1>PROFILE</h1>
-            </div>
-            <table>
-                <tbody>
+            <Container component="main">
+                <div>
+                    <Typography variant="h3"color="primary" component="h1">
+                        PROFILE
+                    </Typography>
+                </div>
+                <div className={classes.root}>
+                    <div>
                     {
                         modifyInfos ?
                             Object.keys(objInfo).map((item, i) => {
                                 let itemFront = tofrontendTitle(item)
                                 if (item === 'sex') {
                                     return (
-                                        <tr key={'tr' + i}>
-                                            <td key={'td' + itemFront}>
-                                                {itemFront} : 
-                                            </td>
-                                            <td key={'td' + objInfo[item]}>
-                                                <input type="radio" name="sex" id="sexM" value="M" checked={objInfo['sex'] === 'M' ? true : false}  onChange={(e) => handleInputChange(e)} />
-                                                <label htmlFor="sexM">M </label>
-                                                <input type="radio" name="sex" id="sexF" value="F" checked={objInfo['sex'] === 'F' ? true : false} onChange={(e) => handleInputChange(e)}/>
-                                                <label htmlFor="sexF">F </label>
-                                                <input type="radio" name="sex" id="sexND" value="ND" checked={objInfo['sex'] === 'ND' ? true : false} onChange={(e) => handleInputChange(e)}/>
-                                                <label htmlFor="sexND">Not Defined </label>
-                                            </td>
-                                        </tr>
+                                        <div key={'div' + i}>
+                                            <FormControl key={"FormControl" + i} className={classes.formControl} required>
+                                                <InputLabel key={"InputLabel" + i} id="sex">Gender</InputLabel>
+                                                <Select
+                                                    key={"Select" + i}
+                                                    labelId="demo-simple-select-label"
+                                                    id="demo-simple-select"
+                                                    onChange={(e) => handleInputChange(e)}
+                                                    name='sex'
+                                                    value={objInfo['sex']}
+                                                >
+                                                    <MenuItem key={"MenuItemM" + i} selected={objInfo['sex'] === 'M' ? true : false} value={'M'}>Male</MenuItem>
+                                                    <MenuItem key={"MenuItemF" + i} selected={objInfo['sex'] === 'F' ? true : false} value={'F'}>Female</MenuItem>
+                                                    <MenuItem key={"MenuItemND" + i} selected={objInfo['sex'] === 'ND' ? true : false} value={'ND'}>Not defined</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </div>
                                     )
                                 } else if (item === 'email') {
                                     return (
-                                        <tr key={'tr' + i}>
-                                            <td key={'tdTitle' + item}>
-                                                {itemFront} : 
-                                            </td>
-                                            <td key={'tdInput' + item}>
-                                                <input key={'input' + item} type="text" name={item} id={item} placeholder={"Insert " + item} value={objInfo[item]} onFocus={(e) => e.target.select()} onChange={(e) => handleInputChange(e)} />
-                                            </td>
-                                            <td key={'tdTitle' + 're' + item}>
-                                                Email again : 
-                                            </td>
-                                            <td key={'tdInput' + 're' + item}>
-                                                <input key={'input' + 're' + item} type="text" name='reEmail' id='reEmail' placeholder={"Insert " + item + ' again'} value={reEmail} onFocus={(e) => e.target.select()} onChange={(e) => setReEmail(e.target.value)} />
-                                            </td>
-                                        </tr>
+                                        <div key={'div' + i}>
+                                            <Grid key={'grid' + i}>
+                                                <TextField
+                                                    key={'TextField' + i}
+                                                    id="email"
+                                                    label="Email Address"
+                                                    name="email"
+                                                    autoComplete="email"
+                                                    value={objInfo[item]}
+                                                    onFocus={(e) => e.target.select()}
+                                                    onChange={(e) => handleInputChange(e)}
+                                                />
+                                                <TextField
+                                                    key={'input' + 're' + item}
+                                                    id="reEmail"
+                                                    label="Email Address again"
+                                                    name="reEmail"
+                                                    autoComplete="reEmail"
+                                                    value={reEmail}
+                                                    onFocus={(e) => e.target.select()}
+                                                    onChange={(e) => setReEmail(e.target.value)}
+                                                />
+                                            </Grid>
+                                        </div>
                                     )
                                 } else {
                                     return (
-                                        <tr key={'tr' + i}>
-                                            <td key={'tdTitle' + item}>
-                                                {itemFront} : 
-                                            </td>
-                                            <td key={'tdInput' + item}>
-                                                <input key={'input' + item} type="text" name={item} id={item} placeholder={"Insert " + item} value={objInfo[item]} onFocus={(e) => e.target.select()} onChange={(e) => handleInputChange(e)} />
-                                            </td>
-                                        </tr>
+                                        <div key={'div' + i}>
+                                            <TextField
+                                                key={'TextField' + i}
+                                                id={item}
+                                                label={itemFront}
+                                                name={item}
+                                                autoComplete={item}
+                                                value={objInfo[item]}
+                                                onFocus={(e) => e.target.select()}
+                                                onChange={(e) => handleInputChange(e)}
+                                            />
+                                        </div>
                                     )
                                 }
                             })
-                        :
+                            :
                             Object.keys(objInfo).map((item, i) => {
                                 let itemFront = tofrontendTitle(item)
-                                return (    
-                                    <tr key={'tr' + i}>
-                                        <td key={'td' + itemFront}>
-                                            {itemFront} : 
-                                        </td>
-                                        <td key={'td' + objInfo[item]}>
-                                            {objInfo[item]}
-                                        </td>
-                                    </tr>
+                                return (
+                                    <ListItem key={'tr' + i}>
+                                        <ListItemText key={'td' + itemFront} secondary={itemFront + ': '} />
+                                        <ListItemText key={'td' + objInfo[item]} primary={objInfo[item]} />
+                                    </ListItem>
                                 )
                             })
                     }
-                    <tr>
-                        <td>
-                            {
-                                modifyInfos ?
-                                    <button onClick={() => modifyInfo()}>Submit changes</button>
-                                :
-                                    <button onClick={() => setModifyInfos(true)}>Change informations</button>
-                            }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <button onClick={() => {history.push("/changepwd")}}>
-                                Change password
-                            </button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <button onClick={removeAccount}>
-                                Delete my account
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div>
-                <p>
-                    {hasBeenChanged}
-                </p>
-            </div>
-            <div>
-                <h3>Super like</h3>
-                <div>
-                {
-                    cartImageSL ? cartImageSL : <p>Loading ...</p>
-                }
+                    </div>
+                    <ButtonGroup
+                        orientation="vertical"
+                        color="primary"
+                        aria-label="vertical outlined primary button group"
+                        className={classes.heroButtons}
+                    >
+                    {
+                        modifyInfos ?
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                name="signUp"
+                                className={classes.submit}
+                                onClick={() => modifyInfo()}
+                            >
+                                Submit changes
+                            </Button>
+                        :
+                            <Button
+                                type="submit"
+                                color="primary"
+                                name="signUp"
+                                className={classes.submit}
+                                onClick={() => setModifyInfos(true)}
+                            >
+                                Change informations
+                            </Button>
+                    }
+                        <Button
+                            type="submit"
+                            color="primary"
+                            name="signUp"
+                            className={classes.submit}
+                            onClick={() => { history.push("/changepwd") }}
+                        >
+                            Change password
+                        </Button>
+                        <Button
+                            type="submit"
+                            color="primary"
+                            name="signUp"
+                            className={classes.submit}
+                            onClick={removeAccount}
+                        >
+                            Delete my account
+                        </Button>
+                    </ButtonGroup>
                 </div>
-            </div>
-            <div>
-                <h3>Like</h3>
                 <div>
-                {
-                    cartImageL ? cartImageL : <p>Loading ...</p>
-                }
+                    <Typography variant="subtitle1" color="textSecondary" component="p" className={classes.heroButtons}>
+                        {hasBeenChanged}
+                    </Typography>
                 </div>
+            </Container>
+            <div>
+                <Container className={classes.cardGrid} maxWidth="lg">
+                    <Typography className={classes.titleLike} gutterBottom variant="h5" component="h2">Super like</Typography>
+                    <Grid container spacing={4}>
+                        {
+                            cartImageSL ? cartImageSL : <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Loading ...</Typography>
+                        }
+                    </Grid>
+                </Container>
             </div>
-        </div>  
+            <Divider />
+            <div>
+                <Container className={classes.cardGrid} maxWidth="lg">
+                    <Typography className={classes.titleLike} gutterBottom variant="h5" component="h2">Like</Typography>
+                    <Grid container spacing={4}>
+                        {
+                            cartImageL ? cartImageL : <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Loading ...</Typography>
+                        }
+                    </Grid>
+                </Container>
+            </div>
+        </div>
     );
 }
 

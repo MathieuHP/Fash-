@@ -1,19 +1,46 @@
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes, faStar, faHeart } from '@fortawesome/free-solid-svg-icons'
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+// import { faTimes, faStar, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { useHistory } from "react-router-dom";
+
+// MATERIAL UI
+import { makeStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
+import Fab from '@material-ui/core/Fab';
+import FavoriteIcon from '@material-ui/icons/Favorite';
+import CrossIcon from '@material-ui/icons/Clear';
+import StarIcon from '@material-ui/icons/Star';
 
 function Client(props) {
     // STYLED
-    const ClientDiv = styled.div`
-    `;
 
-    const ClothImg = styled.img`
-        max-width : 640px;
-        max-height : 640px;
-        height : 500px;
-    `;
+    const useStyles = makeStyles(theme =>({
+        card: {
+        maxWidth: 500,
+        },
+        media: {
+            height: 500,
+        },
+        CardActions: {
+            justifyContent: 'center',
+        },
+        root: {
+            '& > *': {
+              margin: theme.spacing(1),
+            },
+        },
+        extendedIcon: {
+            marginRight: theme.spacing(1),
+        },
+    }))
+
+    const classes = useStyles();
 
     // STATE, EFFECT
     const [imageSrc, setImageSrc] = useState('')
@@ -129,30 +156,58 @@ function Client(props) {
     }
 
     return (
-        <ClientDiv>
-            <div>
-                <h1>
-                    Client
-                </h1>
-            </div>
-            <div>
+        <Container component="main" maxWidth="xs">
+            <div className={classes.paper}>
                 {
-                    imageSrc ? <ClothImg src={imageSrc} alt="image"/> : <p>Loading ...</p>
+                    imageSrc ?
+                    <Card className={classes.card}>
+                        <CardMedia
+                            className={classes.media}
+                            image={imageSrc}
+                            title="fash"
+                        />
+                        <CardContent>
+                            <Typography component="p">
+                                {name}
+                            </Typography>
+                            <Typography component="p">
+                                {typeCloth}
+                            </Typography>
+                            <Typography component="p">
+                                {materialCloth}
+                            </Typography>
+                            <Typography component="p">
+                                {productionMethod}
+                            </Typography>
+                            <Typography component="p">
+                                {price}
+                            </Typography>
+                            <Typography component="p">
+                                {sex}
+                            </Typography>
+                            <Typography component="p">
+                                {description}
+                            </Typography>
+                        </CardContent>
+                        <CardActions className={classes.CardActions}>
+                            <div className={classes.root}>
+                                <Fab onClick={() => rateImage(0)} aria-label="dislike" title="Dislike">
+                                    <CrossIcon />
+                                </Fab>
+                                <Fab onClick={() => rateImage(2)} color="primary" aria-label="superLike" title="Super like">
+                                    <StarIcon />
+                                </Fab>
+                                <Fab onClick={() => rateImage(1)} color="secondary" aria-label="like" title="Like">
+                                    <FavoriteIcon />
+                                </Fab>
+                            </div>
+                        </CardActions>
+                    </Card> 
+                    :
+                    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Loading ...</Typography>
                 }
-                <p>{name}</p>
-                <p>{typeCloth}</p>
-                <p>{materialCloth}</p>
-                <p>{productionMethod}</p>
-                <p>{price}</p>
-                <p>{sex}</p>
-                <p>{description}</p>
             </div>
-            <div>
-                <button onClick={() => rateImage(0)} type="button"><FontAwesomeIcon icon={faTimes} /></button>
-                <button onClick={() => rateImage(2)} type="button"><FontAwesomeIcon icon={faStar} /></button>
-                <button onClick={() => rateImage(1)} type="button"><FontAwesomeIcon icon={faHeart} /></button>
-            </div>
-        </ClientDiv>  
+        </Container>
     );
 }
 

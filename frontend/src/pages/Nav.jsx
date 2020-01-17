@@ -1,72 +1,115 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useHistory } from "react-router-dom";
-import styled from 'styled-components';
+import { NavLink, useHistory } from "react-router-dom";
 import jwt_decode from 'jwt-decode'
 
+// MATERIAL UI
+
+import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+
+
+const useStyles = makeStyles(theme => ({
+    root: {
+        marginBottom: theme.spacing(4),
+        flexGrow: 1,
+    },
+    menuButton: {
+        marginRight: theme.spacing(2),
+    },
+    title: {
+        flexGrow: 1,
+        display: 'flex',
+    },
+    navTitle: {
+        marginRight: theme.spacing(4),
+        textDecoration: 'none',
+        color: 'white',
+    }
+}));
+
+
 function NavClient(props) {
+    const classes = useStyles();
     return (
-        <div>
-            <h3>Normal NAV</h3>
-            <ul>
-                <li>
-                    <Link to="/client">
-                        Client
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/cart">
-                        Cart
-                    </Link>
-                </li>
-                <li>
-                    <button onClick={() => props.logOut(props.navUserType)}>Click to disconnect</button>
-                </li>
-            </ul>
+        <div className={classes.root}>
+            <AppBar position="static">
+                <Container>
+                    <Toolbar>
+                        <nav className={classes.title}>
+                            <NavLink to="/client" className={classes.navTitle}>
+                                <Typography variant="h6">
+                                    Clothes
+                                </Typography>
+                            </NavLink>
+                            <NavLink to="/cart" className={classes.navTitle}>
+                                <Typography variant="h6">
+                                    Profile
+                                </Typography>
+                            </NavLink>
+                        </nav>
+                        <Button onClick={() => props.logOut(props.navUserType)} color="inherit">Log out</Button>
+                    </Toolbar>
+                </Container>
+            </AppBar>
         </div>
     );
 }
 
 function NavBusiness(props) {
+    const classes = useStyles();
     return (
-        <div>
-            <h3>Business NAV</h3>
-            <ul>
-                <li>
-                    <Link to="/business/company">
-                        Company
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/business/products">
-                        Products
-                    </Link>
-                </li>
-                <li>
-                    <button onClick={() => props.logOut(props.navUserType)}>Click to disconnect</button>
-                </li>
-            </ul>
+        <div className={classes.root}>
+            <AppBar position="static">
+            <Container>
+                <Toolbar>
+                    <nav className={classes.title}>
+                        <NavLink to="/business/company" className={classes.navTitle}>
+                            <Typography variant="h6">
+                                Upload cloth
+                            </Typography>
+                        </NavLink>
+                        <NavLink to="/business/products" className={classes.navTitle}>
+                            <Typography variant="h6">
+                                Company profile
+                            </Typography>
+                        </NavLink>
+                    </nav>
+                    <Button onClick={() => props.logOut(props.navUserType)} color="inherit">Log out</Button>
+                </Toolbar>
+            </Container>
+            </AppBar>
         </div>
-    )
+    );
 }
 
 function NavLog() {
+    const classes = useStyles();
     return (
-        <div>
-            <h3>Welcome</h3>
-            <ul>
-                <li>
-                    <Link to="/">
-                        Home
-                    </Link>
-                </li>
-                <li>
-                    <Link to="/business">
-                        Business 
-                    </Link>
-                </li>
-            </ul>
+        <div className={classes.root}>
+            <AppBar position="static">
+            <Container>
+                <Toolbar>
+                    <nav className={classes.title}>
+                        <NavLink to="/" className={classes.navTitle}>
+                            <Typography variant="h6">
+                                Home
+                            </Typography>
+                        </NavLink>
+                        <NavLink to="/business" className={classes.navTitle}>
+                            <Typography variant="h6">
+                                Business
+                            </Typography>
+                        </NavLink>
+                    </nav>
+                </Toolbar>
+            </Container>
+            </AppBar>
         </div>
-    )
+    );
 }
 
 function Nav(props) {

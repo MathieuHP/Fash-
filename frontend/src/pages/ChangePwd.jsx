@@ -1,11 +1,46 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory } from "react-router-dom";
+import { useHistory, NavLink } from "react-router-dom";
 import axios from 'axios'
 import jwt_decode from 'jwt-decode'
+
+// MATERIAL UI
+
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
 
 function ChangePwd(props) {
     // STYLED
+
+    const useStyles = makeStyles(theme => ({
+        paper: {
+          marginTop: theme.spacing(8),
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        },
+        avatar: {
+          margin: theme.spacing(1),
+          backgroundColor: theme.palette.secondary.main,
+        },
+        form: {
+          width: '100%', // Fix IE 11 issue.
+          marginTop: theme.spacing(3),
+        },
+        submit: {
+          margin: theme.spacing(3, 0, 2),
+        },
+        cancel: {
+            textDecoration: 'none',
+        }
+    }));
+
+    const classes = useStyles();
 
     
     // STATE, USEEFFECT
@@ -84,15 +119,15 @@ function ChangePwd(props) {
                 }
 
                 if ("valid" in response.data) {
-                    setInfoMsg(<p>Password has been updated</p>)
+                    setInfoMsg(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">Password has been updated</Typography>)
                     history.push(pushToCart)
                 } else if ("msg" in response.data){
-                    setInfoMsg(<p>This email address already exists</p>)
+                    setInfoMsg(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">This email address already exists</Typography>)
                     props.setTokenState('')
                     localStorage.removeItem('usertoken')
                     history.push(pushTo)
                 } else if ("info" in response.data){
-                    setInfoMsg(<p>Old password is wrong</p>)
+                    setInfoMsg(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">Old password is wrong</Typography>)
                 } else {
                     props.setTokenState('')
                     localStorage.removeItem('usertoken')
@@ -100,29 +135,81 @@ function ChangePwd(props) {
                 }
             })
         } else {
-            setInfoMsg(<p>Passwords are different</p>)
+            setInfoMsg(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">Passwords are different</Typography>)
         }
     }
 
     return (
-        <div>
-             <form onSubmit={(e) => onSubmit(e)}>
-                <div >
-                    <label htmlFor="oldPassword">Old password: </label>
-                    <input type="password" name="oldPassword" id="oldPassword" placeholder="Insert old password" required value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
-                </div>
-                <div >
-                    <label htmlFor="newPassword">New password: </label>
-                    <input type="Password" name="newPassword" id="newPassword" placeholder="Insert new password" required value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-                </div>
-                <div >
-                    <label htmlFor="rePassword">New password again: </label>
-                    <input type="Password" name="rePassword" id="rePassword" placeholder="Insert new password again" required value={rePassword} onChange={(e) => setRePassword(e.target.value)} />
-                </div>
-                <input type="submit" name="changePwd" value="Change password"/>
+        <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <div className={classes.paper}>
+                <Typography component="h1" variant="h5">
+                    Change password
+                </Typography>
+                <form className={classes.form} noValidate onSubmit={(e) => onSubmit(e)}>
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <TextField
+                            variant="outlined"
+                            required
+                            fullWidth
+                            name="oldPassword"
+                            label="Old password"
+                            type="password"
+                            id="oldPassword"
+                            autoComplete="old-password"
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            variant="outlined"
+                            required
+                            fullWidth
+                            name="newPassword"
+                            label="New password"
+                            type="password"
+                            id="newPassword"
+                            autoComplete="new-password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                    </Grid>
+                     <Grid item xs={12}>
+                        <TextField
+                            variant="outlined"
+                            required
+                            fullWidth
+                            name="rePassword"
+                            label="New password again"
+                            type="password"
+                            id="rePassword"
+                            autoComplete="re-password"
+                            value={rePassword}
+                            onChange={(e) => setRePassword(e.target.value)}
+                        />
+                    </Grid>
+                </Grid>
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    name="changePwd"
+                    className={classes.submit}
+                >
+                    Change password
+                </Button>
+                <NavLink to='/cart' className={classes.cancel}>
+                    <Button variant="outlined" fullWidth color="primary">
+                        Cancel changes
+                    </Button>
+                </NavLink>
+                </form>
                 {infoMsg}
-             </form>
-        </div>
+            </div>
+        </Container>
     )
 }
 

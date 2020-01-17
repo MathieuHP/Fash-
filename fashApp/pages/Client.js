@@ -1,11 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faTimes, faStar, faHeart } from '@fortawesome/free-solid-svg-icons'
-import { View, Image, Text, TouchableHighlight, AsyncStorage } from 'react-native';
+import { View, Image, TouchableHighlight, AsyncStorage, StyleSheet, ScrollView } from 'react-native';
 import { Link, useHistory } from "react-router-native";
+
+// UI KITTEN
+import {
+    Layout,
+    Text,
+    Input,
+    Button,
+	Icon,
+	Select,
+	List,
+	ListItem,
+	ButtonGroup,
+	Card
+} from '@ui-kitten/components';
 
 function Client(props) {
 	// STYLED
+
+	const StarIcon = (style) => (
+		<Icon {...style} name='star'/>
+	);
+
+	const HeartIcon = (style) => (
+		<Icon {...style} name='heart'/>
+	);
+
+	const CloseIcon = (style) => (
+		<Icon {...style} name='close'/>
+	);	
 
 	// STATE, EFFECT
 	const [imageSrc, setImageSrc] = useState('')
@@ -132,32 +158,54 @@ function Client(props) {
 		}
 	}
 
+	const CustomHeaderCard = () => (
+		<React.Fragment>
+			{
+				imageSrc ? <Image style={{ width: 300, height: 300 }} source={{ uri: imageSrc }} /> : <Text>Loading ...</Text>
+			}
+		</React.Fragment>
+	  );
+
 	return (
 		<View>
-			<View>
-				<Text>
-					Client
-                </Text>
-			</View>
-			<View>
-				{
-					imageSrc ? <Image style={{ width: 300, height: 300 }} source={{ uri: imageSrc }} /> : <Text>Loading ...</Text>
-				}
-				<Text>{name}</Text>
-				<Text>{typeCloth}</Text>
-				<Text>{materialCloth}</Text>
-				<Text>{productionMethod}</Text>
-				<Text>{price}</Text>
-				<Text>{sex}</Text>
-				<Text>{description}</Text>
-			</View>
-			<View>
-				<TouchableHighlight onPress={() => rateImage(0)}><View><FontAwesomeIcon icon={faTimes} /></View></TouchableHighlight>
-				<TouchableHighlight onPress={() => rateImage(2)}><View><FontAwesomeIcon icon={faStar} /></View></TouchableHighlight>
-				<TouchableHighlight onPress={() => rateImage(1)}><View><FontAwesomeIcon icon={faHeart} /></View></TouchableHighlight>
-			</View>
+			<ScrollView>
+				<Card style={styles.card} header={CustomHeaderCard}>
+					{/* <Text>{name}</Text> */}
+					<Text appearance='hint' >Type of cloth: </Text><Text>{typeCloth}</Text> 
+					<Text appearance='hint' >Cloth material: </Text><Text>{materialCloth}</Text>
+					<Text appearance='hint' >Production method: </Text><Text>{productionMethod}</Text>
+					<Text appearance='hint' >Price: </Text><Text>{price}</Text>
+					{/* <Text>Gender : {sex}</Text> */}
+					<Text appearance='hint' >Description: </Text><Text>{description}</Text>
+				</Card>
+				<View style={styles.buttonGroup}>
+					<Button style={styles.button} onPress={() => rateImage(0)} appearance='outline' status='basic' icon={CloseIcon}/>
+					<Button style={styles.button} onPress={() => rateImage(2)} appearance='outline' icon={StarIcon}/>
+					<Button style={styles.button} onPress={() => rateImage(1)} appearance='outline' status='danger' icon={HeartIcon}/>
+				</View>
+			</ScrollView>
 		</View>
 	);
 }
 
 export default Client;
+
+const styles = StyleSheet.create({
+	buttonGroup: {
+		justifyContent : 'center',
+		alignItems: 'center',
+		flexDirection: 'row',
+		flexWrap: 'wrap'
+	},
+	button: {
+		margin: 8
+	},
+	headerText: {
+		marginHorizontal: 24,
+		marginVertical: 16,
+	},
+	headerImage: {
+		flex: 1,
+		height: 192,
+	},
+});

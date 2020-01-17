@@ -1,12 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'
-import { View, Text, Button, TextInput, AsyncStorage } from 'react-native';
+import { View, TextInput, AsyncStorage, StyleSheet, ScrollView } from 'react-native';
 import RadioForm from 'react-native-simple-radio-button';
-import { useHistory } from "react-router-native";
+import { useHistory, Link } from "react-router-native";
 
+
+// UI KITTEN
+import {
+    Layout,
+    Text,
+    Input,
+    Button,
+	Icon,
+	Select,
+} from '@ui-kitten/components';
 
 function SignUp() {
 	// STYLED
+
+	const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+
+    const onIconPress = () => {
+        setSecureTextEntry(!secureTextEntry);
+      };
+    
+      const renderIcon = (style) => (
+        <Icon {...style} name={secureTextEntry ? 'eye-off' : 'eye'}/>
+      );
 
 	// STATE
 	const [first_name, setFirst_name] = useState('')
@@ -19,10 +39,10 @@ function SignUp() {
 	const [phone, setPhone] = useState('')
 	const [connectionMessage, setConnectionMessage] = useState('')
 
-	const radio_props = [
-		{label: 'M', value: "M" },
-		{label: 'F', value: "F" },
-		{label: 'ND', value: "ND" }
+	const data = [
+		{ text: 'Male', value: "M"},
+		{ text: 'Female',  value: "F"},
+		{ text: 'Not defined',  value: "ND" },
 	];
 
 	const history = useHistory();
@@ -52,7 +72,7 @@ function SignUp() {
 	        register(newUser)
 	    } else {
 	        setConnectionMessage(<Text>Passwords or emails are differents</Text>)
-	    }
+		}
 	}
 
 	const register = newUser => {
@@ -79,44 +99,106 @@ function SignUp() {
 	}
 
 	return (
-		<View>
-		    <Text>
-		        Sign in
-		    </Text>
-		    <View>
-				<View >	
-					<TextInput placeholder="First Name" autoCapitalize="none" value={first_name} onChangeText={text => setFirst_name(text)} />
-				</View>
-				<View >
-					<TextInput placeholder="Last Name" autoCapitalize="none" onChangeText={text => setLast_name(text)} />
-				</View>
-				<View >
-					<TextInput placeholder="Phone number" autoCapitalize="none" onChangeText={text => setPhone(text)} />
-				</View>
-				<View >
-					<TextInput placeholder="Email Address" autoCapitalize="none" onChangeText={text => setEmail(text)} />
-				</View>
-				<View >
-					<TextInput placeholder="Email Address again" autoCapitalize="none" onChangeText={text => setReEmail(text)} />
-				</View>
-				<View >
-					<TextInput placeholder="Password" secureTextEntry={true} autoCapitalize="none" onChangeText={text => setPassword(text)} />
-				</View>
-				<View >
-					<TextInput placeholder="Password again" secureTextEntry={true} autoCapitalize="none" onChangeText={text => setRePassword(text)} />
-				</View>
+		<ScrollView style={{width: 300}}>
+				<Text style={styles.text} category='h5'>
+					Sign Up
+				</Text>
 				<View>
-					<RadioForm
-						radio_props={radio_props}
-						initial={-1}
-						onPress={(value) => setSex(value)}
-					/>
+					<View>
+						<Input
+							style={styles.inputPassword}
+							value={first_name}
+							label='First Name'
+							placeholder="Insert First Name"
+							onChangeText={text => setFirst_name(text)}
+						/>
+						<Input
+							style={styles.inputPassword}
+							value={last_name}
+							label='Last Name'
+							placeholder="Insert Last Name"
+							onChangeText={text => setLast_name(text)}
+						/>
+						<Input
+							style={styles.inputPassword}
+							value={phone}
+							label='Phone number'
+							placeholder="Insert Phone number"
+							onChangeText={text => setPhone(text)}
+							autoCapitalize="none"
+						/>
+						<Input
+							style={styles.inputPassword}
+							value={email}
+							label='Email Address'
+							placeholder="Insert Email Address"
+							onChangeText={text => setEmail(text)}
+							autoCapitalize="none"
+						/>
+						<Input
+							style={styles.inputPassword}
+							value={reEmail}
+							label='Email Address again'
+							placeholder="Insert Email Address again"
+							onChangeText={text => setReEmail(text)}
+							autoCapitalize="none"
+						/>
+						<Input
+							style={styles.inputPassword}
+							value={password}
+							placeholder="Insert Password"
+							onChangeText={text => setPassword(text)}
+							secureTextEntry={secureTextEntry}
+							onIconPress={onIconPress}
+							autoCapitalize="none"
+							icon={renderIcon}
+							label='Password'
+						/>
+						<Input
+							style={styles.inputPassword}
+							value={rePassword}
+							placeholder="Insert Password again"
+							onChangeText={text => setRePassword(text)}
+							secureTextEntry={secureTextEntry}
+							onIconPress={onIconPress}
+							autoCapitalize="none"
+							icon={renderIcon}
+							label='Password again'
+						/>
+						<Select
+							label='Gender'
+							style={styles.inputPassword}
+							data={data}
+							selectedOption={sex}
+							onSelect={(text) => setSex(text.value)}
+						/>
+					</View>
+					<Button style={styles.button} onPress={() => onSubmit()}>
+						Register
+					</Button>
+					<Text style={styles.inputPassword}>{connectionMessage}</Text>
 				</View>
-				<Button title="Register" onPress={() => onSubmit()} />
-				<Text>{connectionMessage}</Text>
-		    </View>
-		</View>  
+			</ScrollView>
 	);
 }
 
 export default SignUp;
+
+const styles = StyleSheet.create({
+    inputPassword: {
+        width: 300
+    },
+    button:{
+        marginTop: 15,
+        marginBottom: 8
+	},
+	text: {
+		margin: 8,
+		alignItems : 'center',
+		justifyContent : 'center'
+	},
+	titleFash:{
+		alignItems : 'center',
+		justifyContent : 'center'
+	}
+});

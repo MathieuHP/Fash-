@@ -1,10 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, TextInput, Button, AsyncStorage } from 'react-native';
+import { View, TouchableOpacity, TextInput, AsyncStorage, StyleSheet, Image } from 'react-native';
 import axios from 'axios'
 import { Link, useHistory } from "react-router-native";
 
+import {
+    Layout,
+    Text,
+    Input,
+    Button,
+    Icon,
+  } from '@ui-kitten/components';
+
 function Home(props) {
     // STYLED
+
+    const [secureTextEntry, setSecureTextEntry] = React.useState(true);
+
+    const onIconPress = () => {
+        setSecureTextEntry(!secureTextEntry);
+      };
+    
+      const renderIcon = (style) => (
+        <Icon {...style} name={secureTextEntry ? 'eye-off' : 'eye'}/>
+      );
     
     // STATE
     const [email, setEmail] = useState('')
@@ -58,31 +76,47 @@ function Home(props) {
     }
 
     return (
-        <View>
-            <Text>Home</Text>
+        <Layout style={{width: 300}}>
             <View>
-                <TextInput
+                <Input
+                    style={styles.inputPassword}
+                    value={email}
+                    label='Email'
                     placeholder="Insert Email"
                     onChangeText={text => setEmail(text)}
                     autoCapitalize="none"
                 />
-                <TextInput
+                <Input
+                    style={styles.inputPassword}
+                    value={password}
                     placeholder="Insert Password"
                     onChangeText={text => setPassword(text)}
-                    secureTextEntry={true}
+                    secureTextEntry={secureTextEntry}
+                    onIconPress={onIconPress}
                     autoCapitalize="none"
+                    icon={renderIcon}
+                    label='Password'
                 />
-                <Button
-                    title="Log in"
-                    onPress={() => onSubmit()}
-                />
-                <Text>{connectionMessage}</Text>
+                <Button style={styles.button} onPress={() => onSubmit()}>
+                    Log In
+                </Button>
             </View>
-            <Link to="/signup">
-                <Text>Sign Up</Text>
-            </Link>
-        </View> 
+            <Button style={styles.button} onPress={() => history.push("/signup")} appearance='outline'>
+                Sign Up
+            </Button>
+            <Text>{connectionMessage}</Text>
+        </Layout> 
     );
 }
 
 export default Home;
+
+const styles = StyleSheet.create({
+    inputPassword: {
+        width: 300
+    },
+    button:{
+        marginTop: 8,
+        marginBottom: 8
+    }
+});

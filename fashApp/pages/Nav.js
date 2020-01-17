@@ -1,43 +1,91 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, AsyncStorage } from 'react-native';
-import { Link, useHistory } from "react-router-native";
+import { View, AsyncStorage, StyleSheet } from 'react-native';
+// import { View, Text, Button, AsyncStorage } from 'react-native';
+
+import { Link, useHistory, useLocation } from "react-router-native";
 import jwt_decode from 'jwt-decode'
 
+// UI KITTEN
+
+import {
+    Layout,
+    Text,
+    Input,
+    Button,
+    Icon,
+    TopNavigation,
+    TopNavigationAction,
+} from '@ui-kitten/components';
+
 function NavClient(props) {
+    const location = useLocation();
+    const history = useHistory();
+
+    let pathname = location.pathname;
+
+    const LogOutIcon = (style) => (
+		<Icon {...style} name='log-out'/>
+    );
+
+    const LogOutAction = () => (
+        <TopNavigationAction icon={LogOutIcon} onPress={() => props.logOut(props.navUserType)}/>
+    );
+
+    const RateImageIcon = (style) => (
+		<Icon {...style} name='image'/>
+    );    
+
+    const RateImageAction = () => (
+        <TopNavigationAction icon={RateImageIcon} onPress={() => history.push('/client')}/>
+    );
+
+    const ProfileIcon = (style) => (
+		<Icon {...style} name='person'/>
+    );    
+
+    const ProfileAction = () => (
+        <TopNavigationAction icon={ProfileIcon} onPress={() => history.push('/cart')}/>
+    );
+
     return (
-        <View>
-            <Text>Normal NAV</Text>
-            <View>
-                <View>
-                    <Link to="/client">
-                       <Text>Client</Text>
-                    </Link>
-                </View>
-                <View>
-                    <Link to="/cart">
-                        <Text>Cart</Text>
-                    </Link>
-                </View>
-                <View>
-                    <Button onPress={() => props.logOut(props.navUserType)} title='Click to disconnect' />
-                </View>
-            </View>
-        </View>
+        <Layout style={styles.buttonGroup}>
+            <TopNavigation
+                leftControl={ pathname === '/client' ? ProfileAction() : RateImageAction() }
+                rightControls={LogOutAction()}
+            />
+            <TopNavigation
+                leftControl={pathname === '/client' ? <Text status='primary' style={styles.titleText} category='h4'>Cloths</Text> : <Text status='primary' style={styles.titleText} category='h4'>Profile</Text>}
+                alignment="center"
+            />
+        </Layout>
     );
 }
 
 function NavLog() {
+    const history = useHistory();
+    const location = useLocation();
+    let pathname = location.pathname;    
+
+    const BackIcon = (style) => (
+        <Icon {...style} name='arrow-back'/>
+    );
+
+    const renderBackAction = () => (
+        <TopNavigationAction icon={BackIcon} onPress={() => history.push('/')}/>
+    );
+    
     return (
-        <View>
-            <Text>Welcome</Text>
-            <View>
-                <View>
-                    <Link to="/">
-                        <Text>Home</Text>
-                    </Link>
-                </View>
-            </View>
-        </View>
+        <Layout style={styles.buttonGroup}>
+            {
+                pathname === '/signup' ? 
+                    <TopNavigation alignment='start' leftControl={renderBackAction()}/> : 
+                    <Text></Text>
+            }
+            <TopNavigation
+                leftControl={<Text style={styles.text} category='h1' status='primary'>Fash</Text>}
+                alignment="center"
+            />
+        </Layout>
     )
 }
 
@@ -85,10 +133,27 @@ function Nav(props) {
     }
  
     return (
-        <View>
+        <View >
             {navContent === '' ? <Text>{navContent}</Text> : navContent}
         </View>
     );
 }
 
 export default Nav;
+
+const styles = StyleSheet.create({
+    text: {
+      margin: 8,
+    },
+    titleText: {
+        marginBottom: 20,
+    },
+    buttonGroup: {
+        justifyContent : 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        flexWrap: 'wrap'
+    },
+  });
+
+  
