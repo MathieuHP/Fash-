@@ -36,7 +36,7 @@ def check_minimum_data():
         return True
     else:
         return False
-
+    
 def filtering_out_users_and_ratings(df):
 
     """filter out user and images with too few 
