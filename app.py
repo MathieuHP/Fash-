@@ -21,6 +21,15 @@ from ressources.picture_list_creation import get_recommended_picture_list
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
 
+
+filt_dic = {
+    "clothe_sex" : 'M',
+    "clothe_type" : 'all',
+    "clothe_material" : 'all',
+    "clothe_production" : 'all',
+    "clothe_price_range" : [50, 200]
+}
+
 # init app
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -333,7 +342,9 @@ def load_image_for_rating():
 
     user_id = current_user["_id"]
 
-    pictures_list = get_recommended_picture_list(user_id)
+    pictures_list = get_recommended_picture_list(user_id, filt_dic)
+    if not pictures_list:
+        return jsonify({"no_more_pictures":"No more pictures to show, try to change your filters, bitch!"})
 
     coll = db["image_info"]
     list_dict = []
@@ -388,6 +399,7 @@ def rate_image():
         temp_id = results[0]["_id"]
         cursor = coll.update_one({"_id":temp_id},{"$set":post})
         print(" SAME IMAGE RATED TWICE !!!")
+        print(name)
     except:
         x = coll.insert_one(post)
 
