@@ -158,7 +158,9 @@ function Client(props) {
         };
     }
 
-    const getListImages = async () => {
+    const getListImages = async (update = false) => {
+        console.log('ici');
+        
         const options = {
             method: 'GET',
             headers: {
@@ -175,12 +177,20 @@ function Client(props) {
                     history.push("/")
                     return;
                 }
-
-                props.setTokenState(token)
-                let iL = imageList.concat(listImageFromBackend)
-                setImageList(iL)
-                if (!imageSrc) {
+                if (update === 'rate') {
+                    console.log('rateUpdate true');
+                    props.setTokenState(token)
+                    let iL = imageList.concat(listImageFromBackend)
+                    iL.shift()
+                    console.log(iL);
+                    setImageList(iL)
                     showImage(iL[0])
+                } else {
+                    console.log('no rate : ', update);
+                    props.setTokenState(token)
+                    console.log(listImageFromBackend);
+                    setImageList(listImageFromBackend)
+                    showImage(listImageFromBackend[0])
                 }
             });
         })
@@ -232,14 +242,12 @@ function Client(props) {
                 });
             })
             let iL = imageList
-            iL.shift()
             if (iL.length === 0) {
                 console.log("Loading new images...")
             } else if (iL.length < 7) {
-                getListImages()
-                showImage(iL[0])
-                setImageList(iL)
+                getListImages('rate')
             } else {
+                iL.shift()
                 showImage(iL[0])
                 setImageList(iL)
             }
@@ -248,12 +256,39 @@ function Client(props) {
         }
     }
 
+    const updateFilters = async () => {
+        console.log('updateFilters');
+        const options = {
+            method: 'POST',
+            body: JSON.stringify(filtersObj),
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': token
+            }
+        };
+        fetch(`http://127.0.0.1:5000/update_filters`, options)
+        .then((response) => {
+            response.json().then(function (res) {
+                if ("msg" in res) {
+                    props.setTokenState('')
+                    localStorage.removeItem('usertoken')
+                    history.push("/")
+                    return;
+                }
+                if ("valid" in res) {
+                    console.log(res['valid']);
+                    getListImages('filters')
+                }
+            });
+        })
+    };
+
     const handleOpen = () => {
         setOpen(true);
     };
     
     const handleClose = () => {
-        console.log(filtersObj);
+        updateFilters()
         setOpen(false);
     };
 
@@ -271,11 +306,7 @@ function Client(props) {
             marginTop: -12,
             marginLeft: -13,
             boxShadow: '#ebebeb 0px 2px 2px',
-            //     '&:focus,&:hover,&$active': {
-            //     boxShadow: '#ccc 0px 2px 3px 1px',
-            // },
             '& .bar': {
-                // display: inline-block !important;
                 height: 9,
                 width: 1,
                 backgroundColor: 'currentColor',
@@ -296,11 +327,6 @@ function Client(props) {
             height: 3,
         },
     })(Slider);
-
-    const handleChangePrice = (e, v) => {
-        e.preventDefault()
-        setFiltersObj({...filtersObj, clothe_price_range: v})
-    }
     
     return (
         <Container className={classes.container} component="main" maxWidth="xl">

@@ -21,15 +21,6 @@ from ressources.picture_list_creation import get_recommended_picture_list
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
 
-
-filt_dic = {
-    "clothe_sex" : 'M',
-    "clothe_type" : 'all',
-    "clothe_material" : 'all',
-    "clothe_production" : 'all',
-    "clothe_price_range" : [50, 200]
-}
-
 # init app
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -184,6 +175,33 @@ def update_info():
     except:  
         print('error')
         return jsonify({'msg' : 'Something went wrong'})
+
+
+@app.route('/update_filters', methods=["POST"])
+@jwt_required
+def update_filters():
+    try:
+        current_user = get_jwt_identity()
+        user_id = ObjectId(current_user["_id"])
+        filters = db.filters
+        print('filters coll')
+        print(user_id)
+        res = filters.find_one({ "user_id" : user_id })
+        print('after find one')
+        if res:
+            print('find')
+            x = filters.update_one({ "user_id" : user_id },{ "$set" : request.get_json() })
+            return jsonify({'valid' : 'Filters updated'})
+        else:
+            print('else')
+            json_data = request.get_json(force = True)
+            json_data["user_id"] = user_id
+            print(json_data)
+            # x = filters.insert_one(json_data)
+            return jsonify({'valid' : 'Filters created'})
+    except:  
+        print('error in update filters')
+        return jsonify({'msg' : 'Something went wrong'})
     
     
 @app.route('/change_pwd', methods=["POST"])
@@ -335,6 +353,14 @@ def remove_account():
 @app.route("/load_image_for_rating", methods=["GET"])
 @jwt_required
 def load_image_for_rating():
+    filt_dic = {
+        'clothe_sex' : 'M',
+        'clothe_type' : 'All',
+        'clothe_material' : 'All',
+        'clothe_production' : 'All',
+        'clothe_price_range' : [100, 150]
+    }
+    
     current_user = get_jwt_identity()
     
     if current_user["userType"] != 'client' :
@@ -343,8 +369,9 @@ def load_image_for_rating():
     user_id = current_user["_id"]
 
     pictures_list = get_recommended_picture_list(user_id, filt_dic)
+    print(pictures_list)
     if not pictures_list:
-        return jsonify({"no_more_pictures":"No more pictures to show, try to change your filters, bitch!"})
+        return jsonify({"no_more_pictures":"No more pictures to show, try to change your filters"})
 
     coll = db["image_info"]
     list_dict = []
@@ -364,7 +391,6 @@ def load_image_for_rating():
 
     send_image_info = jsonify(list_dict)
     return send_image_info
-
 
 
 @app.route("/show_image", methods=["POST"])
