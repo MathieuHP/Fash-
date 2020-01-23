@@ -353,12 +353,13 @@ def remove_account():
 @app.route("/load_image_for_rating", methods=["GET"])
 @jwt_required
 def load_image_for_rating():
+
     filt_dic = {
-        'clothe_sex' : 'M',
-        'clothe_type' : 'All',
-        'clothe_material' : 'All',
-        'clothe_production' : 'All',
-        'clothe_price_range' : [100, 150]
+        "clothe_sex" : ['M'],
+        "clothe_type" : ['all'],
+        "clothe_material" : ['all'],
+        "clothe_production" : ['all'],
+        "clothe_price_range" : [50, 2000]
     }
     
     current_user = get_jwt_identity()
@@ -367,7 +368,6 @@ def load_image_for_rating():
         return jsonify({"msg" : "Wrong type of user"})
 
     user_id = current_user["_id"]
-
     pictures_list = get_recommended_picture_list(user_id, filt_dic)
     print(pictures_list)
     if not pictures_list:
