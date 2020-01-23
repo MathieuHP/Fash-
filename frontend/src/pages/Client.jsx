@@ -1,11 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import styled from 'styled-components';
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // import { faTimes, faStar, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { useHistory } from "react-router-dom";
 
 // MATERIAL UI
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles, useTheme } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -16,13 +15,24 @@ import Fab from '@material-ui/core/Fab';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import CrossIcon from '@material-ui/icons/Clear';
 import StarIcon from '@material-ui/icons/Star';
+import Chip from '@material-ui/core/Chip';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import Modal from '@material-ui/core/Modal';
+import { Button } from '@material-ui/core';
+import Slider from '@material-ui/core/Slider';
+import Tooltip from '@material-ui/core/Tooltip';
 
 function Client(props) {
     // STYLED
 
     const useStyles = makeStyles(theme =>({
         card: {
-        maxWidth: 500,
+        // maxWidth: 500,
+        width: 400
         },
         media: {
             height: 500,
@@ -38,9 +48,49 @@ function Client(props) {
         extendedIcon: {
             marginRight: theme.spacing(1),
         },
+        formControl: {
+            display: 'flex',
+            margin: theme.spacing(1),
+            minWidth: 120,
+        },
+        chips: {
+            display: 'flex',
+            flexWrap: 'wrap',
+        },
+        chip: {
+            margin: 2,
+        },
+        paper: {
+            display : 'flex',
+        },
+        container: {
+            display : 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        modal: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            overflow: 'scroll',
+          },
+        modalContent: {
+            padding: 30,
+            outline: 'none',
+            position: 'absolute',
+            width: '70%',
+            backgroundColor: theme.palette.background.paper,
+        },
+        sliderPrice: {
+            width: '70%' + theme.spacing(3) * 2,
+        },
+        sliderPriceMargin: {
+            height: theme.spacing(3),
+        },
     }))
 
     const classes = useStyles();
+    const theme = useTheme();
 
     // STATE, EFFECT
     const [imageSrc, setImageSrc] = useState('')
@@ -52,6 +102,14 @@ function Client(props) {
     const [price, setPrice] = useState('')
     const [sex, setSex] = useState('')
     const [description, setDescription] = useState('')
+    const [open, setOpen] = React.useState(false);
+    const [filtersObj, setFiltersObj] = useState({
+        clothe_sex: [],
+        clothe_type: [],
+        clothe_material: [],
+        clothe_production: [],
+        clothe_price_range: [0, 999],
+    })
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -63,8 +121,43 @@ function Client(props) {
             getListImages();
         }
     }, []);
+
+    const sexList= [
+        'Male',
+        'Female',
+    ];
+
+    const typeList= [
+        'Type 1',
+        'Type 2',
+        'Type 3'
+    ];
+
+    const materialList= [
+        'Material 1',
+        'Material 2',
+        'Material 3',
+    ];
+    
+    const productionList= [
+        'Production 1',
+        'Production 2',
+        'Production 3'
+    ];
+
+    let sliderValue = [0,999]
     
     // FUNCTIONS
+    
+    const getStyles = (name, personName, theme) => {
+        return {
+            fontWeight:
+            personName.indexOf(name) === -1
+                ? theme.typography.fontWeightRegular
+                : theme.typography.fontWeightMedium,
+        };
+    }
+
     const getListImages = async () => {
         const options = {
             method: 'GET',
@@ -155,9 +248,63 @@ function Client(props) {
         }
     }
 
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    
+    const handleClose = () => {
+        console.log(filtersObj);
+        setOpen(false);
+    };
+
+    const AirbnbSlider = withStyles({
+        root: {
+            color: '#3a8589',
+            height: 3,
+            padding: '13px 0',
+        },
+        thumb: {
+            height: 27,
+            width: 27,
+            backgroundColor: '#fff',
+            border: '1px solid currentColor',
+            marginTop: -12,
+            marginLeft: -13,
+            boxShadow: '#ebebeb 0px 2px 2px',
+            //     '&:focus,&:hover,&$active': {
+            //     boxShadow: '#ccc 0px 2px 3px 1px',
+            // },
+            '& .bar': {
+                // display: inline-block !important;
+                height: 9,
+                width: 1,
+                backgroundColor: 'currentColor',
+                marginLeft: 1,
+                marginRight: 1,
+            },
+        },
+        active: {},
+        valueLabel: {
+            left: 'calc(-50% + 4px)',
+        },
+        track: {
+          height: 3,
+        },
+        rail: {
+            color: '#d8d8d8',
+            opacity: 1,
+            height: 3,
+        },
+    })(Slider);
+
+    const handleChangePrice = (e, v) => {
+        e.preventDefault()
+        setFiltersObj({...filtersObj, clothe_price_range: v})
+    }
+    
     return (
-        <Container component="main" maxWidth="xs">
-            <div className={classes.paper}>
+        <Container className={classes.container} component="main" maxWidth="xl">
+            <div className={classes.Button}>
                 {
                     imageSrc ?
                     <Card className={classes.card}>
@@ -206,7 +353,131 @@ function Client(props) {
                     :
                     <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Loading ...</Typography>
                 }
+                <Button onClick={handleOpen}>
+                    Filters
+                </Button>
             </div>
+            <Modal
+                open={open}
+                onClose={handleClose}
+                className={classes.modal}
+            >
+                <div className={classes.modalContent}>
+                    <Typography variant="h4" align="center" color="secondary" component="h4">Filters</Typography>
+                    <FormControl className={classes.formControl}>
+                        <InputLabel>Sex</InputLabel>
+                        <Select
+                            multiple
+                            value={filtersObj['clothe_sex']}
+                            onChange={e => setFiltersObj({...filtersObj, clothe_sex: e.target.value})}
+                            input={<Input />}
+                            renderValue={selected => (
+                                <div className={classes.chips}>
+                                    {
+                                        selected.map(value => (
+                                            <Chip key={value} label={value} className={classes.chip} />
+                                        ))
+                                    }
+                                </div>
+                            )}
+                        >
+                        {sexList.map(sexItems => (
+                            <MenuItem key={sexItems} value={sexItems} style={getStyles(sexItems, filtersObj['clothe_sex'], theme)}>
+                                {sexItems}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                    <br/>
+                    <FormControl className={classes.formControl}>
+                        <InputLabel>Cloth type</InputLabel>
+                        <Select
+                            multiple
+                            value={filtersObj['clothe_type']}
+                            onChange={e => setFiltersObj({...filtersObj, clothe_type: e.target.value})}
+                            input={<Input />}
+                            renderValue={selected => (
+                                <div className={classes.chips}>
+                                    {
+                                        selected.map(value => (
+                                            <Chip key={value} label={value} className={classes.chip} />
+                                        ))
+                                    }
+                                </div>
+                            )}
+                        >
+                        {typeList.map(typeItems => (
+                            <MenuItem key={typeItems} value={typeItems} style={getStyles(typeItems, filtersObj['clothe_type'], theme)}>
+                                {typeItems}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                    <br/>
+                    <FormControl className={classes.formControl}>
+                        <InputLabel>Cloth material</InputLabel>
+                        <Select
+                            multiple
+                            value={filtersObj['clothe_material']}
+                            onChange={e => setFiltersObj({...filtersObj, clothe_material: e.target.value})}
+                            input={<Input />}
+                            renderValue={selected => (
+                                <div className={classes.chips}>
+                                    {
+                                        selected.map(value => (
+                                            <Chip key={value} label={value} className={classes.chip} />
+                                        ))
+                                    }
+                                </div>
+                            )}
+                        >
+                        {materialList.map(materialItems => (
+                            <MenuItem key={materialItems} value={materialItems} style={getStyles(materialItems, filtersObj['clothe_material'], theme)}>
+                                {materialItems}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                    <br/>
+                    <FormControl className={classes.formControl}>
+                        <InputLabel>Cloth production</InputLabel>
+                        <Select
+                            multiple
+                            value={filtersObj['clothe_production']}
+                            onChange={e => setFiltersObj({...filtersObj, clothe_production: e.target.value})}
+                            input={<Input />}
+                            renderValue={selected => (
+                                <div className={classes.chips}>
+                                    {
+                                        selected.map(value => (
+                                            <Chip key={value} label={value} className={classes.chip} />
+                                        ))
+                                    }
+                                </div>
+                            )}
+                        >
+                        {productionList.map(productionItems => (
+                            <MenuItem key={productionItems} value={productionItems} style={getStyles(productionItems, filtersObj['clothe_production'], theme)}>
+                                {productionItems}
+                            </MenuItem>
+                        ))}
+                        </Select>
+                    </FormControl>
+                    <br/>
+                    <div className={classes.sliderPrice}>
+                        <div className={classes.sliderPriceMargin} />
+                            <Typography color="textSecondary" gutterBottom>Price</Typography>
+                            <AirbnbSlider
+                                valueLabelDisplay="on"
+                                defaultValue={[filtersObj['clothe_price_range'][0], filtersObj['clothe_price_range'][1]]}
+                                max={999}
+                                min={0}
+                                onChange={(event ,value) => {sliderValue = value}}
+                                onChangeCommitted={(v) => setFiltersObj({...filtersObj, clothe_price_range: sliderValue})}
+                            />
+                    </div>
+                </div>
+            </Modal>
         </Container>
     );
 }
