@@ -368,6 +368,7 @@ def load_image_for_rating():
         return jsonify({"msg" : "Wrong type of user"})
 
     user_id = current_user["_id"]
+    print(user_id)
     pictures_list = get_recommended_picture_list(user_id, filt_dic)
     print(pictures_list)
     if not pictures_list:

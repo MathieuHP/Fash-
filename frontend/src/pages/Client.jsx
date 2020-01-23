@@ -31,7 +31,6 @@ function Client(props) {
 
     const useStyles = makeStyles(theme =>({
         card: {
-        // maxWidth: 500,
         width: 400
         },
         media: {
@@ -110,6 +109,7 @@ function Client(props) {
         clothe_production: [],
         clothe_price_range: [0, 999],
     })
+    const [noMoreCloth, setNoMoreCloth] = useState(false)
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -159,8 +159,6 @@ function Client(props) {
     }
 
     const getListImages = async (update = false) => {
-        console.log('ici');
-        
         const options = {
             method: 'GET',
             headers: {
@@ -177,18 +175,27 @@ function Client(props) {
                     history.push("/")
                     return;
                 }
+                if ("no_more_pictures" in listImageFromBackend){
+                    props.setTokenState(token)
+                    let iL = imageList
+                    iL.shift()
+                    if (iL.length > 0 ) {
+                        setImageList(iL)
+                        showImage(iL[0])
+                    } else {
+                        setImageSrc('')
+                    }
+                    setNoMoreCloth(true)
+                    return;
+                }
                 if (update === 'rate') {
-                    console.log('rateUpdate true');
                     props.setTokenState(token)
                     let iL = imageList.concat(listImageFromBackend)
                     iL.shift()
-                    console.log(iL);
                     setImageList(iL)
                     showImage(iL[0])
                 } else {
-                    console.log('no rate : ', update);
                     props.setTokenState(token)
-                    console.log(listImageFromBackend);
                     setImageList(listImageFromBackend)
                     showImage(listImageFromBackend[0])
                 }
@@ -242,7 +249,9 @@ function Client(props) {
                 });
             })
             let iL = imageList
-            if (iL.length === 0) {
+            if (iL.length === 0 && noMoreCloth) {
+                setImageSrc('')
+            } else if (iL.length === 0) {
                 console.log("Loading new images...")
             } else if (iL.length < 7) {
                 getListImages('rate')
@@ -377,7 +386,7 @@ function Client(props) {
                         </CardActions>
                     </Card> 
                     :
-                    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Loading ...</Typography>
+                    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">{noMoreCloth ? 'No more clothes for now. Try again later.' : 'Loading ...'}</Typography>
                 }
                 <Button onClick={handleOpen}>
                     Filters
