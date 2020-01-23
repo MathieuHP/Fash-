@@ -47,25 +47,31 @@ def filter_pictures(filt_dic):
                     sex_c = True
             if not sex_c:
                 return False 
+            
             for elem in clothe_type:
                 if elem == 'all' or str(elem) == str(clothe["typeCloth"]):
                     type_c = True
             if not type_c:
                 return False
+            
             for elem in clothe_material:
                 if elem == 'all' or str(elem) == str(clothe["materialCloth"]):
                     material_c = True
             if not material_c:
                 return False    
+            
             for elem in clothe_production:
                 if elem == 'all' or str(elem) == str(clothe["productionMethod"]):
                     production_c = True
             if not production_c:
                 return False 
-            if not clothe_price_down == 'all' and clothe_price_down > str(clothe["price"]):
-                return False
-            if not clothe_price_up == 'all' and clothe_price_up < str(clothe["price"]):
-                return False
+            
+            if not clothe_price_down == 'all':
+                if int(clothe_price_down) > int(clothe["price"]):
+                    return False
+            if not clothe_price_up == 'all':
+                if int(clothe_price_up) < int(clothe["price"]):
+                    return False
             return True
 
         return _predicate
@@ -73,6 +79,7 @@ def filter_pictures(filt_dic):
     my_filtered_clothes = list(filter(predicate(
         clothe_sex, clothe_type,  clothe_material, clothe_production, clothe_price_down, clothe_price_up
     ), clothes_list))
+    print(f"filtered clothes : {len(my_filtered_clothes)} out of {len(clothes_list)} total pictures")
 
     return my_filtered_clothes
 
@@ -145,6 +152,7 @@ def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
 
     candidates = [pic["name"] for pic in filtered_clothes 
                   if pic["name"] not in already_rated_pics and pic["name"] not in actual_list]
+
             
     #check if user has already seen all pictures
     if len(candidates) == 0:
@@ -231,8 +239,10 @@ def get_recommended_picture_list(user_id, filt_dic):
             pictures_list = list(create_picture_list(user_id, filt_dic, list_image,already_rated_pics))
         else:
             pictures_list = list_image
+
     except:
-        pictures_list = list(create_picture_list(user_id, filt_dic, [], already_rated_pics))
+        list_image = []
+        pictures_list = list(create_picture_list(user_id, filt_dic, list_image, already_rated_pics))
 
     pictures_list = [pic for pic in pictures_list if pic not in already_rated_pics]
 
