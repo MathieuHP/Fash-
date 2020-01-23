@@ -22,14 +22,6 @@ from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
 
 
-filt_dic = {
-    "clothe_sex" : 'M',
-    "clothe_type" : 'all',
-    "clothe_material" : 'all',
-    "clothe_production" : 'all',
-    "clothe_price_range" : [50, 200]
-}
-
 # init app
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -335,13 +327,21 @@ def remove_account():
 @app.route("/load_image_for_rating", methods=["GET"])
 @jwt_required
 def load_image_for_rating():
+
+
+    filt_dic = {
+        "clothe_sex" : ['M'],
+        "clothe_type" : ['all'],
+        "clothe_material" : ['all'],
+        "clothe_production" : ['all'],
+        "clothe_price_range" : [50, 2000]
+    }
     current_user = get_jwt_identity()
     
     if current_user["userType"] != 'client' :
         return jsonify({"msg" : "Wrong type of user"})
 
     user_id = current_user["_id"]
-
     pictures_list = get_recommended_picture_list(user_id, filt_dic)
     if not pictures_list:
         return jsonify({"no_more_pictures":"No more pictures to show, try to change your filters, bitch!"})
