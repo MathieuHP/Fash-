@@ -7,7 +7,7 @@ from image_similarity.src_get_embeddings.CV_IO_utils import read_imgs_dir
 from image_similarity.src_get_embeddings.CV_transform_utils import apply_transformer, resize_img, normalize_img
 import annoy
 
-def get_similar_images(picture_name ="IMG_1.jpg"):
+def get_similar_images(picture_name, candidates):
 
     train_filenames = list(np.load('image_similarity/outfile/filenames.npy'))
     train_embs = np.load('image_similarity/outfile/embs.npy')
@@ -19,8 +19,7 @@ def get_similar_images(picture_name ="IMG_1.jpg"):
     load_annoy_model.load('image_similarity/models/annoy_model.annoy')
 
     similar_images = load_annoy_model.get_nns_by_item(index_image, 15)
-    list_annoy = [train_filenames[i] for i in similar_images]
-    del list_annoy[0]
+    list_annoy = [train_filenames[i] for i in similar_images if i in candidates]
     return list_annoy
 
 

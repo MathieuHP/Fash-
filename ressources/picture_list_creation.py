@@ -10,57 +10,92 @@ from ressources.enable_collab import train_collab
 from image_similarity.get_similar_images import get_similar_images
 
 def get_already_rated_pictures(user_id):
-
+    """retreive all pictures the user already rated"""
     collection = db["user_ratings"]
-    rated_pictures = pd.DataFrame(list(collection.find({"user_id":user_id})))
+    results = list(collection.find({"user_id":user_id}))
     try:
-        rated_pictures = np.array(rated_pictures[["picture"]])
+        rated_pictures = [pic["picture"] for pic in results]
     except:
         rated_pictures = []
     return rated_pictures
 
 
-def less_rated_pictures_selection(rated_pictures, sex):
+def filter_pictures(filt_dic):
+    """filter out picture based on preferences"""
+    
+    coll = db.image_info
+    clothes_list =  list(coll.find({}))
+
+    clothe_sex = filt_dic["clothe_sex"]
+    clothe_type = filt_dic["clothe_type"]
+    clothe_material = filt_dic["clothe_material"]
+    clothe_production = filt_dic["clothe_production"]
+    clothe_price_range = filt_dic["clothe_price_range"]
+    clothe_price_down = str(clothe_price_range[0])
+    clothe_price_up = str(clothe_price_range[1])
+
+    def predicate(clothe_sex, clothe_type,  clothe_material, clothe_production, 
+                  clothe_price_down, clothe_price_up):
+
+        def _predicate(clothe):
+
+            if not clothe_sex == 'all' and not clothe_sex == clothe["sex"]:
+                return False
+            if not clothe_type == 'all' and not clothe_type == clothe["typeCloth"]:
+                return False
+            if not clothe_material == 'all' and not clothe_material == clothe["materialCloth"]:
+                return False
+            if not clothe_production == 'all' and not clothe_production == clothe["productionMethod"]:
+                return False
+            if not clothe_price_down == 'all' and int(clothe_price_down) > int(clothe["price"]):
+                return False
+            if not clothe_price_up == 'all' and int(clothe_price_up) < int(clothe["price"]):
+                return False
+            return True
+
+        return _predicate
+
+    my_filtered_clothes = list(filter(predicate(
+        clothe_sex, clothe_type,  clothe_material, clothe_production, clothe_price_down, clothe_price_up
+    ), clothes_list))
+
+    return my_filtered_clothes
+
+
+def less_rated_pictures_selection(candidates, alread_rated_pics):
     """ return a list with the least reated pictures """
 
-    coll = db["image_info"]
-
-    sex = str(sex)
-    if sex == "M" or sex == "F":
-        results = list(coll.find({"sex":sex}))
-    else:
-        results = list(coll.find({}))
-
-    result = [res["name"] for res in results]
-
+    #get all rated picture and sort them by ascending number of ratings
     collection = db["user_ratings"]
     ratings = pd.DataFrame(list(collection.find({})))
-
     if ratings.shape == (0,0):
-        rate_ind = result
-
+        return candidates
     else:
         ratings_count = ratings["picture"].value_counts()
+        rate_index =np.array(ratings_count.index)
+        rate_index =np.flip(rate_index)
 
-        rate_ind = np.array(ratings_count.index)
-        rate_ind =np.flip(rate_ind)
+    #get all picture and sort those with no ratings
+    coll = db.image_info
+    all_images = list(coll.find({}))
+    not_rated_pics = [res["name"] for res in all_images if res["name"] not in rate_index]
 
-    bag = []
-    for pic in result:
-        if pic not in rate_ind:
-            bag.append(pic)
-        elif pic not in rated_pictures:
-            bag.append(pic)
+    #add zero ratings pictures in the bag if they match filters, then add less rated pictures if needed
+    bag = [pic for pic in not_rated_pics if pic in candidates]
+    counter = 0
+
+    while len(bag) < 10:
+        if counter > len(rate_index):
+            break    
+        if rate_index[counter] in candidates:
+            bag.append(rate_index[counter])
+        counter += 1
 
     shuffle(bag)
-    if len(bag) > 0:
-        return bag[:15]
-    else:
-        return None
+    return bag
 
 
-def get_collaborative_recommended_picture(user_id, rated_pictures):
-
+def get_collaborative_recommended_picture(user_id, candidates):
     """ get 10 best estimated pictures for an user_id from 
     Surprise predictions """
 
@@ -69,25 +104,42 @@ def get_collaborative_recommended_picture(user_id, rated_pictures):
 
     estimated_ratings = []
     for pred in predictions:
-        if pred["user_id"] == user_id:
-            estimated_ratings.append([pred["estimation"] , pred["picture"]])
-    estimated_ratings.sort(reverse = True)
+        estimated_ratings.append([pred["estimation"] , pred["picture"]])
     if len(estimated_ratings) < 10:
-        return []
+        x = len(estimated_ratings)
     else:
-        return [estimated_ratings[i][1] for i in range(10) if i not in rated_pictures]
+        x= 10
+    estimated_ratings.sort(reverse = True)
+    return [estimated_ratings[i][1] for i in range(x) if estimated_ratings[i][1] in candidates]
 
 
-def create_recommended_pictures_list(user_id, rated_pictures, sex):
-    """ return a list of picture that the user had not rated yet """    
-    number_ratings = len(rated_pictures)
+def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
+    """create list of picture to give to user
+    inputs:  user_id and filter dict
+    output: list of picture, or False if user as already seen all pictures"""
 
-    list_new_pic = less_rated_pictures_selection(rated_pictures, sex)
-    if list_new_pic == None:
-        print("YOU ALREADY LIKED ALL THE PICTURES")
-        return None 
+    print("--== CREATING PICTURE LIST ==--")
+    #retreive already rated pictures and filtered pictures, 
+    #then return a picture with candidates pictures
+    filtered_clothes = filter_pictures(filt_dic)
 
-    if number_ratings < 20:
+    try:
+        len(already_rated_pics)
+    except:
+        already_rated_pics = []
+
+    candidates = [pic["name"] for pic in filtered_clothes 
+                  if pic["name"] not in already_rated_pics and pic["name"] not in actual_list]
+            
+    #check if user has already seen all pictures
+    if len(candidates) == 0:
+        print("you've already seen all the pictures")
+        return []
+
+    #check if user has already rated enough pictures, and if not return list with less rated pictures
+    list_new_pic = less_rated_pictures_selection(candidates, already_rated_pics)
+    
+    if len(already_rated_pics) < 10 and len(list_new_pic) > 5:
         return list_new_pic
 
     super_like = False
@@ -97,23 +149,23 @@ def create_recommended_pictures_list(user_id, rated_pictures, sex):
 
     if check_minimum_data():
         collab_on = True
-        predict_ratings()   #TO REMOVE
+        predict_ratings()   #TO REMOVE ? train collab reco, takes 0.5-0.7 sec with few datas
         print("-- data amount OK --")
 
     collection = db["list_images"]
     results = list(collection.find({"user_id": user_id}))[0]
 
+    #check with geoffrey cmt il feed son annoy car il faut appliquer les filtres
     if len(results["super_like"]) > 0:
         sup_like = results["super_like"]
-        annoy_brut = get_similar_images(sup_like[0])
-        list_annoy = [pic for pic in annoy_brut if pic not in rated_pictures]
+        list_annoy = get_similar_images(sup_like[0], candidates)
         if len(list_annoy) >= 5:
             super_like = True
             cursor = collection.update_one({"_id":results["_id"]},{"$set":{"super_like":sup_like[1:]}})
 
     if collab_on:
-        list_collab = get_collaborative_recommended_picture(user_id, rated_pictures)
-        if len(list_collab) < 5:
+        list_collab = get_collaborative_recommended_picture(user_id, candidates)
+        if len(list_collab) < 1:
             collab_on = False
 
     list_final = []
@@ -122,52 +174,55 @@ def create_recommended_pictures_list(user_id, rated_pictures, sex):
     print(f"-=_=- collab_on => {collab_on}")
 
     if super_like == True and collab_on == True:
-        for i in range(5):
-            list_final.append(list_annoy.pop(0))
-            list_final.append(list_collab.pop(0))
-            list_final.append(list_new_pic.pop(0))          
+        for i, j in zip(list_annoy, list_collab) :
+            list_final.append(i)
+            list_final.append(j)      
 
     elif super_like == False and collab_on == True:
-        for i in range(5):
-            list_final.append(list_collab.pop(0))
-            list_final.append(list_new_pic.pop(0))
-
+        for i, j in zip(list_new_pic, list_collab) :
+            list_final.append(i)
+            list_final.append(j)    
 
     elif super_like == True and collab_on == False:
-        for i in range(5):
-            list_final.append(list_annoy.pop(0))
-            list_final.append(list_new_pic.pop(0))
+        for i, j,k in zip(list_annoy, list_collab, list_new_pic):
+            list_final.append(i)
+            list_final.append(j)
+            list_final.append(k)
 
     if len(list_final) > 0:
-        return [pic for pic in list_final if pic not in rated_pictures]
-    else:     
-        return [pic for pic in list_new_pic if pic not in rated_pictures]
+        final = [pic for pic in list_final if pic in candidates]
+        return set(final)
+
+    elif len(list_new_pic) > 0:     
+        final = [pic for pic in list_new_pic if pic in candidates]
+        return set(final)
+
+    else:
+        return []
 
 
-def get_recommended_picture_list(user_id):
+def get_recommended_picture_list(user_id, filt_dic):
     """ check in DB if a list of recommended picture exists, and if not, generate it then return it """
-    rated_pictures = get_already_rated_pictures(user_id)
     collection = db["list_images"]
     result = list(collection.find({"user_id":user_id}))
-
-    coll = db["user_info"]
-    sex = list(coll.find({"_id":ObjectId(user_id)}))[0]["sex"]
+    already_rated_pics = get_already_rated_pictures(user_id)
 
     try:
         list_image = result[0]["list_image"]
-
-        if len(list_image) < 8 and type(pictures_list)== list:
-            pictures_list = list_image.extend(create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex))
-
+        if not list_image:
+            list_image = []
+            
+        if len(list_image) < 7 and type(list_image)== list:
+            pictures_list = list(create_picture_list(user_id, filt_dic, list_image,already_rated_pics))
         else:
             pictures_list = list_image
-
     except:
-        pictures_list = create_recommended_pictures_list(user_id= user_id,rated_pictures= rated_pictures, sex=sex)
-    final_list = [pic for pic in pictures_list if pic not in rated_pictures]
+        pictures_list = list(create_picture_list(user_id, filt_dic, [], already_rated_pics))
 
+    pictures_list = [pic for pic in pictures_list if pic not in already_rated_pics]
 
-    cursor = collection.update_one({"user_id": user_id },{"$set":{"list_image":final_list}})
-    return final_list
-
+    cursor = collection.update_one({"user_id": user_id },{"$set":{"list_image":pictures_list}})
+    for i in enumerate(pictures_list):
+        print(i)
+    return pictures_list
 
