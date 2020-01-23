@@ -182,22 +182,16 @@ def update_info():
 def update_filters():
     try:
         current_user = get_jwt_identity()
-        user_id = ObjectId(current_user["_id"])
+        user_id = current_user["_id"]
         filters = db.filters
-        print('filters coll')
-        print(user_id)
         res = filters.find_one({ "user_id" : user_id })
-        print('after find one')
         if res:
-            print('find')
-            x = filters.update_one({ "user_id" : user_id },{ "$set" : request.get_json() })
+            x = filters.update_one({ "user_id" : user_id },{ "$set" : request.get_json(force = True) })
             return jsonify({'valid' : 'Filters updated'})
         else:
-            print('else')
             json_data = request.get_json(force = True)
             json_data["user_id"] = user_id
-            print(json_data)
-            # x = filters.insert_one(json_data)
+            x = filters.insert_one(json_data)
             return jsonify({'valid' : 'Filters created'})
     except:  
         print('error in update filters')
@@ -353,6 +347,8 @@ def remove_account():
 @app.route("/load_image_for_rating", methods=["GET"])
 @jwt_required
 def load_image_for_rating():
+    
+    # TODO CHANGE FILT_DICT WITH FILTERS FROM DB 
 
     filt_dic = {
         "clothe_sex" : ['M'],
@@ -368,9 +364,7 @@ def load_image_for_rating():
         return jsonify({"msg" : "Wrong type of user"})
 
     user_id = current_user["_id"]
-    print(user_id)
     pictures_list = get_recommended_picture_list(user_id, filt_dic)
-    print(pictures_list)
     if not pictures_list:
         return jsonify({"no_more_pictures":"No more pictures to show, try to change your filters"})
 
