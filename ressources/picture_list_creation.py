@@ -107,7 +107,7 @@ def less_rated_pictures_selection(candidates, alread_rated_pics):
     counter = 0
 
     while len(bag) < 10:
-        if counter > len(rate_index):
+        if counter >= len(rate_index):
             break    
         if rate_index[counter] in candidates:
             bag.append(rate_index[counter])
