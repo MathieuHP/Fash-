@@ -38,18 +38,33 @@ def filter_pictures(filt_dic):
                   clothe_price_down, clothe_price_up):
 
         def _predicate(clothe):
-
-            if not clothe_sex == 'all' and not clothe_sex == clothe["sex"]:
+            sex_c = False
+            type_c = False
+            material_c = False
+            production_c = False
+            for elem in clothe_sex:
+                if elem == 'all' or elem == clothe["sex"]:
+                    sex_c = True
+            if not sex_c:
+                return False 
+            for elem in clothe_type:
+                if elem == 'all' or str(elem) == str(clothe["typeCloth"]):
+                    type_c = True
+            if not type_c:
                 return False
-            if not clothe_type == 'all' and not clothe_type == clothe["typeCloth"]:
+            for elem in clothe_material:
+                if elem == 'all' or str(elem) == str(clothe["materialCloth"]):
+                    material_c = True
+            if not material_c:
+                return False    
+            for elem in clothe_production:
+                if elem == 'all' or str(elem) == str(clothe["productionMethod"]):
+                    production_c = True
+            if not production_c:
+                return False 
+            if not clothe_price_down == 'all' and clothe_price_down > str(clothe["price"]):
                 return False
-            if not clothe_material == 'all' and not clothe_material == clothe["materialCloth"]:
-                return False
-            if not clothe_production == 'all' and not clothe_production == clothe["productionMethod"]:
-                return False
-            if not clothe_price_down == 'all' and int(clothe_price_down) > int(clothe["price"]):
-                return False
-            if not clothe_price_up == 'all' and int(clothe_price_up) < int(clothe["price"]):
+            if not clothe_price_up == 'all' and clothe_price_up < str(clothe["price"]):
                 return False
             return True
 
