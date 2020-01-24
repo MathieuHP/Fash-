@@ -19,7 +19,10 @@ def get_similar_images(picture_name, candidates):
     load_annoy_model.load('image_similarity/models/annoy_model.annoy')
 
     similar_images = load_annoy_model.get_nns_by_item(index_image, 15)
-    list_annoy = [train_filenames[i] for i in similar_images if i in candidates]
+    list_annoy = [train_filenames[i] for i in similar_images if train_filenames[i] in candidates]
+
+    print(f"ANNOY got {len(list_annoy)} out of {len(candidates)} candidates")
+
     return list_annoy
 
 
