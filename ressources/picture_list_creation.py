@@ -42,29 +42,33 @@ def filter_pictures(filt_dic):
             type_c = False
             material_c = False
             production_c = False
-            for elem in clothe_sex:
-                if elem == 'all' or elem == clothe["sex"]:
-                    sex_c = True
-            if not sex_c:
-                return False 
-            
-            for elem in clothe_type:
-                if elem == 'all' or str(elem) == str(clothe["typeCloth"]):
-                    type_c = True
-            if not type_c:
-                return False
-            
-            for elem in clothe_material:
-                if elem == 'all' or str(elem) == str(clothe["materialCloth"]):
-                    material_c = True
-            if not material_c:
-                return False    
-            
-            for elem in clothe_production:
-                if elem == 'all' or str(elem) == str(clothe["productionMethod"]):
-                    production_c = True
-            if not production_c:
-                return False 
+            if len(clothe_sex) > 0:
+                for elem in clothe_sex:
+                    if elem == 'all' or elem == clothe["sex"]:
+                        sex_c = True
+                if not sex_c:
+                    return False 
+
+            if len(clothe_type) > 0:    
+                for elem in clothe_type:
+                    if elem == 'all' or str(elem) == str(clothe["typeCloth"]):
+                        type_c = True
+                if not type_c:
+                    return False
+
+            if len(clothe_material) > 0:    
+                for elem in clothe_material:
+                    if elem == 'all' or str(elem) == str(clothe["materialCloth"]):
+                        material_c = True
+                if not material_c:
+                    return False  
+                      
+            if len(clothe_production) > 0:    
+                for elem in clothe_production:
+                    if elem == 'all' or str(elem) == str(clothe["productionMethod"]):
+                        production_c = True
+                if not production_c:
+                    return False 
             
             if not clothe_price_down == 'all':
                 if int(clothe_price_down) > int(clothe["price"]):
