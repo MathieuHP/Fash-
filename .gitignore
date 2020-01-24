@@ -18,3 +18,4 @@ image_similarity/src_get_embeddings/__pycache__/CV_transform_utils.cpython-37.py
 image_similarity/src_get_embeddings/__pycache__/CV_IO_utils.cpython-37.pyc
 image_similarity/__pycache__/train_annoy_model.cpython-37.pyc
 image_similarity/__pycache__/get_embeddings.cpython-37.pyc
+main.py

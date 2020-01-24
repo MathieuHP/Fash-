@@ -253,6 +253,7 @@ def get_recommended_picture_list(user_id, filt_dic, list_pic):
     #     print(i)
 
     # secondary function with front-end stored list
+    list_image = [pic["name"] for pic in list_pic]
     already_rated_pics = get_already_rated_pictures(user_id)
     pictures_list = list(create_picture_list(user_id, filt_dic, list_image, already_rated_pics))
     
