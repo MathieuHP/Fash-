@@ -123,8 +123,8 @@ function Client(props) {
     }, []);
 
     const sexList= [
-        'Male',
-        'Female',
+        'M',
+        'F',
     ];
 
     const typeList= [
@@ -170,6 +170,8 @@ function Client(props) {
         fetch(`http://127.0.0.1:5000/load_image_for_rating`, options)
         .then((response) => {
             response.json().then(function (listImageFromBackend) {
+                console.log(listImageFromBackend);
+                
                 if ("msg" in listImageFromBackend) {
                     props.setTokenState('')
                     localStorage.removeItem('usertoken')
@@ -179,7 +181,8 @@ function Client(props) {
                 if ("no_more_pictures" in listImageFromBackend){
                     props.setTokenState(token)
                     let iL = imageList
-                    iL.shift()
+                    iL.shift()                    
+                    setFiltersObj(listImageFromBackend['filters'])
                     if (iL.length > 0 ) {
                         setImageList(iL)
                         showImage(iL[0])
@@ -190,15 +193,16 @@ function Client(props) {
                     return;
                 }
                 if (update === 'rate') {
+                    setFiltersObj(listImageFromBackend['filters'])
                     props.setTokenState(token)
-                    let iL = imageList.concat(listImageFromBackend)
+                    let iL = imageList.concat(listImageFromBackend['imgs'])
                     iL.shift()
                     setImageList(iL)
                     showImage(iL[0])
                 } else {
                     props.setTokenState(token)
-                    setImageList(listImageFromBackend)
-                    showImage(listImageFromBackend[0])
+                    setImageList(listImageFromBackend['imgs'])
+                    showImage(listImageFromBackend['imgs'][0])
                 }
             });
         })
@@ -267,7 +271,7 @@ function Client(props) {
     }
 
     const updateFilters = async () => {
-        console.log('updateFilters');
+        console.log(filtersObj);
         const options = {
             method: 'POST',
             body: JSON.stringify(filtersObj),

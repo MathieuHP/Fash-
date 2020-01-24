@@ -371,7 +371,7 @@ def load_image_for_rating():
 
     pictures_list = get_recommended_picture_list(user_id, filt_dic, json_data)
     if not pictures_list:
-        return jsonify({"no_more_pictures":"No more pictures to show, try to change your filters"})
+        return jsonify({"no_more_pictures":"No more pictures to show, try to change your filters", 'filters' : filt_dic})
 
     coll = db["image_info"]
     list_dict = []
@@ -389,7 +389,7 @@ def load_image_for_rating():
             })
         i+=1
 
-    send_image_info = jsonify(list_dict)
+    send_image_info = jsonify({'imgs' : list_dict, 'filters' : filt_dic})
     return send_image_info
 
 
@@ -407,7 +407,6 @@ def show_image():
 @jwt_required
 def rate_image():
     json_data = request.get_json(force = True)
-
     current_user = get_jwt_identity()
     
     if current_user["userType"] != 'client' :
