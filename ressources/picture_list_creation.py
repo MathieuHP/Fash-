@@ -42,6 +42,7 @@ def filter_pictures(filt_dic):
             type_c = False
             material_c = False
             production_c = False
+
             if len(clothe_sex) > 0:
                 for elem in clothe_sex:
                     if elem == 'all' or elem == clothe["sex"]:
@@ -186,13 +187,16 @@ def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
     if len(results["super_like"]) > 0:
         sup_like = results["super_like"]
         list_annoy = get_similar_images(sup_like[0], candidates)
-        if len(list_annoy) >= 5:
+        if len(list_annoy) >= 3:
             super_like = True
             cursor = collection.update_one({"_id":results["_id"]},{"$set":{"super_like":sup_like[1:]}})
+        else:
+            print("-= list annoy too small =-")
 
     if collab_on:
         list_collab = get_collaborative_recommended_picture(user_id, candidates)
         if len(list_collab) < 1:
+            print("-= list collab too small =-")
             collab_on = False
 
     list_final = []

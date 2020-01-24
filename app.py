@@ -325,7 +325,7 @@ def remove_account():
     if current_user["userType"] != 'client' :
         return jsonify({"msg" : "Wrong type of user"})
     
-    user_id = ObjectId(current_user["_id"])
+    user_id = current_user["_id"]
     
     collection = db["user_info"]
     cursor = collection.delete_one({"_id":ObjectId(user_id)})
@@ -336,6 +336,9 @@ def remove_account():
 
     collection = db["pictures_list"]
     cursor = collection.delete_many({"user_id":user_id})
+
+    collection = db["filters"]
+    cursor = collection.delete_one({"user_id":user_id})
     
     jti = get_raw_jwt()['jti']
     blacklist.add(jti)
