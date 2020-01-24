@@ -224,30 +224,37 @@ def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
         return []
 
 
-def get_recommended_picture_list(user_id, filt_dic):
+def get_recommended_picture_list(user_id, filt_dic, list_pic):
     """ check in DB if a list of recommended picture exists, and if not, generate it then return it """
-    collection = db["list_images"]
-    result = list(collection.find({"user_id":user_id}))
-    already_rated_pics = get_already_rated_pictures(user_id)
+    #primary function
 
-    try:
-        list_image = result[0]["list_image"]
-        if not list_image:
-            list_image = []
+    # collection = db["list_images"]
+    # result = list(collection.find({"user_id":user_id}))
+    # already_rated_pics = get_already_rated_pictures(user_id)
+
+    # try:
+    #     list_image = result[0]["list_image"]
+    #     if not list_image:
+    #         list_image = []
             
-        if len(list_image) < 7 and type(list_image)== list:
-            pictures_list = list(create_picture_list(user_id, filt_dic, list_image,already_rated_pics))
-        else:
-            pictures_list = list_image
+    #     if len(list_image) < 7 and type(list_image)== list:
+    #         pictures_list = list(create_picture_list(user_id, filt_dic, list_image,already_rated_pics))
+    #     else:
+    #         pictures_list = list_image
 
-    except:
-        list_image = []
-        pictures_list = list(create_picture_list(user_id, filt_dic, list_image, already_rated_pics))
+    # except:
+    #     list_image = []
+    #     pictures_list = list(create_picture_list(user_id, filt_dic, list_image, already_rated_pics))
 
-    pictures_list = [pic for pic in pictures_list if pic not in already_rated_pics]
+    # pictures_list = [pic for pic in pictures_list if pic not in already_rated_pics]
 
-    cursor = collection.update_one({"user_id": user_id },{"$set":{"list_image":pictures_list}})
-    for i in enumerate(pictures_list):
-        print(i)
+    # cursor = collection.update_one({"user_id": user_id },{"$set":{"list_image":pictures_list}})
+    # for i in enumerate(pictures_list):
+    #     print(i)
+
+    # secondary function with front-end stored list
+    already_rated_pics = get_already_rated_pictures(user_id)
+    pictures_list = list(create_picture_list(user_id, filt_dic, list_image, already_rated_pics))
+    
     return pictures_list
 
