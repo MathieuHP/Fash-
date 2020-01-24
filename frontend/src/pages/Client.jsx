@@ -160,7 +160,8 @@ function Client(props) {
 
     const getListImages = async (update = false) => {
         const options = {
-            method: 'GET',
+            method: 'POST',
+            body: JSON.stringify(imageList),
             headers: {
                 'Accept': 'application/json',
                 'Authorization': token

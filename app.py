@@ -343,28 +343,33 @@ def remove_account():
     return jsonify({"valid" : "Account has been removed"})
 
 
-
-@app.route("/load_image_for_rating", methods=["GET"])
+@app.route("/load_image_for_rating", methods=["POST"])
 @jwt_required
 def load_image_for_rating():
     
-    # TODO CHANGE FILT_DICT WITH FILTERS FROM DB 
-
-    filt_dic = {
-        "clothe_sex" : ['M'],
-        "clothe_type" : ['all'],
-        "clothe_material" : ['all'],
-        "clothe_production" : ['all'],
-        "clothe_price_range" : [50, 2000]
-    }
-    
+    json_data = request.get_json(force = True)
     current_user = get_jwt_identity()
+
+    collection = db["filters"]
+    user_id = current_user["_id"]
+    res = collection.find_one({ "user_id" : user_id })
+    if res :
+        del res['_id']
+        del res['user_id']
+        filt_dic = res
+    else :
+        filt_dic = {
+            "clothe_sex" : [],
+            "clothe_type" : [],
+            "clothe_material" : [],
+            "clothe_production" : [],
+            "clothe_price_range" : [0, 999]
+        }
     
     if current_user["userType"] != 'client' :
         return jsonify({"msg" : "Wrong type of user"})
 
-    user_id = current_user["_id"]
-    pictures_list = get_recommended_picture_list(user_id, filt_dic)
+    pictures_list = get_recommended_picture_list(user_id, filt_dic, json_data)
     if not pictures_list:
         return jsonify({"no_more_pictures":"No more pictures to show, try to change your filters"})
 
