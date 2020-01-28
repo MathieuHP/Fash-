@@ -108,14 +108,15 @@ def upload_image():
             "price": price,
             "sex": sex,
             "description": description,
-            "company_name" : company_name
+            "company_name" : company_name,
+            "company_id": current_user["_id"]
         })
 
         coll = db.company_info
         result = coll.find_one({"company_name":company_name})
         company_images = result["images_uploaded"]
         company_images.append(filename)
-        cursor = coll.update_one({"company_name":"Moon Company"},{"$set":{"images_uploaded":company_images}})
+        cursor = coll.update_one({"company_name":company_name},{"$set":{"images_uploaded":company_images}})
     
     return jsonify({"valid" : "Cloth has been uploaded"})
 
