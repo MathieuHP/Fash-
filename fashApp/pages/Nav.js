@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, AsyncStorage, StyleSheet } from 'react-native';
 // import { View, Text, Button, AsyncStorage } from 'react-native';
-
 import { Link, useHistory, useLocation } from "react-router-native";
 import jwt_decode from 'jwt-decode'
 

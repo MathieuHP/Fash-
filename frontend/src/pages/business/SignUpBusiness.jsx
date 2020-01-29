@@ -83,17 +83,21 @@ function SignUp() {
 
     const onSubmit = (e) => {
         e.preventDefault()
-        if (password === rePassword && reEmail === email) {
-            const newUser = {
-                companyName: companyName,
-                location: location,
-                email: email,
-                password: password,
-                phone: phone,
+        if (companyName.length > 0 && location.length > 0 && email.length > 0 && password.length > 0 && phone.length > 0){
+            if (password === rePassword && reEmail === email) {
+                const newUser = {
+                    companyName: companyName,
+                    location: location,
+                    email: email,
+                    password: password,
+                    phone: phone,
+                }
+                register(newUser)
+            } else {
+                setConnectionMessage(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">Passwords or emails are different</Typography>)
             }
-            register(newUser)
         } else {
-            setConnectionMessage(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">Passwords or emails are different</Typography>)
+            setConnectionMessage(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">All fields are not complete</Typography>)
         }
     }
 

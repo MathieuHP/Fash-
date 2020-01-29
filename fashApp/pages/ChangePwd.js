@@ -61,11 +61,12 @@ function ChangePwd(props) {
         fetch(`http://127.0.0.1:5000/check_token`, options)
         .then((response) => {
 
-            response.json().then(function (text) {
+            response.json().then( async function (text) {
                 if ("msg" in text) {
+                    await AsyncStorage.removeItem('usertoken');
                     props.setTokenState('')
-                    localStorage.removeItem('usertoken')
-                    history.push('/')
+                    setTokenState('')
+                    history.push("/")
                     return;
                 }
             });
@@ -84,21 +85,23 @@ function ChangePwd(props) {
                     'Authorization': props.tokenState
                 }
             })
-            .then(response => {
+            .then(async response => {
                 if ("valid" in response.data) {
                     setInfoMsg('Password has been updated')
                     history.push("/cart")
                 } else if ("msg" in response.data){
                     setInfoMsg('This email address already exists')
+                    await AsyncStorage.removeItem('usertoken');
                     props.setTokenState('')
-                    localStorage.removeItem('usertoken')
-                    history.push('/')
+                    setTokenState('')
+                    history.push("/")
                 } else if ("info" in response.data){
                     setInfoMsg('Old password is wrong')
                 } else {
+                    await AsyncStorage.removeItem('usertoken');
                     props.setTokenState('')
-                    localStorage.removeItem('usertoken')
-                    history.push('/')
+                    setTokenState('')
+                    history.push("/")
                 }
             })
         } else {

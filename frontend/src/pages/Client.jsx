@@ -1,6 +1,4 @@
 import React, {useState, useEffect} from 'react';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-// import { faTimes, faStar, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { useHistory } from "react-router-dom";
 
 // MATERIAL UI
@@ -24,7 +22,6 @@ import Select from '@material-ui/core/Select';
 import Modal from '@material-ui/core/Modal';
 import { Button } from '@material-ui/core';
 import Slider from '@material-ui/core/Slider';
-import Tooltip from '@material-ui/core/Tooltip';
 
 function Client(props) {
     // STYLED
@@ -102,6 +99,7 @@ function Client(props) {
     const [sex, setSex] = useState('')
     const [description, setDescription] = useState('')
     const [open, setOpen] = React.useState(false);
+    const [noMoreCloth, setNoMoreCloth] = useState(false)
     const [filtersObj, setFiltersObj] = useState({
         clothe_sex: [],
         clothe_type: [],
@@ -109,7 +107,6 @@ function Client(props) {
         clothe_production: [],
         clothe_price_range: [0, 999],
     })
-    const [noMoreCloth, setNoMoreCloth] = useState(false)
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -170,8 +167,6 @@ function Client(props) {
         fetch(`http://127.0.0.1:5000/load_image_for_rating`, options)
         .then((response) => {
             response.json().then(function (listImageFromBackend) {
-                console.log(listImageFromBackend);
-                
                 if ("msg" in listImageFromBackend) {
                     props.setTokenState('')
                     localStorage.removeItem('usertoken')
@@ -180,14 +175,19 @@ function Client(props) {
                 }
                 if ("no_more_pictures" in listImageFromBackend){
                     props.setTokenState(token)
-                    let iL = imageList
-                    iL.shift()                    
-                    setFiltersObj(listImageFromBackend['filters'])
-                    if (iL.length > 0 ) {
-                        setImageList(iL)
-                        showImage(iL[0])
-                    } else {
+                    if (update === 'filters') {
+                        setImageList([])
                         setImageSrc('')
+                    } else {
+                        let iL = imageList
+                        iL.shift()                    
+                        setFiltersObj(listImageFromBackend['filters'])
+                        if (iL.length > 0 ) {
+                            setImageList(iL)
+                            showImage(iL[0])
+                        } else {
+                            setImageSrc('')
+                        }
                     }
                     setNoMoreCloth(true)
                     return;
@@ -200,6 +200,7 @@ function Client(props) {
                     setImageList(iL)
                     showImage(iL[0])
                 } else {
+                    setFiltersObj(listImageFromBackend['filters'])
                     props.setTokenState(token)
                     setImageList(listImageFromBackend['imgs'])
                     showImage(listImageFromBackend['imgs'][0])
@@ -271,7 +272,6 @@ function Client(props) {
     }
 
     const updateFilters = async () => {
-        console.log(filtersObj);
         const options = {
             method: 'POST',
             body: JSON.stringify(filtersObj),
@@ -290,7 +290,6 @@ function Client(props) {
                     return;
                 }
                 if ("valid" in res) {
-                    console.log(res['valid']);
                     getListImages('filters')
                 }
             });
@@ -354,9 +353,9 @@ function Client(props) {
                             title="fash"
                         />
                         <CardContent>
-                            <Typography component="p">
+                            {/* <Typography component="p">
                                 {name}
-                            </Typography>
+                            </Typography> */}
                             <Typography component="p">
                                 {typeCloth}
                             </Typography>
@@ -369,9 +368,9 @@ function Client(props) {
                             <Typography component="p">
                                 {price}
                             </Typography>
-                            <Typography component="p">
+                            {/* <Typography component="p">
                                 {sex}
-                            </Typography>
+                            </Typography> */}
                             <Typography component="p">
                                 {description}
                             </Typography>

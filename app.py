@@ -293,7 +293,6 @@ def login():
     return result
 
     
-    
 @app.route('/getProfileInfo', methods=['POST'])
 @jwt_required
 def getProfileInfo():
@@ -307,14 +306,12 @@ def getProfileInfo():
     return jsonify(allInfo)
 
 
-
 @app.route('/logout', methods=['DELETE'])
 @jwt_required
 def logout():
     jti = get_raw_jwt()['jti']
     blacklist.add(jti)
     return jsonify({"msg": "Successfully logged out"})
-
 
 
 @app.route('/remove_account', methods=['POST'])
@@ -395,6 +392,27 @@ def load_image_for_rating():
     send_image_info = jsonify({'imgs' : list_dict, 'filters' : filt_dic})
     return send_image_info
 
+@app.route("/one_image_info", methods=["POST"])
+def one_image_info():
+    image_name = request.get_json(force = True)['image_name']
+    
+    print(image_name)
+
+    coll = db["image_info"]
+    get_info = coll.find_one({"name":image_name})
+    image_info = {
+        "name": image_name,
+        "typeCloth": get_info["typeCloth"],
+        "materialCloth": get_info["materialCloth"],
+        "productionMethod": get_info["productionMethod"],
+        "price": get_info["price"],
+        "sex": get_info["sex"],
+        "description": get_info["description"]
+    }
+
+    send_image_info = jsonify({'image_info' : image_info})
+    return send_image_info
+
 
 @app.route("/show_image", methods=["POST"])
 def show_image():
@@ -403,7 +421,6 @@ def show_image():
     send_file_image = send_file(filename, mimetype='image/jpg')
 
     return send_file_image
-
 
 
 @app.route("/rate_image", methods=["POST"])
@@ -450,7 +467,6 @@ def rate_image():
     return jsonify({"valid" : "Cloth has been rated"})
 
 
-
 @app.route("/cart", methods=["POST"])
 @jwt_required
 def cart():
@@ -475,7 +491,6 @@ def cart():
         return liked_picture
     except:
         return ''
-
 
 
 @app.route("/images_uploaded", methods=["POST"])

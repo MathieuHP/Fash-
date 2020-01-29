@@ -143,7 +143,7 @@ function Company(props) {
                 if ("msg" in text) {
                     props.setTokenState('')
                     localStorage.removeItem('usertoken')
-                    history.push("/business")
+                    history.push("/business/products")
                     return;
                 } else if ("valid" in text) {
                     setTypeCloth('')

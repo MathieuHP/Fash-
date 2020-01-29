@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, AsyncStorage, StyleSheet } from 'react-native';
+import { View, Image, AsyncStorage, StyleSheet, TouchableHighlight } from 'react-native';
 import { useHistory } from "react-router-native";
 import RadioForm from 'react-native-simple-radio-button';
 import axios from 'axios'
@@ -21,7 +21,8 @@ import {
 	List,
 	ListItem,
 	ButtonGroup,
-	Card
+    Card,
+    Modal
 } from '@ui-kitten/components';
 
 function Cart(props) {
@@ -35,12 +36,22 @@ function Cart(props) {
     const [hasBeenChanged, setHasBeenChanged] = useState(false);
     const [objInfo, setObjInfo] = useState({})
     const [objInfoBeforeChanges, setObjInfoBeforeChanges] = useState({});
+    const [imageInfoCard, setImageInfoCard] = useState({
+        typeCloth: '',
+        materialCloth: '',
+        productionMethod: '',
+        price: '',
+        description: ''
+    });
 
     const [first_name, setFirst_name] = useState([])
 	const [last_name, setLast_name] = useState([])
     const [email, setEmail] = useState([])
 	const [reEmail, setReEmail] = useState([])
     const [phone, setPhone] = useState([])
+
+    const [visible, setVisible] = React.useState(false);
+    const [imgCardSrc, setImgCardSrc] = React.useState('')
     
     const data = [
 		{ text: 'Male', value: "M"},
@@ -149,9 +160,50 @@ function Cart(props) {
         let imageUrl = urlCreator.createObjectURL(imageBlob);
 
         return (
-            <Image style={styles.imageCart} source={{ uri: imageUrl }} key={key} />
+            <TouchableHighlight onPress={ e => openCard(imageUrl, imageName)} key={key + 'th'}>
+                <Image style={styles.imageCart} source={{ uri: imageUrl }} key={key} />
+            </TouchableHighlight>
         )
     }
+
+    const imageCard = () => {
+        return (
+            <Layout
+                style={styles.modalContainer}
+            >
+                {imgCardSrc ? <Image style={styles.imageCard} source={{ uri: imgCardSrc }} key={'imgCard'} /> : <Text>Loading ...</Text>}
+                {
+                    imageInfoCard ?
+                        <Layout style={styles.imageInfoCard}>
+                            <Text appearance='hint' >Type of cloth: </Text><Text style={styles.imageInfoCardText} >{imageInfoCard['typeCloth']}</Text> 
+                            <Text appearance='hint' >Cloth material: </Text><Text style={styles.imageInfoCardText} >{imageInfoCard['materialCloth']}</Text>
+                            <Text appearance='hint' >Production method: </Text><Text style={styles.imageInfoCardText} >{imageInfoCard['productionMethod']}</Text>
+                            <Text appearance='hint' >Price: </Text><Text style={styles.imageInfoCardText} >{imageInfoCard['price']}</Text>
+                            <Text appearance='hint' >Description: </Text><Text style={styles.imageInfoCardText} >{imageInfoCard['description']}</Text>
+                        </Layout>
+                    :
+                    <Text>Loading ...</Text>
+                }
+            </Layout>
+        )
+    }
+
+    const openCard = (src = '', imageNameCard = '') => {
+        if (visible === false) {
+            const options = {
+                method: 'POST',
+                body: JSON.stringify({ image_name: imageNameCard }),
+            };
+            fetch(`http://127.0.0.1:5000/one_image_info`, options)
+            .then((response) => {
+                response.json().then(function (res) {
+                    setImageInfoCard(res['image_info'])
+                });
+            })
+			setImgCardSrc(src)
+		}
+        setVisible(!visible);
+    };
 
 
     const removeAccount = () => {
@@ -163,24 +215,24 @@ function Cart(props) {
             }
         };
         fetch(`http://127.0.0.1:5000/remove_account`, options)
-            .then((response) => {
-                response.json().then(async function (text) {
-                    if ("msg" in text) {
-                        await AsyncStorage.removeItem('usertoken');
-                        props.setTokenState('')
-						setTokenState('')
-                        history.push("/")
-                        return;
-                    } else if ("valid" in text) {
-                        console.log(text["valid"])
-                        await AsyncStorage.removeItem('usertoken');
-                        setTokenState('')
-                        props.setTokenState('')
-                        history.push("/")
-                        return;
-                    }
-                });
-            })
+        .then((response) => {
+            response.json().then(async function (text) {
+                if ("msg" in text) {
+                    await AsyncStorage.removeItem('usertoken');
+                    props.setTokenState('')
+                    setTokenState('')
+                    history.push("/")
+                    return;
+                } else if ("valid" in text) {
+                    console.log(text["valid"])
+                    await AsyncStorage.removeItem('usertoken');
+                    setTokenState('')
+                    props.setTokenState('')
+                    history.push("/")
+                    return;
+                }
+            });
+        })
     }
 
 
@@ -197,7 +249,7 @@ function Cart(props) {
                             'Authorization': tokenState
                         }
                     })
-                    .then(response => {
+                    .then(async response => {
                         if ('valid' in response.data) {
                             console.log("Informations has changed")
                             setModifyInfos(false)
@@ -211,16 +263,17 @@ function Cart(props) {
                             setHasBeenChanged('An error occured. Try again later please')
                             props.setTokenState('')
                             setTokenState('')
-                            localStorage.removeItem('usertoken')
+                            await AsyncStorage.removeItem('usertoken');
                             history.push("/")
+                            return;
                         }
                     })
-                    .catch(error => {
+                    .catch(async error => {
                         console.log(error.response)
                         setHasBeenChanged('An error occured. Try again later please')
+                        await AsyncStorage.removeItem('usertoken');
                         props.setTokenState('')
-                        setTokenState('')
-                        localStorage.removeItem('usertoken')
+						setTokenState('')
                         history.push("/")
                     });
             }
@@ -235,7 +288,7 @@ function Cart(props) {
     }
 
     return (
-        <ScrollView style={{width: 300}}>
+        <ScrollView style={{width: 300, marginBottom: 100}}>
             <View>
                 <View style={styles.info}>
                     {
@@ -327,22 +380,29 @@ function Cart(props) {
                     {hasBeenChanged}
                 </Text>
             </View>
+            <View>
+                <Text style={styles.text} category='h4'>Super like</Text>
                 <View>
-                    <Text style={styles.text} category='h4'>Super like</Text>
-                    <View>
-                        {
-                            cartImageSL ? cartImageSL : <Text>Loading ...</Text>
-                        }
-                    </View>
+                    {
+                        cartImageSL ? cartImageSL : <Text>Loading ...</Text>
+                    }
                 </View>
+            </View>
+            <View>
+                <Text style={styles.text} category='h4'>Like</Text>
                 <View>
-                    <Text style={styles.text} category='h4'>Like</Text>
-                    <View>
-                        {
-                            cartImageL ? cartImageL : <Text>Loading ...</Text>
-                        }
-                    </View>
+                    {
+                        cartImageL ? cartImageL : <Text>Loading ...</Text>
+                    }
                 </View>
+            </View>
+            <Modal
+                allowBackdrop={true} 
+                backdropStyle={styles.backdrop}
+                onBackdropPress={openCard}
+                visible={visible}>
+                {imageCard()}
+            </Modal>
         </ScrollView>
     );
 }
@@ -368,4 +428,32 @@ const styles = StyleSheet.create({
     inputPassword: {
         width: 300
     },
+    container: {
+    },
+    modalContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 400,
+        height: 400,
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+    },
+    backdrop: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    },
+    imageCard: {
+        borderRadius: 3,
+        width: 400,
+        height: 400,
+    },
+    imageInfoCard: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        marginTop: 20,
+        padding: 10,
+        width: 400,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    imageInfoCardText: {
+        color: 'white'
+    }
 });
