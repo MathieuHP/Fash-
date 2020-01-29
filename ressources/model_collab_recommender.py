@@ -37,21 +37,23 @@ def check_minimum_data():
     else:
         return False
     
-def filtering_out_users_and_ratings(df):
+def filtering_out_users_and_ratings(df_ratings):
 
     """filter out user and images with too few 
     ratings to preserve matrix sparsity"""
 
-    min_picture_ratings = 10
-    filter_picture = df['picture'].value_counts() > min_picture_ratings
+    min_picture_ratings = 5
+    filter_picture = df_ratings['picture'].value_counts() > min_picture_ratings
     filter_picture = filter_picture[filter_picture].index.tolist()
 
-    min_user_ratings = 20
-    filter_users = df['user_id'].value_counts() > min_user_ratings
+    min_user_ratings = 10
+    filter_users = df_ratings['user_id'].value_counts() > min_user_ratings
     filter_users = filter_users[filter_users].index.tolist()
 
-    df_new = df[(df['picture'].isin(filter_picture)) & (df['user_id'].isin(filter_users))]
-    print('The original data frame shape:\t{}'.format(df.shape))
+    df_new = df_ratings[(df_ratings['picture'].isin(filter_picture)) &
+                        (df_ratings['user_id'].isin(filter_users))]
+
+    print('The original data frame shape:\t{}'.format(df_ratings.shape))
     print('The new data frame shape:\t{}'.format(df_new.shape))
     return df_new
 
@@ -61,13 +63,13 @@ def predict_ratings():
     colaborative recommender system"""
 
     collection = db["user_ratings"]
-    df = pd.DataFrame(list(collection.find({})))
+    df_ratings = pd.DataFrame(list(collection.find({})))
 
     # preprocess, feed and predict ratings
 
-    df = filtering_out_users_and_ratings(df)
+    df_filtered = filtering_out_users_and_ratings(df_ratings)
     reader = Reader(rating_scale=(0, 2))
-    data = Dataset.load_from_df(df[['user_id', 'picture', 'rating']], reader)
+    data = Dataset.load_from_df(df_filtered[['user_id', 'picture', 'rating']], reader)
     trainset = data.build_full_trainset()
     svd = SVD()
     svd.fit(trainset)

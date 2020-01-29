@@ -132,12 +132,20 @@ def get_collaborative_recommended_picture(user_id, candidates):
     estimated_ratings = []
     for pred in predictions:
         estimated_ratings.append([pred["estimation"] , pred["picture"]])
+
+    estimated_ratings.sort(reverse = True)
+    temp_list = [pic[1] for pic in estimated_ratings if pic[1] in candidates]
+
     if len(estimated_ratings) < 10:
         x = len(estimated_ratings)
     else:
         x= 10
-    estimated_ratings.sort(reverse = True)
-    return [estimated_ratings[i][1] for i in range(x) if estimated_ratings[i][1] in candidates]
+    
+    collab_list =  temp_list[:x]
+
+    print(f"COLLAB got {len(collab_list)} out of {len(estimated_ratings)} estimated ratings")
+
+    return collab_list
 
 
 def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
@@ -177,8 +185,8 @@ def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
 
     if check_minimum_data():
         collab_on = True
-        predict_ratings()   #TO REMOVE ? train collab reco, takes 0.5-0.7 sec with few datas
         print("-- data amount OK --")
+        predict_ratings()   #TO REMOVE ? train collab reco, takes 0.5-0.7 sec with few datas
 
     collection = db["list_images"]
     results = list(collection.find({"user_id": user_id}))[0]

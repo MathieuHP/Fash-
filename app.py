@@ -105,11 +105,18 @@ def upload_image():
             "typeCloth": typeCloth,
             "materialCloth": materialCloth,
             "productionMethod": productionMethod,
-            "price": price,
+            "price": int(price),
             "sex": sex,
             "description": description,
-            "company_name" : company_name
+            "company_name" : company_name,
+            "company_id": current_user["_id"]
         })
+
+        coll = db.company_info
+        result = coll.find_one({"company_name":company_name})
+        company_images = result["images_uploaded"]
+        company_images.append(filename)
+        cursor = coll.update_one({"company_name":company_name},{"$set":{"images_uploaded":company_images}})
     
     return jsonify({"valid" : "Cloth has been uploaded"})
 
@@ -184,7 +191,7 @@ def update_filters():
         current_user = get_jwt_identity()
         user_id = current_user["_id"]
         filters = db.filters
-        res = filters.find_one({ "user_id" : user_id })
+        res = filters.find_one({"user_id": user_id })
         if res:
             x = filters.update_one({ "user_id" : user_id },{ "$set" : request.get_json(force = True) })
             return jsonify({'valid' : 'Filters updated'})
