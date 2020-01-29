@@ -11,6 +11,7 @@ import { isEquivalent } from '../utils/isEquivalent'
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
+import CardActionArea from '@material-ui/core/CardActionArea';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -24,7 +25,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
-
+import Modal from '@material-ui/core/Modal';
 
 
 function Cart(props) {
@@ -72,12 +73,34 @@ function Cart(props) {
             margin: theme.spacing(1),
             minWidth: 120,
         },
+        modal: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+        },
+        modalDiv: {
+            outline: 'none',
+        },
+        modalContent: {
+            display: 'flex',
+        },
+        modalContentText: {
+            color: 'white',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            marginTop: 20,
+            padding: 10,
+        },
+        modalContentTextSpan: {
+            color: "Gray"
+        },
+        imgModal: {
+            maxWidth: '70vw',
+            maxHeight: '70vh',
+            borderRadius: 3,
+        },
     }));
-
-    const ImgCard = styled.img`
-        width : 100px;
-        height : 100px;
-    `;
 
     const classes = useStyles();
 
@@ -89,6 +112,16 @@ function Cart(props) {
     const [objInfo, setObjInfo] = useState({})
     const [objInfoBeforeChanges, setObjInfoBeforeChanges] = useState({});
     const [reEmail, setReEmail] = useState('');
+    const [open, setOpen] = React.useState(false);
+    const [imageInfoCard, setImageInfoCard] = useState({
+        typeCloth: '',
+        materialCloth: '',
+        productionMethod: '',
+        price: '',
+        description: ''
+    });
+    const [imgCardSrc, setImgCardSrc] = React.useState('')
+
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -182,13 +215,15 @@ function Cart(props) {
         return (
             <Grid key={key + 'grid'} item xs={12} sm={6} md={3}>
                 <Card key={key + 'card'} className={classes.card}>
-                    <CardMedia
-                        key={key + 'img'}
-                        style={{ height: "300px" }}
-                        className={classes.cardMedia}
-                        image={imageUrl}
-                        title="Fash img"
-                    />
+                    <CardActionArea onClick={() => handleOpen(imageUrl, imageName)}>
+                        <CardMedia
+                            key={key + 'img'}
+                            style={{ height: "300px" }}
+                            className={classes.cardMedia}
+                            image={imageUrl}
+                            title="Fash img"
+                        />
+                    </CardActionArea>
                 </Card>
             </Grid>
         )
@@ -252,6 +287,25 @@ function Cart(props) {
         const { name, value } = e.target
         setObjInfo({ ...objInfo, [name]: value })
     }
+
+    const handleOpen = (imageUrlModal = '', imageNameModal = '') => {
+        const options = {
+            method: 'POST',
+            body: JSON.stringify({ image_name: imageNameModal }),
+        };
+        fetch(`http://127.0.0.1:5000/one_image_info`, options)
+        .then((response) => {
+            response.json().then(function (res) {
+                setImageInfoCard(res['image_info'])
+            });
+        })
+        setImgCardSrc(imageUrlModal)
+        setOpen(true);
+    };
+    
+    const handleClose = () => {
+        setOpen(false);
+    };
 
     return (
         <div>
@@ -419,6 +473,34 @@ function Cart(props) {
                     </Grid>
                 </Container>
             </div>
+            <Modal
+                open={open}
+                onClose={handleClose}
+                className={classes.modal}
+            >
+                <div className={classes.modalDiv}>
+                    <div className={classes.modalContent}>
+                        <img src={imgCardSrc} className={classes.imgModal} alt="Logo" />
+                    </div>
+                    <div className={classes.modalContentText}>
+                        <Typography color="initial" component="p">
+                            <span className={classes.modalContentTextSpan}>Type of cloth: </span> {imageInfoCard['typeCloth']}
+                        </Typography>
+                        <Typography color="initial" component="p">
+                            <span className={classes.modalContentTextSpan}>Cloth material:</span> {imageInfoCard['materialCloth']}
+                        </Typography>
+                        <Typography color="initial" component="p">
+                            <span className={classes.modalContentTextSpan}>Production method:</span> {imageInfoCard['productionMethod']}
+                        </Typography>
+                        <Typography color="initial" component="p">
+                            <span className={classes.modalContentTextSpan}>Price:</span> {imageInfoCard['price']}
+                        </Typography>
+                        <Typography color="initial" component="p">
+                            <span className={classes.modalContentTextSpan}>Description:</span>{imageInfoCard['description']}
+                        </Typography>
+                    </div> 
+                </div>
+            </Modal>
         </div>
     );
 }

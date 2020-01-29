@@ -396,8 +396,6 @@ def load_image_for_rating():
 def one_image_info():
     image_name = request.get_json(force = True)['image_name']
     
-    print(image_name)
-
     coll = db["image_info"]
     get_info = coll.find_one({"name":image_name})
     image_info = {

@@ -28,7 +28,7 @@ function Client(props) {
 
     const useStyles = makeStyles(theme =>({
         card: {
-        width: 400
+            width: 400
         },
         media: {
             height: 500,
@@ -76,6 +76,9 @@ function Client(props) {
             position: 'absolute',
             width: '70%',
             backgroundColor: theme.palette.background.paper,
+        },
+        modalContentTextSpan: {
+            color: "Gray"
         },
         sliderPrice: {
             width: '70%' + theme.spacing(3) * 2,
@@ -354,25 +357,25 @@ function Client(props) {
                         />
                         <CardContent>
                             {/* <Typography component="p">
-                                {name}
+                                <span className={classes.modalContentTextSpan}></span> {name}
                             </Typography> */}
                             <Typography component="p">
-                                {typeCloth}
+                                <span className={classes.modalContentTextSpan}>Type of cloth:</span> {typeCloth}
                             </Typography>
                             <Typography component="p">
-                                {materialCloth}
+                                <span className={classes.modalContentTextSpan}>Cloth material:</span> {materialCloth}
                             </Typography>
                             <Typography component="p">
-                                {productionMethod}
+                                <span className={classes.modalContentTextSpan}>Production method:</span> {productionMethod}
                             </Typography>
                             <Typography component="p">
-                                {price}
+                                <span className={classes.modalContentTextSpan}>Price:</span> {price}
                             </Typography>
                             {/* <Typography component="p">
-                                {sex}
+                                <span className={classes.modalContentTextSpan}></span> {sex}
                             </Typography> */}
                             <Typography component="p">
-                                {description}
+                                <span className={classes.modalContentTextSpan}>Description:</span> {description}
                             </Typography>
                         </CardContent>
                         <CardActions className={classes.CardActions}>
