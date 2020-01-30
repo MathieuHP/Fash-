@@ -7,16 +7,12 @@ import GestureRecognizer from 'react-native-swipe-gestures';
 import {
     Layout,
     Text,
-    Input,
     Button,
 	Icon,
 	Select,
-	List,
-	ListItem,
-	ButtonGroup,
 	Modal,
 	Card,
-	Popover
+	Spinner,
 } from '@ui-kitten/components';
 
 
@@ -274,7 +270,7 @@ function Client(props) {
 	const CustomHeaderCard = () => (
 		<React.Fragment>
 			{
-				imageSrc ? <Image style={{ width: 300, height: 300 }} source={{ uri: imageSrc }} /> : <Text>{noMoreCloth ? 'Sorry :(' : 'Loading ...'}</Text>
+				imageSrc ? <Image style={{ width: 300, height: 300 }} source={{ uri: imageSrc }} /> : <Text>{noMoreCloth ? 'Sorry :(' : ""}</Text>
 			}
 		</React.Fragment>
 	);
@@ -387,7 +383,7 @@ function Client(props) {
 									<Text appearance='hint' >Description: </Text><Text>{description}</Text>
 								</>
 							:
-								<Text>{noMoreCloth ? 'No more clothes for now. Try again later.' : 'Loading ...'}</Text>
+								<Text>{noMoreCloth ? 'No more clothes for now. Try again later.' : <Spinner/>}</Text>
 						}
 					</Card>
 					<View style={styles.buttonGroup}>

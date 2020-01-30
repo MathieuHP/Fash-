@@ -6,9 +6,7 @@ import axios from 'axios'
 
 import {tofrontendTitle} from '../utils/convertTitles'
 import {isEquivalent} from '../utils/isEquivalent'
-import { TextInput, ScrollView } from 'react-native-gesture-handler';
-
-import Nav from './Nav'
+import { ScrollView } from 'react-native-gesture-handler';
 
 // UI KITTEN
 import {
@@ -16,13 +14,10 @@ import {
     Text,
     Input,
     Button,
-	Icon,
 	Select,
-	List,
-	ListItem,
 	ButtonGroup,
-    Card,
-    Modal
+    Modal,
+    Spinner
 } from '@ui-kitten/components';
 
 function Cart(props) {
@@ -171,7 +166,7 @@ function Cart(props) {
             <Layout
                 style={styles.modalContainer}
             >
-                {imgCardSrc ? <Image style={styles.imageCard} source={{ uri: imgCardSrc }} key={'imgCard'} /> : <Text>Loading ...</Text>}
+                {imgCardSrc ? <Image style={styles.imageCard} source={{ uri: imgCardSrc }} key={'imgCard'} /> : <Spinner/>}
                 {
                     imageInfoCard ?
                         <Layout style={styles.imageInfoCard}>
@@ -182,7 +177,7 @@ function Cart(props) {
                             <Text appearance='hint' >Description: </Text><Text style={styles.imageInfoCardText} >{imageInfoCard['description']}</Text>
                         </Layout>
                     :
-                    <Text>Loading ...</Text>
+                        <Spinner/>
                 }
             </Layout>
         )
@@ -388,7 +383,7 @@ function Cart(props) {
                 <Text style={styles.text} category='h4'>Super like</Text>
                 <View>
                     {
-                        cartImageSL ? cartImageSL : <Text>Loading ...</Text>
+                        cartImageSL ? cartImageSL : <Spinner/>
                     }
                 </View>
             </View>
@@ -396,7 +391,7 @@ function Cart(props) {
                 <Text style={styles.text} category='h4'>Like</Text>
                 <View>
                     {
-                        cartImageL ? cartImageL : <Text>Loading ...</Text>
+                        cartImageL ? cartImageL : <Spinner/>
                     }
                 </View>
             </View>
