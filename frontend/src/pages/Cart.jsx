@@ -221,14 +221,12 @@ function Cart(props) {
                             style={{ height: "300px" }}
                             className={classes.cardMedia}
                             image={imageUrl}
-                            title="Fash img"
                         />
                     </CardActionArea>
                 </Card>
             </Grid>
         )
     }
-
 
     const removeAccount = () => {
         const options = {
@@ -267,6 +265,12 @@ function Cart(props) {
                             console.log("Informations has changed")
                             setModifyInfos(false)
                             setHasBeenChanged('Your informations has been updated')
+                        } else if ('already_exist' in response.data) {
+                            console.log("Email address already exist")
+                            setObjInfo({...objInfo, email: objInfoBeforeChanges['email']})
+                            setReEmail(objInfoBeforeChanges['email'])
+                            setModifyInfos(false)
+                            setHasBeenChanged('Email address already exist')
                         } else if ('msg' in response.data) {
                             setHasBeenChanged('An error occured. Try again later please')
                             props.setTokenState('')
@@ -289,18 +293,25 @@ function Cart(props) {
     }
 
     const handleOpen = (imageUrlModal = '', imageNameModal = '') => {
-        const options = {
-            method: 'POST',
-            body: JSON.stringify({ image_name: imageNameModal }),
-        };
-        fetch(`http://127.0.0.1:5000/one_image_info`, options)
-        .then((response) => {
-            response.json().then(function (res) {
-                setImageInfoCard(res['image_info'])
-            });
-        })
-        setImgCardSrc(imageUrlModal)
-        setOpen(true);
+        try {
+            const options = {
+                method: 'POST',
+                body: JSON.stringify({ image_name: imageNameModal }),
+            };
+            fetch(`http://127.0.0.1:5000/one_image_info`, options)
+            .then((response) => {
+                response.json().then(function (res) {
+                    setImageInfoCard(res['image_info'])
+                });
+            })
+            setImgCardSrc(imageUrlModal)
+            setOpen(true);
+        } catch (error) {
+            setHasBeenChanged('An error occured. Try again later please')
+            props.setTokenState('')
+            localStorage.removeItem('usertoken')
+            history.push("/")
+        }
     };
     
     const handleClose = () => {

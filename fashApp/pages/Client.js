@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, TouchableHighlight, AsyncStorage, StyleSheet, ScrollView } from 'react-native';
+import { View, Image, TouchableHighlight, AsyncStorage, StyleSheet, ScrollView, Animated } from 'react-native';
 import { Link, useHistory } from "react-router-native";
+import GestureRecognizer from 'react-native-swipe-gestures';
 
 // UI KITTEN
 import {
@@ -14,8 +15,10 @@ import {
 	ListItem,
 	ButtonGroup,
 	Modal,
-	Card
+	Card,
+	Popover
 } from '@ui-kitten/components';
+
 
 function Client(props) {
 	// STYLED
@@ -44,6 +47,8 @@ function Client(props) {
 	const [description, setDescription] = useState('')
 	
 	const [visible, setVisible] = useState(false);
+	const [visiblePopover, setVisiblePopover] = React.useState(false);
+	const [popoverValue, setPopoverValue] = useState('empty');
 	
 	const [noMoreCloth, setNoMoreCloth] = useState(false)
 
@@ -61,6 +66,7 @@ function Client(props) {
 	const [clothe_price_range_min, setClothe_price_range_min] = useState(0)
 	const [clothe_price_range_max, setClothe_price_range_max] = useState(999)
 
+	const [fadeAnim] = useState(new Animated.Value(0))
 
     const history = useHistory();
 	const [tokenState, setTokenState] = useState('')
@@ -88,6 +94,11 @@ function Client(props) {
 		{ text: 'Production 3' },
 	];
 	
+	const config = {
+		velocityThreshold: 0.3,
+		directionalOffsetThreshold: 80
+	};
+
     useEffect(() => {
 		let mounted = true;
         async function asyncFuncForAsyncStorage(mounted) {
@@ -183,9 +194,11 @@ function Client(props) {
 					setImageSrc(imageUrl);
 				});
 			})
-	}
+	};
 
 	const rateImage = (value) => {
+		setPopoverValue(value)
+		fadeAnimFunc()
 		try {
 			const options = {
 				method: 'POST',
@@ -223,7 +236,7 @@ function Client(props) {
 		} catch (err) {
 			console.log("Loading images ...");
 		}
-	}
+	};
 
 	const updateFilters = async () => {
 		let newFilters = {
@@ -261,7 +274,7 @@ function Client(props) {
 	const CustomHeaderCard = () => (
 		<React.Fragment>
 			{
-				imageSrc ? <Image style={{ width: 300, height: 300 }} source={{ uri: imageSrc }} /> : <Text>{noMoreCloth ? 'No more clothes for now. Try again later.' : 'Loading ...'}</Text>
+				imageSrc ? <Image style={{ width: 300, height: 300 }} source={{ uri: imageSrc }} /> : <Text>{noMoreCloth ? 'Sorry :(' : 'Loading ...'}</Text>
 			}
 		</React.Fragment>
 	);
@@ -281,7 +294,7 @@ function Client(props) {
 		if((!isNaN(val)) && val >= 0){
 			setStateFunc(val)
 		}
-	}
+	};
 	
 	const renderModalElement = () => (
 		<Layout
@@ -339,36 +352,86 @@ function Client(props) {
 		</Layout>
 	);
 
+	const fadeAnimFunc = () => {
+		Animated.sequence([
+			Animated.timing( fadeAnim, {
+				toValue: 1,
+				duration: 10,
+			}),
+			Animated.timing( fadeAnim, {
+				toValue: 0,
+				duration: 1000,
+			})
+		]).start();
+	};
+
 	return (
 		<View>
 			<ScrollView>
-				<Card style={styles.card} header={CustomHeaderCard}>
-					{/* <Text>{name}</Text> */}
-					<Text appearance='hint' >Type of cloth: </Text><Text>{typeCloth}</Text> 
-					<Text appearance='hint' >Cloth material: </Text><Text>{materialCloth}</Text>
-					<Text appearance='hint' >Production method: </Text><Text>{productionMethod}</Text>
-					<Text appearance='hint' >Price: </Text><Text>{price}</Text>
-					{/* <Text>Gender : {sex}</Text> */}
-					<Text appearance='hint' >Description: </Text><Text>{description}</Text>
-				</Card>
-				<View style={styles.buttonGroup}>
-					<Button style={styles.button} onPress={() => rateImage(0)} appearance='outline' status='basic' icon={CloseIcon}/>
-					<Button style={styles.button} onPress={() => rateImage(2)} appearance='outline' icon={StarIcon}/>
-					<Button style={styles.button} onPress={() => rateImage(1)} appearance='outline' status='danger' icon={HeartIcon}/>
-				</View>
-				<Layout style={styles.container}>
-					<Button appearance='ghost' status='basic' onPress={toggleModal}>
-						FILTERS
-					</Button>
-					<Modal
-						allowBackdrop={true} 
-						backdropStyle={styles.backdrop}
-						onBackdropPress={toggleModal}
-						visible={visible}
-					>
-						{renderModalElement()}
-					</Modal>
-				</Layout>
+				<GestureRecognizer
+					onSwipeLeft={() => {rateImage(0)}}
+					onSwipeUp={() => {rateImage(2)}}
+					onSwipeRight={() => {rateImage(1)}}
+					config={config}
+				>
+					<Card style={styles.card} header={CustomHeaderCard}>
+						{
+							imageSrc ?
+								<>
+									{/* <Text>{name}</Text> */}
+									<Text appearance='hint' >Type of cloth: </Text><Text>{typeCloth}</Text> 
+									<Text appearance='hint' >Cloth material: </Text><Text>{materialCloth}</Text>
+									<Text appearance='hint' >Production method: </Text><Text>{productionMethod}</Text>
+									<Text appearance='hint' >Price: </Text><Text>{price}</Text>
+									{/* <Text>Gender : {sex}</Text> */}
+									<Text appearance='hint' >Description: </Text><Text>{description}</Text>
+								</>
+							:
+								<Text>{noMoreCloth ? 'No more clothes for now. Try again later.' : 'Loading ...'}</Text>
+						}
+					</Card>
+					<View style={styles.buttonGroup}>
+						<Button style={styles.button} onPress={() => rateImage(0)} appearance='outline' status='basic' icon={CloseIcon}/>
+						<Button style={styles.button} onPress={() => rateImage(2)} appearance='outline' icon={StarIcon}/>
+						<Button style={styles.button} onPress={() => rateImage(1)} appearance='outline' status='danger' icon={HeartIcon}/>
+					</View>
+					<Layout style={styles.container}>
+						<Button appearance='ghost' status='basic' onPress={toggleModal}>
+							FILTERS
+						</Button>
+						<Modal
+							allowBackdrop={true} 
+							backdropStyle={styles.backdrop}
+							onBackdropPress={toggleModal}
+							visible={visible}
+						>
+							{renderModalElement()}
+						</Modal>
+					</Layout>
+				</GestureRecognizer>
+				<Animated.View
+					style={{
+						backgroundColor: 'rgba(0, 0, 0, 0.5)',
+						borderRadius: '50%',
+						position: 'absolute',
+						top: 130,
+						left: 130,
+						opacity: fadeAnim,
+					}}
+				>
+					{
+						popoverValue === 0 ?
+							<Icon name='close' placement={"right"} width={50} height={50} fill="#dde1eb"/>
+						: 
+							popoverValue === 1 ?
+								<Icon name='heart' placement={"right"} width={50} height={50} fill='#ff708d'/>
+							:
+								popoverValue === 2 ?
+									<Icon name='star' placement={"right"} width={50} height={50} fill="#598bff"/>
+								:
+									<Text></Text>
+					}
+				</Animated.View>
 			</ScrollView>
 		</View>
 	);
@@ -420,5 +483,8 @@ const styles = StyleSheet.create({
 	},
 	inputPrice: {
 		flex: 1,
-	}
+	},
+	popoverContent: {
+		padding: 10,
+	},
 });

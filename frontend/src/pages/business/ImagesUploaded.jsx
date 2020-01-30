@@ -11,6 +11,7 @@ import {isEquivalent} from '../../utils/isEquivalent'
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardMedia from '@material-ui/core/CardMedia';
+import CardActionArea from '@material-ui/core/CardActionArea';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -19,6 +20,12 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 import TextField from '@material-ui/core/TextField';
+import Modal from '@material-ui/core/Modal';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+
 
 function ImagesUploaded(props) {
     // STYLED
@@ -65,12 +72,35 @@ function ImagesUploaded(props) {
             margin: theme.spacing(1),
             minWidth: 120,
         },
+        modal: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+        },
+        modalDiv: {
+            outline: 'none',
+        },
+        modalContent: {
+            display: 'flex',
+            justifyContent: 'center',
+        },
+        modalContentText: {
+            borderRadius: 3,
+            color: 'white',
+            backgroundColor: 'rgba(254, 254, 254, 0.9)',
+            marginTop: 20,
+            padding: 10,
+        },
+        modalContentTextField: {
+        },
+        imgModal: {
+            maxWidth: '70vw',
+            maxHeight: '70vh',
+            borderRadius: 3,
+        },
     }));
-
-    const ImgCard = styled.img`
-        width : 100px;
-        height : 100px;
-    `;
 
     const classes = useStyles();
 
@@ -83,6 +113,16 @@ function ImagesUploaded(props) {
     const [objInfo, setObjInfo] = useState({})
     const [objInfoBeforeChanges, setObjInfoBeforeChanges] = useState({});
     const [reEmail, setReEmail] = useState('');
+    const [open, setOpen] = React.useState(false);
+    const [imageInfoCard, setImageInfoCard] = useState({
+        typeCloth: '',
+        materialCloth: '',
+        productionMethod: '',
+        price: '',
+        sex: '',
+        description: ''
+    });
+    const [imgCardSrc, setImgCardSrc] = React.useState('')
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -164,22 +204,21 @@ function ImagesUploaded(props) {
         var urlCreator = window.URL || window.webkitURL;
         let imageUrl = urlCreator.createObjectURL(imageBlob);
         
-        // return <ImgCard key={key} src={imageUrl} alt="image"/>
         return (
             <Grid key={key + 'grid'} item xs={12} sm={6} md={3}>
                 <Card key={key + 'card'} className={classes.card}>
-                    <CardMedia
-                        key={key + 'img'}
-                        style={{ height: "300px" }}
-                        className={classes.cardMedia}
-                        image={imageUrl}
-                        title="Fash img"
-                    />
+                    <CardActionArea onClick={() => handleOpen(imageUrl, imageName)}>
+                        <CardMedia
+                            key={key + 'img'}
+                            style={{ height: "300px" }}
+                            className={classes.cardMedia}
+                            image={imageUrl}
+                        />
+                    </CardActionArea>
                 </Card>
             </Grid>
         )
     }
-
 
     const removeAccount = () => {
         const options = {
@@ -217,6 +256,12 @@ function ImagesUploaded(props) {
                             console.log("Informations has changed")
                             setModifyInfos(false)
                             setHasBeenChanged('Your informations has been updated')
+                        } else if ('already_exist' in response.data) {
+                            console.log("Email address already exist")
+                            setObjInfo({...objInfo, email: objInfoBeforeChanges['email']})
+                            setReEmail(objInfoBeforeChanges['email'])
+                            setModifyInfos(false)
+                            setHasBeenChanged('Email address already exist')
                         } else if ('msg' in response.data) {
                             setHasBeenChanged('An error occured. Try again later please')
                             props.setTokenState('')
@@ -237,6 +282,60 @@ function ImagesUploaded(props) {
         const {name, value} = e.target
         setObjInfo({...objInfo, [name]: value})
     }
+
+    const handleOpen = (imageUrlModal = '', imageNameModal = '') => {
+        try {
+            const options = {
+                method: 'POST',
+                body: JSON.stringify({ image_name: imageNameModal }),
+            };
+            fetch(`http://127.0.0.1:5000/one_image_info`, options)
+            .then((response) => {
+                response.json().then(function (res) {
+                    setImageInfoCard(res['image_info'])
+                });
+            })
+            setImgCardSrc(imageUrlModal)
+            setOpen(true);
+        } catch (error) {
+            setHasBeenChanged('An error occured. Try again later please')
+            props.setTokenState('')
+            localStorage.removeItem('usertoken')
+            history.push("/")
+        }
+    };
+    
+    const handleClose = () => {
+        try {
+            const options = {
+                method: 'POST',
+                body: JSON.stringify({ image_info_card: imageInfoCard }),
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': token
+                }
+            };
+            fetch(`http://127.0.0.1:5000/update_image_info`, options)
+            .then((response) => {
+                response.json().then(function (res) {
+                    if ('valid' in res) {
+                        setHasBeenChanged('Your image informations has been updated')
+                    } else if ('msg' in res) {
+                        setHasBeenChanged('An error occured. Try again later please')
+                        props.setTokenState('')
+                        localStorage.removeItem('usertoken')
+                        history.push("/")
+                    }
+                });
+                setOpen(false);
+            })
+        } catch (error) {
+            setHasBeenChanged('An error occured. Try again later please')
+            props.setTokenState('')
+            localStorage.removeItem('usertoken')
+            history.push("/")
+        }
+    };
 
     return (
         <div>
@@ -374,6 +473,83 @@ function ImagesUploaded(props) {
                     </Grid>
                 </Container>
             </div>
+            <Modal
+                open={open}
+                onClose={handleClose}
+                className={classes.modal}
+            >
+                <div className={classes.modalDiv}>
+                    <div className={classes.modalContent}>
+                        <img src={imgCardSrc} className={classes.imgModal} alt="Logo" />
+                    </div>
+                    <div className={classes.modalContentText}>
+                        <TextField
+                            className={classes.modalContentTextField}
+                            id="typeCloth"
+                            label="Type of cloth:"
+                            name="typeCloth"
+                            autoComplete="typeCloth"
+                            value={imageInfoCard['typeCloth']}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['typeCloth']: e.target.value})}
+                        />
+                        <TextField
+                            className={classes.modalContentTextField}
+                            id="materialCloth"
+                            label="Cloth material:"
+                            name="materialCloth"
+                            autoComplete="materialCloth"
+                            value={imageInfoCard['materialCloth']}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['materialCloth']: e.target.value})}
+                        />
+                        <TextField
+                            className={classes.modalContentTextField}
+                            id="productionMethod"
+                            label="Production method:"
+                            name="productionMethod"
+                            autoComplete="productionMethod"
+                            value={imageInfoCard['productionMethod']}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['productionMethod']: e.target.value})}
+                        />
+                        <TextField
+                            className={classes.modalContentTextField}
+                            id="price"
+                            label="Price:"
+                            name="price"
+                            autoComplete="price"
+                            type="number"
+                            value={imageInfoCard['price']}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['price']: e.target.value})}
+                        />
+                        <TextField
+                            className={classes.modalContentTextField}
+                            id="description"
+                            label="Description:"
+                            name="description"
+                            autoComplete="description"
+                            value={imageInfoCard['description']}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['description']: e.target.value})}
+                        />
+                        <FormControl>
+                            <InputLabel id="sexInput">Sex:</InputLabel>
+                            <Select
+                                labelId="sex"
+                                id="sex"
+                                onChange={(e) => setImageInfoCard({... imageInfoCard, ['sex']: e.target.value})}
+                                value={imageInfoCard['sex']}
+                                >
+                                <MenuItem value={'M'}>Male</MenuItem>
+                                <MenuItem value={'F'}>Female</MenuItem>
+                                <MenuItem value={'ND'}>Not defined</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div> 
+                </div>
+            </Modal>
         </div>  
     );
 }

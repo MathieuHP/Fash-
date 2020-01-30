@@ -172,10 +172,34 @@ def update_info():
         current_user = get_jwt_identity()
         user_id = ObjectId(current_user["_id"])
         user = db.user_info if current_user["userType"] == 'client' else db.company_info
-        res = user.find_one({"_id":user_id})
         
+        mailAlreadyExist = user.find_one({"email":request.get_json()["email"]})
+        if mailAlreadyExist :
+            return jsonify({'already_exist' : 'Mail already used'})  
+        
+        res = user.find_one({"_id":user_id})
+    
         if res:
             x = user.update_one({"_id":user_id},{"$set":request.get_json()})
+            return jsonify({'valid' : 'User informations updated !'})
+        else:
+            return jsonify({'msg' : 'User not found'})
+    except:  
+        print('error')
+        return jsonify({'msg' : 'Something went wrong'})
+
+@app.route('/update_image_info', methods=["POST"])
+@jwt_required
+def update_image_info():
+    json_data = request.get_json(force = True)['image_info_card']
+    
+    try:
+        coll = db.image_info
+        image_name = json_data['name']
+        res = coll.find_one({"name":image_name})
+                
+        if res:
+            x = coll.update_one({"name" : image_name},{"$set":json_data})
             return jsonify({'valid' : 'User informations updated !'})
         else:
             return jsonify({'msg' : 'User not found'})
@@ -402,7 +426,6 @@ def load_image_for_rating():
 @app.route("/one_image_info", methods=["POST"])
 def one_image_info():
     image_name = request.get_json(force = True)['image_name']
-    
     coll = db["image_info"]
     get_info = coll.find_one({"name":image_name})
     image_info = {

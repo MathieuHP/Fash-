@@ -75,6 +75,7 @@ function Client(props) {
             outline: 'none',
             position: 'absolute',
             width: '70%',
+            justifyContent: 'center',
             backgroundColor: theme.palette.background.paper,
         },
         modalContentTextSpan: {

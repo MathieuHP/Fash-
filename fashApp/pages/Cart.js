@@ -105,7 +105,7 @@ function Cart(props) {
             props.setTokenState('')
 			history.push("/")
         }
-    }
+    };
 
     const getCart = async (token) => {
         const options = {
@@ -147,7 +147,7 @@ function Cart(props) {
             setCartImageSL([<Text key="cartSLEmpty">Sorry, an error occurred try again later</Text>])
             setCartImageL([<Text key="cartLEmpty">Sorry, an error occurred try again later</Text>])
         }
-    }
+    };
 
     const getImage = async (key, imageName) => {
         const options = {
@@ -164,7 +164,7 @@ function Cart(props) {
                 <Image style={styles.imageCart} source={{ uri: imageUrl }} key={key} />
             </TouchableHighlight>
         )
-    }
+    };
 
     const imageCard = () => {
         return (
@@ -186,7 +186,7 @@ function Cart(props) {
                 }
             </Layout>
         )
-    }
+    };
 
     const openCard = (src = '', imageNameCard = '') => {
         if (visible === false) {
@@ -204,7 +204,6 @@ function Cart(props) {
 		}
         setVisible(!visible);
     };
-
 
     const removeAccount = () => {
         const options = {
@@ -233,8 +232,7 @@ function Cart(props) {
                 }
             });
         })
-    }
-
+    };
 
     const modifyInfo = () => {
         if (objInfo['email'] === reEmail[0]) {
@@ -259,6 +257,12 @@ function Cart(props) {
                             setEmail([objInfo['email'],false])
                             setReEmail([objInfo['email'],false])
                             setPhone([objInfo['phone'],false])
+                        } else if ('already_exist' in response.data) {
+                            console.log("Email address already exist")
+                            setObjInfo({...objInfo, email: objInfoBeforeChanges['email']})
+                            setReEmail(objInfoBeforeChanges['email'],false)
+                            setModifyInfos(false)
+                            setHasBeenChanged('Email address already exist')
                         } else if ('msg' in response.data) {
                             setHasBeenChanged('An error occured. Try again later please')
                             props.setTokenState('')
@@ -280,12 +284,12 @@ function Cart(props) {
         } else {
             setHasBeenChanged('Emails are different')
         }
-    }
+    };
 
     const handleChanges = (name, text, setState) => {
         setObjInfo({...objInfo, [name]: text})
         setState([text, true])
-    }
+    };
 
     return (
         <ScrollView style={{width: 300, marginBottom: 100}}>
