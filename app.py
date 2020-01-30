@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify, send_file, json 
+from flask import Flask, request, jsonify, send_file, json, url_for, render_template
+from flask_mail import Mail, Message
 from tensorflow.keras import backend
 import os
 import cv2
@@ -15,17 +16,26 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_raw_jwt
 
 #custom modules
-# from ressources.config import db, JWT_SECRET_KEY, SECRET_KEY, SECURITY_PASSWORD_SALT
+from ressources.config_db import db
+import config
 from ressources.model_collab_recommender import predict_ratings
 from ressources.picture_list_creation import get_recommended_picture_list
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
-# from ressources.token import generate_confirmation_token, confirm_token
+# from ressources.token_mail import generate_confirmation_token, confirm_token
+# from ressources.email import send_email
+
+
 
 
 # init app
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
+app.config.from_pyfile('config.py')
+
+app.config.update(config.mail_settings)
+mail = Mail(app)
+
 
 # app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
 
@@ -238,49 +248,72 @@ def new_company():
 
 @app.route('/new_user', methods=["POST"])
 def new_user():
+    # try:
+    user = db.user_info
+    first_name = request.get_json()['first_name']
+    last_name = request.get_json()['last_name']
+    email = request.get_json()['email']
+    phone = request.get_json()['phone']
+    sex = request.get_json()['sex']
+    password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+    created = datetime.utcnow()
+
     try:
-        user = db.user_info
-        first_name = request.get_json()['first_name']
-        last_name = request.get_json()['last_name']
-        email = request.get_json()['email']
-        phone = request.get_json()['phone']
-        sex = request.get_json()['sex']
-        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
-        created = datetime.utcnow()
-
-        try:
-            res = user.find_one({"email":email})
-            if res["email"] == email:
-                return "already exists"
-        except:
-            None
-
-        x = user.insert_one({
-            'first_name': first_name,
-            'last_name': last_name,
-            'email': email,
-            'password': password,
-            'created': created,
-            "sex" : sex,
-            'phone' : phone,
-            'mail_verified': False
-        })
-        
-        result = user.find_one({"email":email})
-        user_id = str(result["_id"])
-
-        collection = db.list_images
-        x = collection.insert_one({
-            "user_id":user_id,
-            "super_like":[],
-            "list_image":[]
-            })
-
-        token = generate_confirmation_token(email)
-        
-        return 'ok'
+        res = user.find_one({"email":email})
+        if res["email"] == email:
+            return "already exists"
     except:
-        return ''
+        None
+
+    x = user.insert_one({
+        'first_name': first_name,
+        'last_name': last_name,
+        'email': email,
+        'password': password,
+        'created': created,
+        "sex" : sex,
+        'phone' : phone,
+        'mail_verified': False
+    })
+    
+    result = user.find_one({"email":email})
+    user_id = str(result["_id"])
+
+    collection = db.list_images
+    x = collection.insert_one({
+        "user_id":user_id,
+        "super_like":[],
+        "list_image":[]
+        })
+
+    from ressources.token_mail import generate_confirmation_token, confirm_token
+    from ressources.email import send_email     
+
+    token = generate_confirmation_token(email)
+    print(f" sending token : {token}")
+    confirm_url = url_for('confirm_email', token=token, _external=True)
+
+    html = render_template('activate.html', confirm_url=confirm_url)
+
+    subject = "Please confirm your email"
+
+    
+    Mail.send(app, Message(
+    subject,
+    recipients=[email],
+    html=html,
+    sender=config.MAIL_DEFAULT_SENDER
+    ))
+
+    print(" ")
+    print(" confirmation mail sent ")
+    print(" ")
+
+    flash('A confirmation email has been sent via email.', 'success')
+    
+    redirect("/login")
+    # except:
+    #     return(" ")
 
 
 

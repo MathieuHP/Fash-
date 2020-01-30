@@ -8,6 +8,7 @@ from bson import ObjectId
 from ressources.model_collab_recommender import predict_ratings, check_minimum_data
 from ressources.enable_collab import train_collab
 from image_similarity.get_similar_images import get_similar_images
+from ressources.config_db import db
 
 def get_already_rated_pictures(user_id):
     """retreive all pictures the user already rated"""

@@ -1,12 +1,15 @@
-from flask.mail import Message
+from flask_mail import Message, Mail
 
-import app
+import config
+
 
 def send_email(to, subject, template):
     msg = Message(
         subject,
         recipients=[to],
         html=template,
-        sender=app.config['MAIL_DEFAULT_SENDER']
+        sender=config.MAIL_DEFAULT_SENDER
     )
-    mail.send(msg)
+    Mail.send(msg)
+
+    print(f"--- email sent to {to} ---")
