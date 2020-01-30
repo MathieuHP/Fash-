@@ -15,18 +15,20 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_raw_jwt
 
 #custom modules
-from ressources.config import db, db_connect
+# from ressources.config import db, JWT_SECRET_KEY, SECRET_KEY, SECURITY_PASSWORD_SALT
 from ressources.model_collab_recommender import predict_ratings
 from ressources.picture_list_creation import get_recommended_picture_list
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
+# from ressources.token import generate_confirmation_token, confirm_token
+
 
 # init app
 app = Flask(__name__)
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
 # app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
-app.config['JWT_SECRET_KEY'] = 'this_secret_wont_be_enough'
+
 app.config['JWT_HEADER_TYPE'] = None
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access']
@@ -37,15 +39,20 @@ CORS(app)
 
 blacklist = set()
 
+
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return jti in blacklist
 
+
+
 @app.route("/", methods= ["GET"])
 def testingBackend():
     print("Backend is on")
     return 'Backend is on'
+
+
 
 @app.route("/check_token", methods= ["GET"])
 @jwt_required
@@ -56,6 +63,7 @@ def check_token():
         return jsonify({"valid" : 'Token is valid'})
     else :
         return jsonify({"msg" : "Wrong type of user"})
+
 
 
 @app.route("/upload_image", methods= ["POST"])
@@ -121,49 +129,6 @@ def upload_image():
     return jsonify({"valid" : "Cloth has been uploaded"})
 
 
-@app.route('/new_user', methods=["POST"])
-def new_user():
-    try:
-        user = db.user_info
-        first_name = request.get_json()['first_name']
-        last_name = request.get_json()['last_name']
-        email = request.get_json()['email']
-        phone = request.get_json()['phone']
-        sex = request.get_json()['sex']
-        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
-        created = datetime.utcnow()
-
-        try:
-            res = user.find_one({"email":email})
-            if res["email"] == email:
-                return "already exists"
-        except:
-            None
-
-        x = user.insert_one({
-            'first_name': first_name,
-            'last_name': last_name,
-            'email': email,
-            'password': password,
-            'created': created,
-            "sex" : sex,
-            'phone' : phone
-        })
-        
-        result = user.find_one({"email":email})
-        user_id = str(result["_id"])
-
-        collection = db.list_images
-        x = collection.insert_one({
-            "user_id":user_id,
-            "super_like":[],
-            "list_image":[]
-            })
-        
-        return 'ok'
-    except:
-        return ''
-
 
 @app.route('/update_info', methods=["POST"])
 @jwt_required
@@ -182,6 +147,7 @@ def update_info():
     except:  
         print('error')
         return jsonify({'msg' : 'Something went wrong'})
+
 
 
 @app.route('/update_filters', methods=["POST"])
@@ -205,6 +171,7 @@ def update_filters():
         return jsonify({'msg' : 'Something went wrong'})
     
     
+
 @app.route('/change_pwd', methods=["POST"])
 @jwt_required
 def change_pwd():
@@ -226,6 +193,7 @@ def change_pwd():
             return jsonify({'msg' : 'User not found'})
     except:
         return jsonify({'msg' : 'Something went wrong'})
+
 
 
 @app.route('/new_company', methods=["POST"])
@@ -253,15 +221,92 @@ def new_company():
             'password': password,
             'created': created,
             'phone' : phone,
-            "images_uploaded":[]
+            "images_uploaded":[],
+            'mail_verified': False
         })
                 
         result = company.find_one({"email":email})
         company_id = str(result["_id"])
 
+        token = generate_confirmation_token(email)
+
         return 'ok'
     except:
         return ''
+
+
+
+@app.route('/new_user', methods=["POST"])
+def new_user():
+    try:
+        user = db.user_info
+        first_name = request.get_json()['first_name']
+        last_name = request.get_json()['last_name']
+        email = request.get_json()['email']
+        phone = request.get_json()['phone']
+        sex = request.get_json()['sex']
+        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+        created = datetime.utcnow()
+
+        try:
+            res = user.find_one({"email":email})
+            if res["email"] == email:
+                return "already exists"
+        except:
+            None
+
+        x = user.insert_one({
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'password': password,
+            'created': created,
+            "sex" : sex,
+            'phone' : phone,
+            'mail_verified': False
+        })
+        
+        result = user.find_one({"email":email})
+        user_id = str(result["_id"])
+
+        collection = db.list_images
+        x = collection.insert_one({
+            "user_id":user_id,
+            "super_like":[],
+            "list_image":[]
+            })
+
+        token = generate_confirmation_token(email)
+        
+        return 'ok'
+    except:
+        return ''
+
+
+
+@app.route('/confirm/<token>')
+@jwt_required
+def confirm_email(token):
+    try:
+        email = confirm_token(token)
+    except:
+        flash('The confirmation link is invalid or has expired.', 'danger')
+    user = User.query.filter_by(email=email).first_or_404()
+    coll = db.user_info
+    result = coll.find_one({"email":email})
+    confirmed = result["mail_verified"]
+    if confirmed:
+        flash('Account already confirmed. Please login.', 'success')
+    else:
+        confirmed = True
+        confirmed_on = time.ctime()
+        coll.update_one({"email":email},{"$set":{
+            "mail_verified":confirmed, "mail_verified_on":confirmed_on
+            }})
+
+        flash('You have confirmed your account. Thanks! You can now login.', 'success')
+    return redirect('/login')
+
 
 
 @app.route('/login', methods=['POST'])
@@ -309,7 +354,8 @@ def getProfileInfo():
     user = db.user_info if current_user["userType"] == 'client' else db.company_info
     
     allInfo = user.find_one({'_id': user_id})
-    allInfo = { k : v for k,v in allInfo.items() if k != '_id' and k != 'password' and k !='images_uploaded' and k != 'created' }
+    excluded = ['_id','password','images_uploaded', 'created', "mail_verified", "mail_verified_on" ]
+    allInfo = { k : v for k,v in allInfo.items() if k not in excluded }
     
     return jsonify(allInfo)
 
@@ -351,6 +397,7 @@ def remove_account():
     blacklist.add(jti)
 
     return jsonify({"valid" : "Account has been removed"})
+
 
 
 @app.route("/load_image_for_rating", methods=["POST"])
@@ -401,6 +448,7 @@ def load_image_for_rating():
 
     send_image_info = jsonify({'imgs' : list_dict, 'filters' : filt_dic})
     return send_image_info
+
 
 
 @app.route("/show_image", methods=["POST"])

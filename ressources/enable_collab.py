@@ -7,7 +7,7 @@ from threading import Timer
 from time import sleep
 
 #customs imports
-from ressources.config import db, db_connect
+# from ressources.config import db, db_connect
 from ressources.model_collab_recommender import predict_ratings, check_minimum_data
 
 

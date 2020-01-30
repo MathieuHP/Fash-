@@ -4,7 +4,7 @@ import pandas as pd
 from random  import randrange, shuffle
 from bson import ObjectId
 
-from ressources.config import db, db_connect
+# from ressources.config import db, JWT_SECRET_KEY, SECRET_KEY, SECURITY_PASSWORD_SALT
 from ressources.model_collab_recommender import predict_ratings, check_minimum_data
 from ressources.enable_collab import train_collab
 from image_similarity.get_similar_images import get_similar_images
