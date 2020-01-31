@@ -244,12 +244,11 @@ def re_verify():
     coll= db.user_info
     result = coll.find_one({"email":email})
     if not result:
-        return jsonify({'msg' : 'This email is not in our database'})
+        return jsonify({'msg' : 'This email does not exists, try to register again !'})
 
 
     verify_email(email)
-    return redirect(URL + "", code=307)  # !!! TO DO : change toward login screen 
-                                                    # and add relevant message
+    return jsonify({'success' : 'verification email sent'})
 
 
 
