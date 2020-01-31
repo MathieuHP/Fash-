@@ -17,6 +17,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import Modal from '@material-ui/core/Modal';
+
 
 function SignUp() {
     // STYLED
@@ -46,6 +48,26 @@ function SignUp() {
         selectEmpty: {
             marginTop: theme.spacing(2),
         },
+        modalPaper: {
+            position: 'absolute',
+            width: 400,
+            backgroundColor: theme.palette.background.paper,
+            border: '2px solid #000',
+            boxShadow: theme.shadows[5],
+            padding: theme.spacing(2, 4, 3),
+            outline: 'none',
+            borderRadius: 3,
+        },
+        modal: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+        },
+        titleModal: {
+            marginBottom: 30,
+        }
     }));
 
     const classes = useStyles();
@@ -63,6 +85,9 @@ function SignUp() {
     
     const history = useHistory();
     const token = localStorage.usertoken
+
+    const [open, setOpen] = React.useState(false);
+
 
     useEffect(() => {
         if(token){
@@ -105,8 +130,7 @@ function SignUp() {
             })
             .then(response => {
                 if (response.data === "ok") {
-                    console.log("Registered")
-                    history.push("/")
+                    handleOpen()
                 } else if (response.data === "already exists"){
                     setConnectionMessage(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">This email address already exists</Typography>)
                 } else {
@@ -114,6 +138,15 @@ function SignUp() {
                 }
             })
     }
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    
+    const handleClose = () => {
+        setOpen(false);
+        history.push("/")
+    };
 
     return (
         <Container component="main" maxWidth="xs">
@@ -249,6 +282,20 @@ function SignUp() {
                 </form>
                 {connectionMessage}
             </div>
+            <Modal
+                open={open}
+                onClose={handleClose}
+                className={classes.modal}
+            >
+                <div className={classes.modalPaper}>
+                    <Typography className={classes.titleModal} component="h5" variant="h5">
+                        Thanks for signing up 
+                    </Typography>
+                    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
+                        You will receive a confirmation email shortly.
+                    </Typography>
+                </div>
+            </Modal>
         </Container>  
     );
 }

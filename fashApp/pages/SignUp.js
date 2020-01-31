@@ -13,6 +13,7 @@ import {
     Button,
 	Icon,
 	Select,
+	Modal,
 } from '@ui-kitten/components';
 
 function SignUp() {
@@ -39,6 +40,8 @@ function SignUp() {
 	const [phone, setPhone] = useState('')
 	const [connectionMessage, setConnectionMessage] = useState('')
 
+	const [visible, setVisible] = React.useState('f');
+
 	const data = [
 		{ text: 'Male', value: "M"},
 		{ text: 'Female',  value: "F"},
@@ -55,7 +58,13 @@ function SignUp() {
             }
         }
         asyncFuncForAsyncStorage();
-    }, []);
+	}, []);
+	
+	useEffect(() => {
+		if(visible === false){
+			history.push("/")
+		}
+	  }, [visible]);
 
 	// FUNCTIONS
 
@@ -91,16 +100,23 @@ function SignUp() {
 	        })
 	        .then(response => {
 	            if (response.data === "ok") {
-	                console.log("Registered")
-	                history.push("/")
+	                handleOpen()
 	            } else if (response.data === "already exists"){
 	                setConnectionMessage(<Text>This email address already exists</Text>)
 	            } else {
 	                setConnectionMessage(<Text>An error occured. Try again later please.</Text>)
 	                history.push("/signup")
 	            }
-	        })
+		    })
 	}
+
+	const handleOpen = () => {
+        setVisible(true);
+    };
+    
+    const handleClose = () => {
+		setVisible(false)
+	};
 
 	return (
 		<ScrollView style={{width: 300}}>
@@ -182,6 +198,20 @@ function SignUp() {
 					</Button>
 					<Text style={styles.inputPassword}>{connectionMessage}</Text>
 				</View>
+				<Modal
+					backdropStyle={styles.backdrop}
+					visible={visible}
+				>
+					<Layout style={styles.modalContainer}>
+						<Text category='h5'>
+							Thanks for signing up 
+						</Text>
+						<Text style={styles.text}>
+							You will receive a confirmation email shortly.
+						</Text>
+						<Button onPress={() => handleClose()}>Ok</Button>
+					</Layout>
+				</Modal>
 			</ScrollView>
 	);
 }
@@ -197,12 +227,22 @@ const styles = StyleSheet.create({
         marginBottom: 8
 	},
 	text: {
-		margin: 8,
+		marginTop: 30,
+		marginBottom: 30,
 		alignItems : 'center',
 		justifyContent : 'center'
 	},
 	titleFash:{
 		alignItems : 'center',
 		justifyContent : 'center'
-	}
+	},
+	modalContainer: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		width: 300,
+		padding: 16,
+	},
+	backdrop: {
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    },
 });

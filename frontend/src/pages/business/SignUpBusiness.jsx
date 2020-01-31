@@ -14,6 +14,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import Modal from '@material-ui/core/Modal';
 
 function SignUp() {
     // STYLED
@@ -55,7 +56,27 @@ function SignUp() {
               marginRight: 10,
               fontSize: 18,
             },
-          },
+        },
+        modalPaper: {
+            position: 'absolute',
+            width: 400,
+            backgroundColor: theme.palette.background.paper,
+            border: '2px solid #000',
+            boxShadow: theme.shadows[5],
+            padding: theme.spacing(2, 4, 3),
+            outline: 'none',
+            borderRadius: 3,
+        },
+        modal: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+        },
+        titleModal: {
+            marginBottom: 30,
+        }
     }));
 
     const classes = useStyles();
@@ -69,6 +90,8 @@ function SignUp() {
     const [rePassword, setRePassword] = useState('')
     const [phone, setPhone] = useState('')
     const [connectionMessage, setConnectionMessage] = useState('')
+    const [open, setOpen] = React.useState(false);
+
     
     const history = useHistory();
     const token = localStorage.usertoken
@@ -112,8 +135,7 @@ function SignUp() {
             })
             .then(response => {
                 if (response.data === "ok") {
-                    console.log("Registered")
-                    history.push("/business")
+                    handleOpen()
                 } else if (response.data === "already exists"){
                     setConnectionMessage(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">This email address already exists</Typography>)
                 } else {
@@ -121,6 +143,15 @@ function SignUp() {
                 }
             })
     }
+
+    const handleOpen = () => {
+        setOpen(true);
+    };
+    
+    const handleClose = () => {
+        setOpen(false);
+        history.push("/business")
+    };
 
     return (
         <Container component="main" maxWidth="xs">
@@ -218,20 +249,20 @@ function SignUp() {
                         </Grid>
                         <Grid item xs={12}>
                             <Autocomplete
-                                id="country-select-demo"
                                 style={{ width: 300 }}
                                 options={countries}
                                 classes={{
                                     option: classes.option,
                                 }}
                                 autoHighlight
-                                getOptionLabel={option => option.label}
+                                getOptionLabel={option => { return(option.label)}}
                                 renderOption={option => (
                                     <React.Fragment>
                                     <span>{countryToFlag(option.code)}</span>
                                     {option.label} ({option.code}) +{option.phone}
                                     </React.Fragment>
                                 )}
+                                onChange= {(e, value)  => setLocation(value.label)}
                                 renderInput={params => (
                                     <TextField
                                     {...params}
@@ -240,7 +271,7 @@ function SignUp() {
                                     fullWidth
                                     inputProps={{
                                         ...params.inputProps,
-                                        autoComplete: 'new-password', // disable autocomplete and autofill
+                                        autoComplete: 'new-password',
                                     }}
                                     />
                                 )}
@@ -260,6 +291,20 @@ function SignUp() {
                 </form>
                 {connectionMessage}
             </div>
+            <Modal
+                open={open}
+                onClose={handleClose}
+                className={classes.modal}
+            >
+                <div className={classes.modalPaper}>
+                    <Typography className={classes.titleModal} component="h5" variant="h5">
+                        Thanks for signing up 
+                    </Typography>
+                    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
+                        You will receive a confirmation email shortly.
+                    </Typography>
+                </div>
+            </Modal>
         </Container>
     );
 }
