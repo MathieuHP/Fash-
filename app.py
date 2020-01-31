@@ -148,7 +148,9 @@ def update_info():
         current_user = get_jwt_identity()
         user_id = ObjectId(current_user["_id"])
         user = db.user_info if current_user["userType"] == 'client' else db.company_info
-        
+
+        new_mail = str(request.get_json()["email"])
+        old_mail = current_user["email"]
         mailAlreadyExist = user.find_one({"email":request.get_json()["email"]})
         if mailAlreadyExist :
             return jsonify({'already_exist' : 'Mail already used'})  
@@ -157,6 +159,9 @@ def update_info():
     
         if res:
             x = user.update_one({"_id":user_id},{"$set":request.get_json()})
+            if old_mail != new_mail:
+                verify_email(new_mail)
+                x = user.update_one({"_id":user_id},{"$set":{"mail_verified":False, "mail_verified_on":""}})
             return jsonify({'valid' : 'User informations updated !'})
         else:
             return jsonify({'msg' : 'User not found'})
@@ -341,12 +346,14 @@ def confirm_email(token):
 
     try:
         result = coll.find_one({"email":email})
-        if len(results) >0:
-            confirmed = result["mail_verified"]
+        confirmed = result["mail_verified"]
     except:
         coll = db.company_info
+    try:
         result = coll.find_one({"email":email})
         confirmed = result["mail_verified"]
+    except: 
+        confirmed=None
 
     if confirmed:
         flash('Account already confirmed. Please login.', 'success')
