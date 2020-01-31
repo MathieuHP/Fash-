@@ -11,6 +11,7 @@ import SignUpBusiness from './pages/business/SignUpBusiness'
 import ImagesUploaded from "./pages/business/ImagesUploaded"
 import ChangePwd from './pages/ChangePwd'
 import NotFound from './pages/NotFound'
+import NotConfirm from './pages/NotConfirm'
 
 function App() {
 	// STYLED
@@ -42,7 +43,6 @@ function App() {
 				</div>
 				<div>
 					<Switch>
-						<Route exact path="/" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/client" render={(props) => <Client {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/changepwd" render={(props) => <ChangePwd tokenState={tokenState} {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/signup" component={SignUp} />
@@ -51,6 +51,9 @@ function App() {
 						<Route exact path="/business/company" render={(props) => <Company {...props} setTokenState={setTokenState} />} />
 						<Route exact path="/business/signupbusiness" component={SignUpBusiness} />
 						<Route exact path="/business/products" render={(props) => <ImagesUploaded {...props} setTokenState={setTokenState} />} />
+						<Route exact path="/notconfirm" render={(props) => <NotConfirm {...props}  />} />
+						<Route exact path="/" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
+						<Route path="/:mail" render={(props) => <Home {...props} setTokenState={setTokenState} />} />
 						<Route path="*" component={NotFound}/>
 					</Switch>
 				</div>

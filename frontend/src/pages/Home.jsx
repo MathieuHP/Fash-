@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useHistory } from "react-router-dom";
+import { useParams} from "react-router";
 import axios from 'axios'
 
 // MATERIAL UI
@@ -44,17 +45,22 @@ function Home(props) {
     // STATE
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [connectionMessage, setConnectionMessage] = useState('')
+	const [connectionMessage, setConnectionMessage] = useState('')
+	const [emailConfirm, setEmailConfirm] = useState('')
 
     const history = useHistory();
-    const token = localStorage.usertoken
+	const token = localStorage.usertoken
+	let { mail } = useParams();
 
     useEffect(() => {
         if(token){
             props.setTokenState(token)
             history.push("/client")
         } else {
-            props.setTokenState('')
+			props.setTokenState('')
+			if (mail === 'confirm') {
+				setEmailConfirm(<Typography variant="subtitle1" align="center" color="textSecondary" component="h6">Your email has been verified</Typography>)
+			}
         }
     }, []);
 
@@ -98,6 +104,7 @@ function Home(props) {
 				<Typography component="h1" variant="h5">
 					Log In
 				</Typography>
+				{emailConfirm}
 				<form onSubmit={(e) => onSubmit(e)} className={classes.form} noValidate>
 					<Grid container spacing={2}>
 						<Grid item xs={12}>
