@@ -28,10 +28,33 @@ function NotFound() {
     const classes = useStyles();
 
     const [email, setEmail] = useState('');
+    const [infoMsg, setInfoMsg] = useState();
 
     const sendLink = () => {
         if (email > 0) {
-
+            const options = {
+                method: 'POST',
+                body: JSON.stringify({ email: email}),
+            };
+            fetch(`http://127.0.0.1:5000/re_verify`, options)
+            .then((response) => {
+                response.json().then(function(res) {
+                    console.log(res);
+                    if ('msg' in res){
+                        setInfoMsg(
+                            <Typography className={classes.secondTitle} variant="subtitle1" color="textSecondary" component="h6">
+                                {res['msg']}
+                            </Typography>
+                        )
+                    } else if ('success' in res) {
+                        setInfoMsg(
+                            <Typography className={classes.secondTitle} variant="subtitle1" color="textSecondary" component="h6">
+                                You will get a email with a new link shortly.
+                            </Typography>
+                        )
+                    }
+                })
+            })
         }
     }
 
