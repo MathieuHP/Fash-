@@ -26,7 +26,7 @@ from ressources.email_verification import send_email, verify_email, confirm_toke
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
 
-
+URL = "http://127.0.0.1:3000-"
 
 
 # init app
@@ -236,7 +236,14 @@ def change_pwd():
     except:
         return jsonify({'msg' : 'Something went wrong'})
 
+@app.route('/re_verify')
+def re_verify():
+    email = request.get_json()["email"]
 
+
+    verify_email(email)
+    return redirect(URL + "", code=307)  # !!! TO DO : change toward login screen 
+                                                    # and add relevant message
 
 @app.route('/new_company', methods=["POST"])
 def new_company():
@@ -272,7 +279,7 @@ def new_company():
 
         verify_email(email)
 
-        return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+        return redirect(URL + "", code=307)  # !!! TO DO : change toward login screen 
                                                     # and add relevant message
     except:
         return ''
@@ -322,7 +329,7 @@ def new_user():
 
     verify_email(email)
     
-    return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+    return redirect(URL + "/notconfirm", code=307)  # !!! TO DO : change toward login screen 
                                                     # and add relevant message
     # except:
     #     return(" ")
@@ -338,7 +345,7 @@ def confirm_email(token):
         email = None
 
     if email == None:
-            return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+            return redirect(URL + "/notconfirm", code=307)  # !!! TO DO : change toward login screen 
                                                         # and add relevant message
 
     coll = db.user_info
@@ -364,7 +371,7 @@ def confirm_email(token):
             "mail_verified":confirmed, "mail_verified_on":confirmed_on
             }})
         flash('You have confirmed your account. Thanks! You can now login.', 'success')
-    return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+    return redirect(URL + "/confirm", code=307)  # !!! TO DO : change toward login screen 
                                                         # and add relevant message
 
 
@@ -382,7 +389,7 @@ def login():
     if response:
         if response["mail_verified"] == False:
             print(" ! YOU HAVE TO VERIFY YOUR MAIL ! ")
-            return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+            return redirect(URL + "/notconfirm", code=307)  # !!! TO DO : change toward login screen 
                                                         # and add relevant message
 
 
