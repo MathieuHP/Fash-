@@ -236,14 +236,22 @@ def change_pwd():
     except:
         return jsonify({'msg' : 'Something went wrong'})
 
-@app.route('/re_verify')
+
+
+@app.route('/re_verify', methods=["POST"])
 def re_verify():
-    email = request.get_json()["email"]
+    email = request.get_json(force = True)["email"]
+    coll= db.user_info
+    result = coll.find_one({"email":email})
+    if not result:
+        return jsonify({'msg' : 'This email is not in our database'})
 
 
     verify_email(email)
     return redirect(URL + "", code=307)  # !!! TO DO : change toward login screen 
                                                     # and add relevant message
+
+
 
 @app.route('/new_company', methods=["POST"])
 def new_company():
