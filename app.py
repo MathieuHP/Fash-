@@ -42,10 +42,12 @@ def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return jti in blacklist
 
+
 @app.route("/", methods= ["GET"])
 def testingBackend():
     print("Backend is on")
     return 'Backend is on'
+
 
 @app.route("/check_token", methods= ["GET"])
 @jwt_required
@@ -187,6 +189,7 @@ def update_info():
     except:  
         print('error')
         return jsonify({'msg' : 'Something went wrong'})
+
 
 @app.route('/update_image_info', methods=["POST"])
 @jwt_required
@@ -423,6 +426,7 @@ def load_image_for_rating():
     send_image_info = jsonify({'imgs' : list_dict, 'filters' : filt_dic})
     return send_image_info
 
+
 @app.route("/one_image_info", methods=["POST"])
 def one_image_info():
     image_name = request.get_json(force = True)['image_name']
@@ -541,6 +545,7 @@ def images_uploaded():
 @app.errorhandler(404)
 def page_not_found(e):
     return '', 404
+
 
 # run server
 if __name__ == "__main__":

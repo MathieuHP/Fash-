@@ -4,7 +4,6 @@ import { useHistory } from "react-router-dom";
 // MATERIAL UI
 import { makeStyles, withStyles, useTheme } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
@@ -22,6 +21,9 @@ import Select from '@material-ui/core/Select';
 import Modal from '@material-ui/core/Modal';
 import { Button } from '@material-ui/core';
 import Slider from '@material-ui/core/Slider';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { withTheme } from 'styled-components';
+import Fade from '@material-ui/core/Fade';
 
 function Client(props) {
     // STYLED
@@ -33,13 +35,13 @@ function Client(props) {
         media: {
             height: 500,
         },
-        CardActions: {
-            justifyContent: 'center',
-        },
         root: {
             '& > *': {
               margin: theme.spacing(1),
             },
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
         },
         extendedIcon: {
             marginRight: theme.spacing(1),
@@ -87,6 +89,21 @@ function Client(props) {
         sliderPriceMargin: {
             height: theme.spacing(3),
         },
+        rateIcon: {
+            position: 'absolute'     
+        },
+        iconDiv : {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 75,
+            height: 75,
+            position: 'relative',
+            top: 225,
+            left: 160,
+        }
     }))
 
     const classes = useStyles();
@@ -111,6 +128,9 @@ function Client(props) {
         clothe_production: [],
         clothe_price_range: [0, 999],
     })
+
+    const [popoverValue, setPopoverValue] = useState('empty');
+    const [checkedIcon, setCheckedIcon] = useState(false);
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -237,6 +257,8 @@ function Client(props) {
     }
 
     const rateImage = (value) => {
+        setPopoverValue(value)
+        handleChangeIcon()
         try {
             const options = {
                 method: 'POST',
@@ -309,6 +331,16 @@ function Client(props) {
         setOpen(false);
     };
 
+    const handleChangeIcon = () => {
+        setCheckedIcon(true);
+        setTimeout(
+            function() {
+                setCheckedIcon(false);
+            },
+            500
+        );
+      };
+
     const AirbnbSlider = withStyles({
         root: {
             color: '#3a8589',
@@ -350,11 +382,47 @@ function Client(props) {
             <div className={classes.Button}>
                 {
                     imageSrc ?
+                    <>
                     <Card className={classes.card}>
+                        {
+                            popoverValue === 0 ?
+                                <Fade 
+                                    in={checkedIcon}
+                                >
+                                    <div className={classes.rateIcon}>
+                                        <div className={classes.iconDiv}>
+                                            <CrossIcon style={{ color: 'white', height: 50, width: 50 }} />
+                                        </div>
+                                    </div>
+                                </Fade>
+                            : 
+                                popoverValue === 1 ?
+                                    <Fade 
+                                        in={checkedIcon}
+                                    >
+                                        <div className={classes.rateIcon}>
+                                            <div className={classes.iconDiv}>
+                                                <FavoriteIcon color="secondary" style={{ height: 50, width: 50 }} /> 
+                                            </div>
+                                        </div>
+                                    </Fade>
+                                :
+                                    popoverValue === 2 ?
+                                        <Fade 
+                                            in={checkedIcon}
+                                        >
+                                            <div className={classes.rateIcon}>
+                                                <div className={classes.iconDiv}>
+                                                    <StarIcon color="primary" style={{ height: 50, width: 50 }} />
+                                                </div>
+                                            </div> 
+                                        </Fade>
+                                    :
+                                        <div></div>
+                        }
                         <CardMedia
                             className={classes.media}
                             image={imageSrc}
-                            title="fash"
                         />
                         <CardContent>
                             {/* <Typography component="p">
@@ -379,22 +447,21 @@ function Client(props) {
                                 <span className={classes.modalContentTextSpan}>Description:</span> {description}
                             </Typography>
                         </CardContent>
-                        <CardActions className={classes.CardActions}>
-                            <div className={classes.root}>
-                                <Fab onClick={() => rateImage(0)} aria-label="dislike" title="Dislike">
-                                    <CrossIcon />
-                                </Fab>
-                                <Fab onClick={() => rateImage(2)} color="primary" aria-label="superLike" title="Super like">
-                                    <StarIcon />
-                                </Fab>
-                                <Fab onClick={() => rateImage(1)} color="secondary" aria-label="like" title="Like">
-                                    <FavoriteIcon />
-                                </Fab>
-                            </div>
-                        </CardActions>
                     </Card> 
+                        <div className={classes.root}>
+                            <Fab onClick={() => rateImage(0)} aria-label="dislike" title="Dislike">
+                                <CrossIcon style={{ color: 'white' }} />
+                            </Fab>
+                            <Fab onClick={() => rateImage(2)} color="primary" aria-label="superLike" title="Super like">
+                                <StarIcon />
+                            </Fab>
+                            <Fab onClick={() => rateImage(1)} color="secondary" aria-label="like" title="Like">
+                                <FavoriteIcon />
+                            </Fab>
+                        </div>
+                    </>
                     :
-                    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">{noMoreCloth ? 'No more clothes for now. Try again later.' : 'Loading ...'}</Typography>
+                    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">{noMoreCloth ? 'No more clothes for now. Try again later or change your filters.' :  <CircularProgress />}</Typography>
                 }
                 <Button onClick={handleOpen}>
                     Filters

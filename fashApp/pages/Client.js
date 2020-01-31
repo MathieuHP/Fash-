@@ -383,7 +383,7 @@ function Client(props) {
 									<Text appearance='hint' >Description: </Text><Text>{description}</Text>
 								</>
 							:
-								<Text>{noMoreCloth ? 'No more clothes for now. Try again later.' : <Spinner/>}</Text>
+								<Text>{noMoreCloth ? 'No more clothes for now. Try again later or change your filters.' : <Spinner/>}</Text>
 						}
 					</Card>
 					<View style={styles.buttonGroup}>

@@ -16,6 +16,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 
 function Company(props) {
     // STYLED
@@ -67,6 +69,7 @@ function Company(props) {
     const [sex, setSex] = useState('')
     const [description, setDescription] = useState('')
     const [formValidationText, setFormValidationText] = useState('')
+    const [loading, setLoading] = useState(false);
 
     const token = localStorage.usertoken
     const history = useHistory();
@@ -115,6 +118,9 @@ function Company(props) {
     }
 
     const sendValue = async () => {
+        console.log('ici');
+        
+        setLoading(true)
         const formDataObj = {
             imageFile : image[0],
             typeCloth : typeCloth,
@@ -140,6 +146,7 @@ function Company(props) {
         fetch(`http://127.0.0.1:5000/upload_image`, options)
         .then((response) => {
             response.json().then(function (text) {
+                setLoading(false)
                 if ("msg" in text) {
                     props.setTokenState('')
                     localStorage.removeItem('usertoken')
@@ -153,6 +160,7 @@ function Company(props) {
                     setSex('')
                     setDescription('')
                     setImage('')
+                    setFormValidationText("Your cloth has been uploaded")
                     console.log(text["valid"]);
                 }
             });
@@ -282,7 +290,12 @@ function Company(props) {
                         >
                             Upload cloth
                         </Button>
-                            <Typography variant="subtitle1" align="center" color="textSecondary" component="p">{formValidationText}</Typography>
+                        { 
+                            loading ? 
+                                <CircularProgress />
+                            :
+                                <Typography variant="subtitle1" align="center" color="textSecondary" component="p">{formValidationText}</Typography>
+                        }
                     </form>
                 </div>
             </div>

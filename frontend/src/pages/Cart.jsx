@@ -26,6 +26,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import Modal from '@material-ui/core/Modal';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 function Cart(props) {
@@ -468,7 +469,7 @@ function Cart(props) {
                     <Typography className={classes.titleLike} gutterBottom variant="h5" component="h2">Super like</Typography>
                     <Grid container spacing={4}>
                         {
-                            cartImageSL ? cartImageSL : <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Loading ...</Typography>
+                            cartImageSL ? cartImageSL :  <CircularProgress />
                         }
                     </Grid>
                 </Container>
@@ -479,7 +480,7 @@ function Cart(props) {
                     <Typography className={classes.titleLike} gutterBottom variant="h5" component="h2">Like</Typography>
                     <Grid container spacing={4}>
                         {
-                            cartImageL ? cartImageL : <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Loading ...</Typography>
+                            cartImageL ? cartImageL :  <CircularProgress />
                         }
                     </Grid>
                 </Container>

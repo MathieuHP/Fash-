@@ -25,6 +25,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 function ImagesUploaded(props) {
@@ -468,7 +469,7 @@ function ImagesUploaded(props) {
                     <Typography className={classes.titleLike} gutterBottom variant="h5" component="h2">Products</Typography>
                     <Grid container spacing={4}>
                         {
-                            companyImages ? companyImages : <Typography variant="subtitle1" align="center" color="textSecondary" component="p">Loading ...</Typography>
+                            companyImages ? companyImages : <CircularProgress />
                         }
                     </Grid>
                 </Container>
