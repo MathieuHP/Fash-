@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, json, url_for, render_template
+from flask import Flask, request, jsonify, send_file, json, url_for, redirect, render_template, flash
 from flask_mail import Mail, Message
 from tensorflow.keras import backend
 import os
@@ -16,14 +16,15 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity, get_raw_jwt
 
 #custom modules
-from ressources.config_db import db
 import config
+from ressources.config_db import db
+
 from ressources.model_collab_recommender import predict_ratings
 from ressources.picture_list_creation import get_recommended_picture_list
+from ressources.email_verification import send_email, verify_email, confirm_token
+
 from image_similarity.get_embeddings import get_embeddings
 from image_similarity.train_annoy_model import train_annoy_model
-# from ressources.token_mail import generate_confirmation_token, confirm_token
-# from ressources.email import send_email
 
 
 
@@ -232,15 +233,16 @@ def new_company():
             'created': created,
             'phone' : phone,
             "images_uploaded":[],
-            'mail_verified': False
+            'mail_verified': True  # IF TRUE EMAIL VERIF IS NOT ACTIVE !!!
         })
                 
         result = company.find_one({"email":email})
         company_id = str(result["_id"])
 
-        token = generate_confirmation_token(email)
+        verify_email(email)
 
-        return 'ok'
+        return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+                                                    # and add relevant message
     except:
         return ''
 
@@ -273,7 +275,7 @@ def new_user():
         'created': created,
         "sex" : sex,
         'phone' : phone,
-        'mail_verified': False
+        'mail_verified': True  # IF TRUE EMAIL VERIF IS NOT ACTIVE !!!
     })
     
     result = user.find_one({"email":email})
@@ -285,60 +287,52 @@ def new_user():
         "super_like":[],
         "list_image":[]
         })
+  
 
-    from ressources.token_mail import generate_confirmation_token, confirm_token
-    from ressources.email import send_email     
-
-    token = generate_confirmation_token(email)
-    print(f" sending token : {token}")
-    confirm_url = url_for('confirm_email', token=token, _external=True)
-
-    html = render_template('activate.html', confirm_url=confirm_url)
-
-    subject = "Please confirm your email"
-
+    verify_email(email)
     
-    Mail.send(app, Message(
-    subject,
-    recipients=[email],
-    html=html,
-    sender=config.MAIL_DEFAULT_SENDER
-    ))
-
-    print(" ")
-    print(" confirmation mail sent ")
-    print(" ")
-
-    flash('A confirmation email has been sent via email.', 'success')
-    
-    redirect("/login")
+    return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+                                                    # and add relevant message
     # except:
     #     return(" ")
 
 
 
-@app.route('/confirm/<token>')
-@jwt_required
+@app.route('/confirm/<token>', methods=["GET"])
 def confirm_email(token):
     try:
         email = confirm_token(token)
     except:
         flash('The confirmation link is invalid or has expired.', 'danger')
-    user = User.query.filter_by(email=email).first_or_404()
+        email = None
+
+    if email == None:
+            return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+                                                        # and add relevant message
+
     coll = db.user_info
-    result = coll.find_one({"email":email})
-    confirmed = result["mail_verified"]
+
+
+    try:
+        result = coll.find_one({"email":email})
+        if len(results) >0:
+            confirmed = result["mail_verified"]
+    except:
+        coll = db.company_info
+        result = coll.find_one({"email":email})
+        confirmed = result["mail_verified"]
+
     if confirmed:
         flash('Account already confirmed. Please login.', 'success')
     else:
         confirmed = True
         confirmed_on = time.ctime()
-        coll.update_one({"email":email},{"$set":{
+        cursor = coll.update_one({"email":email},{"$set":{
             "mail_verified":confirmed, "mail_verified_on":confirmed_on
             }})
-
         flash('You have confirmed your account. Thanks! You can now login.', 'success')
-    return redirect('/login')
+    return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+                                                        # and add relevant message
 
 
 
@@ -353,6 +347,12 @@ def login():
     response = user.find_one({'email': email})
     
     if response:
+        if response["mail_verified"] == False:
+            print(" ! YOU HAVE TO VERIFY YOUR MAIL ! ")
+            return redirect("http://127.0.0.1:3000", code=307)  # !!! TO DO : change toward login screen 
+                                                        # and add relevant message
+
+
         if bcrypt.check_password_hash(response['password'], password):
             if userType == 'client' :
                 access_token = create_access_token(identity = {
@@ -514,7 +514,7 @@ def rate_image():
     try:
         temp_id = results[0]["_id"]
         cursor = coll.update_one({"_id":temp_id},{"$set":post})
-        print(" SAME IMAGE RATED TWICE !!!")
+        print(" !!! SAME IMAGE RATED TWICE !!! ")
         print(name)
     except:
         x = coll.insert_one(post)
