@@ -5,7 +5,8 @@ import os
 from surprise import Reader, Dataset, Trainset, SVD, BaselineOnly
 from surprise.model_selection import cross_validate
 
-from ressources.config import db, db_connect
+
+from ressources.config_db import db
 
 def check_minimum_data():
     # minimum data needed
