@@ -57,6 +57,9 @@ def verify_email(receiver):
     subject = "Please confirm your email"
 
     
-    send_email(subject, body, receiver)
+    try:
+        send_email(subject, body, receiver)
+        print(f'confirmation email sent to {receiver}') 
 
-    print(f'confirmation email sent to {receiver}')    
+    except:
+        return "email invalid"

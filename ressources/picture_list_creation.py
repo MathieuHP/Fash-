@@ -234,6 +234,8 @@ def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
             list_final.append(i)
             list_final.append(j)
             list_final.append(k)
+    else:
+        return list_new_pic
 
     if len(list_final) > 0:
         final = [pic for pic in list_final if pic in candidates]

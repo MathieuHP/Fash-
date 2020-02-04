@@ -285,8 +285,8 @@ def new_company():
 
         verify_email(email)
 
-        return redirect(URL + "", code=307)  # !!! TO DO : change toward login screen 
-                                                    # and add relevant message
+        return "ok"  
+
     except:
         return ''
 
@@ -294,51 +294,50 @@ def new_company():
 
 @app.route('/new_user', methods=["POST"])
 def new_user():
-    # try:
-    user = db.user_info
-    first_name = request.get_json()['first_name']
-    last_name = request.get_json()['last_name']
-    email = request.get_json()['email']
-    phone = request.get_json()['phone']
-    sex = request.get_json()['sex']
-    password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
-    created = datetime.utcnow()
-
     try:
-        res = user.find_one({"email":email})
-        if res["email"] == email:
-            return "already exists"
-    except:
-        None
+        user = db.user_info
+        first_name = request.get_json()['first_name']
+        last_name = request.get_json()['last_name']
+        email = request.get_json()['email']
+        phone = request.get_json()['phone']
+        sex = request.get_json()['sex']
+        password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+        created = datetime.utcnow()
 
-    x = user.insert_one({
-        'first_name': first_name,
-        'last_name': last_name,
-        'email': email,
-        'password': password,
-        'created': created,
-        "sex" : sex,
-        'phone' : phone,
-        'mail_verified': True  # IF TRUE EMAIL VERIF IS NOT ACTIVE !!!
-    })
-    
-    result = user.find_one({"email":email})
-    user_id = str(result["_id"])
+        try:
+            res = user.find_one({"email":email})
+            if res["email"] == email:
+                return "already exists"
+        except:
+            None
 
-    collection = db.list_images
-    x = collection.insert_one({
-        "user_id":user_id,
-        "super_like":[],
-        "list_image":[]
+        x = user.insert_one({
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'password': password,
+            'created': created,
+            "sex" : sex,
+            'phone' : phone,
+            'mail_verified': True  # IF TRUE EMAIL VERIF IS NOT ACTIVE !!!
         })
-  
+        
+        result = user.find_one({"email":email})
+        user_id = str(result["_id"])
 
-    verify_email(email)
-    
-    return redirect(URL + "/notconfirm", code=307)  # !!! TO DO : change toward login screen 
-                                                    # and add relevant message
-    # except:
-    #     return(" ")
+        collection = db.list_images
+        x = collection.insert_one({
+            "user_id":user_id,
+            "super_like":[],
+            "list_image":[]
+            })
+      
+
+        verify_email(email)
+        
+        return "ok"
+    except:
+        return ""
 
 
 
