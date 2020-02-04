@@ -197,6 +197,7 @@ def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
     results = list(collection.find({"user_id": user_id}))[0]
 
     #check with geoffrey cmt il feed son annoy car il faut appliquer les filtres
+    list_annoy = []
     if len(results["super_like"]) > 0:
         sup_like = results["super_like"]
         list_annoy = get_similar_images(sup_like[0], candidates)
@@ -205,6 +206,7 @@ def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
             cursor = collection.update_one({"_id":results["_id"]},{"$set":{"super_like":sup_like[1:]}})
         else:
             print("-= list annoy too small =-")
+    list_collab = []
 
     if collab_on:
         list_collab = get_collaborative_recommended_picture(user_id, candidates)
