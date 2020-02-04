@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, TextInput, AsyncStorage, StyleSheet, Image } from 'react-native';
+import { View, AsyncStorage, StyleSheet } from 'react-native';
 import axios from 'axios'
-import { Link, useHistory } from "react-router-native";
+import { useHistory } from "react-router-native";
 
 import {
     Layout,
@@ -42,7 +42,7 @@ function Home(props) {
             }
         }
         asyncFuncForAsyncStorage();
-    }, []);
+    }, [ history]);
 
     // FUNCTIONS
     

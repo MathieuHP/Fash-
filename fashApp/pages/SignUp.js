@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'
-import { View, TextInput, AsyncStorage, StyleSheet, ScrollView } from 'react-native';
-import RadioForm from 'react-native-simple-radio-button';
-import { useHistory, Link } from "react-router-native";
+import { View, AsyncStorage, StyleSheet, ScrollView } from 'react-native';
+import { useHistory } from "react-router-native";
 
 
 // UI KITTEN
@@ -58,7 +57,7 @@ function SignUp() {
             }
         }
         asyncFuncForAsyncStorage();
-	}, []);
+	}, [token, history]);
 	
 	useEffect(() => {
 		if(visible === false){

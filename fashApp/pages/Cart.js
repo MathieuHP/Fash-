@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Image, AsyncStorage, StyleSheet, TouchableHighlight } from 'react-native';
 import { useHistory } from "react-router-native";
-import RadioForm from 'react-native-simple-radio-button';
 import axios from 'axios'
 
 import {tofrontendTitle} from '../utils/convertTitles'

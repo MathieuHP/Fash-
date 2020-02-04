@@ -420,9 +420,6 @@ function Client(props) {
                             image={imageSrc}
                         />
                         <CardContent>
-                            {/* <Typography component="p">
-                                <span className={classes.modalContentTextSpan}></span> {name}
-                            </Typography> */}
                             <Typography component="p">
                                 <span className={classes.modalContentTextSpan}>Type of cloth:</span> {typeCloth}
                             </Typography>
@@ -435,9 +432,6 @@ function Client(props) {
                             <Typography component="p">
                                 <span className={classes.modalContentTextSpan}>Price:</span> {price}
                             </Typography>
-                            {/* <Typography component="p">
-                                <span className={classes.modalContentTextSpan}></span> {sex}
-                            </Typography> */}
                             <Typography component="p">
                                 <span className={classes.modalContentTextSpan}>Description:</span> {description}
                             </Typography>

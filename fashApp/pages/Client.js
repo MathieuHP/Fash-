@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, TouchableHighlight, AsyncStorage, StyleSheet, ScrollView, Animated } from 'react-native';
-import { Link, useHistory } from "react-router-native";
+import { View, Image, AsyncStorage, StyleSheet, ScrollView, Animated } from 'react-native';
+import { useHistory } from "react-router-native";
 import GestureRecognizer from 'react-native-swipe-gestures';
 
 // UI KITTEN
@@ -34,16 +34,13 @@ function Client(props) {
 	// STATE, EFFECT
 	const [imageSrc, setImageSrc] = useState('')
 	const [imageList, setImageList] = useState([])
-	const [name, setName] = useState('')
 	const [typeCloth, setTypeCloth] = useState('')
 	const [materialCloth, setMaterialCloth] = useState('')
 	const [productionMethod, setProductionMethod] = useState('')
 	const [price, setPrice] = useState('')
-	const [sex, setSex] = useState('')
 	const [description, setDescription] = useState('')
 	
 	const [visible, setVisible] = useState(false);
-	const [visiblePopover, setVisiblePopover] = React.useState(false);
 	const [popoverValue, setPopoverValue] = useState('empty');
 	
 	const [noMoreCloth, setNoMoreCloth] = useState(false)
@@ -170,12 +167,10 @@ function Client(props) {
 	};
 
 	const showImage = async (imageInfo) => {
-		setName(imageInfo["name"])
 		setTypeCloth(imageInfo["typeCloth"])
 		setMaterialCloth(imageInfo["productionMethod"])
 		setProductionMethod(imageInfo["productionMethod"])
 		setPrice(imageInfo["price"])
-		setSex(imageInfo["sex"])
 		setDescription(imageInfo["description"])
 
 		const options = {
@@ -374,12 +369,10 @@ function Client(props) {
 						{
 							imageSrc ?
 								<>
-									{/* <Text>{name}</Text> */}
 									<Text appearance='hint' >Type of cloth: </Text><Text>{typeCloth}</Text> 
 									<Text appearance='hint' >Cloth material: </Text><Text>{materialCloth}</Text>
 									<Text appearance='hint' >Production method: </Text><Text>{productionMethod}</Text>
 									<Text appearance='hint' >Price: </Text><Text>{price}</Text>
-									{/* <Text>Gender : {sex}</Text> */}
 									<Text appearance='hint' >Description: </Text><Text>{description}</Text>
 								</>
 							:

@@ -133,6 +133,8 @@ function SignUp() {
                     handleOpen()
                 } else if (response.data === "already exists"){
                     setConnectionMessage(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">This email address already exists</Typography>)
+                } else if (response.data === "email invalid"){
+                    setConnectionMessage(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">This email address is not valid</Typography>)
                 } else {
                     setConnectionMessage(<Typography variant="subtitle1" align="center" color="textSecondary" component="p">An error occured. Try again later please.</Typography>)
                 }

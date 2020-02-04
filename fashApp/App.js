@@ -11,7 +11,6 @@ import Nav from './pages/Nav'
 import SignUp from './pages/SignUp'
 import Client from './pages/Client'
 import Cart from './pages/Cart'
-import NotFound from './pages/NotFound'
 import ChangePwd from './pages/ChangePwd';
 
 function App() {
@@ -37,7 +36,6 @@ function App() {
 						<Route exact path="/changepwd" render={(props) => <ChangePwd {...props} tokenState={tokenState} setTokenState={setTokenState} />} />
 						<Route exact path="/signup" component={SignUp} />
 						<Route exact path="/cart" render={(props) => <Cart {...props} setTokenState={setTokenState} />} />
-						{/* <Route component={NotFound}/> */}
 					</Layout>
 				</Layout>
 			</ApplicationProvider>

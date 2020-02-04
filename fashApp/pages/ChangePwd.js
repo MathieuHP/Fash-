@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useHistory } from "react-router-native";
 import axios from 'axios'
-import { View, Image, TextInput, AsyncStorage, StyleSheet } from 'react-native';
+import { View, AsyncStorage, StyleSheet } from 'react-native';
 
 // UI KITTEN
 import {
-    Layout,
     Text,
     Input,
     Button,
 	Icon,
-	Select,
-	List,
-	ListItem,
-	ButtonGroup,
-	Card
 } from '@ui-kitten/components';
 
 
@@ -123,7 +117,6 @@ function ChangePwd(props) {
                         icon={renderIcon}
                         label='Old Password'
                     />
-                    {/* <TextInput placeholder="Old password" secureTextEntry={true} autoCapitalize="none" value={oldPassword} onChangeText={text => setOldPassword(text)} /> */}
                 </View>
                 <View >
                     <Input
@@ -137,7 +130,6 @@ function ChangePwd(props) {
                         icon={renderIcon}
                         label='New Password'
                     />
-                    {/* <TextInput placeholder="New password" secureTextEntry={true} autoCapitalize="none" value={newPassword} onChangeText={text => setNewPassword(text)} /> */}
                 </View>
                 <View >
                     <Input
@@ -151,7 +143,6 @@ function ChangePwd(props) {
                         icon={renderIcon}
                         label='New Password again'
                     />
-                    {/* <TextInput placeholder="New password again" secureTextEntry={true} autoCapitalize="none" value={rePassword} onChangeText={text => setRePassword(text)} /> */}
                 </View>
                 <Button style={styles.button} onPress={() => onSubmit()}>
                 Change password
