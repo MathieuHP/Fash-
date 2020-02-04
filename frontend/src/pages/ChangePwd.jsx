@@ -58,7 +58,7 @@ function ChangePwd(props) {
         } else {
             checkToken()
         }
-    }, []);
+    }, [token, history]);
 
     // FUNCTIONS
 

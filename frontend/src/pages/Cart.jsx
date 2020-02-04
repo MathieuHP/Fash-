@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import styled from 'styled-components';
 import axios from 'axios'
 
 import { tofrontendTitle } from '../utils/convertTitles'
@@ -134,7 +133,7 @@ function Cart(props) {
             getProfileInfo();
             getCart()
         }
-    }, []);
+    }, [history, token]);
 
     // FUNCTIONS
 
@@ -368,7 +367,7 @@ function Cart(props) {
                                                     onChange={(e) => handleInputChange(e)}
                                                 />
                                                 <TextField
-                                                    key={'input' + 're' + item}
+                                                    key={'inputre' + item}
                                                     id="reEmail"
                                                     label="Email Address again"
                                                     name="reEmail"

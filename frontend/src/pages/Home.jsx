@@ -62,7 +62,7 @@ function Home(props) {
 				setEmailConfirm(<Typography variant="subtitle1" align="center" color="textSecondary" component="h6">Your email has been verified</Typography>)
 			}
         }
-    }, []);
+    }, [token, history, props, mail]);
 
     // FUNCTIONS
 

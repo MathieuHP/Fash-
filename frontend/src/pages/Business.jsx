@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useHistory } from "react-router-dom";
-import styled from 'styled-components';
 import axios from 'axios'
 
 // MATERIAL UI
@@ -57,7 +56,7 @@ function Business(props) {
         } else {
             props.setTokenState('')
         }
-    }, []);
+    }, [token, history, props]);
 
     // FUNCTIONS
     

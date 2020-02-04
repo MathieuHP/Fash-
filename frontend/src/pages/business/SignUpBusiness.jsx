@@ -100,7 +100,7 @@ function SignUp() {
         if(token){
             history.push("/business/company")
         }
-    }, []);
+    }, [token, history]);
 
     // FUNCTIONS
 

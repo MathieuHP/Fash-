@@ -1,6 +1,5 @@
 import React, { useState, useEffect} from 'react';
 import { useHistory } from "react-router-dom";
-import styled from 'styled-components';
 import axios from 'axios'
 
 import {tofrontendTitle} from '../../utils/convertTitles'
@@ -135,7 +134,7 @@ function ImagesUploaded(props) {
             getProfileInfo();
             getImagesUploaded()
         }
-      }, []);
+      }, [token, history]);
 
     // FUNCTIONS
 
@@ -367,7 +366,7 @@ function ImagesUploaded(props) {
                                                         onChange={(e) => handleInputChange(e)}
                                                     />
                                                     <TextField
-                                                        key={'input' + 're' + item}
+                                                        key={'inputre' + item}
                                                         id="reEmail"
                                                         label="Email Address again"
                                                         name="reEmail"
@@ -492,7 +491,7 @@ function ImagesUploaded(props) {
                             autoComplete="typeCloth"
                             value={imageInfoCard['typeCloth']}
                             onFocus={(e) => e.target.select()}
-                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['typeCloth']: e.target.value})}
+                            onChange={(e) => setImageInfoCard({...imageInfoCard, 'typeCloth': e.target.value})}
                         />
                         <TextField
                             className={classes.modalContentTextField}
@@ -502,7 +501,7 @@ function ImagesUploaded(props) {
                             autoComplete="materialCloth"
                             value={imageInfoCard['materialCloth']}
                             onFocus={(e) => e.target.select()}
-                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['materialCloth']: e.target.value})}
+                            onChange={(e) => setImageInfoCard({...imageInfoCard, 'materialCloth': e.target.value})}
                         />
                         <TextField
                             className={classes.modalContentTextField}
@@ -512,7 +511,7 @@ function ImagesUploaded(props) {
                             autoComplete="productionMethod"
                             value={imageInfoCard['productionMethod']}
                             onFocus={(e) => e.target.select()}
-                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['productionMethod']: e.target.value})}
+                            onChange={(e) => setImageInfoCard({...imageInfoCard, 'productionMethod': e.target.value})}
                         />
                         <TextField
                             className={classes.modalContentTextField}
@@ -523,7 +522,7 @@ function ImagesUploaded(props) {
                             type="number"
                             value={imageInfoCard['price']}
                             onFocus={(e) => e.target.select()}
-                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['price']: e.target.value})}
+                            onChange={(e) => setImageInfoCard({...imageInfoCard, 'price': e.target.value})}
                         />
                         <TextField
                             className={classes.modalContentTextField}
@@ -533,14 +532,14 @@ function ImagesUploaded(props) {
                             autoComplete="description"
                             value={imageInfoCard['description']}
                             onFocus={(e) => e.target.select()}
-                            onChange={(e) => setImageInfoCard({... imageInfoCard, ['description']: e.target.value})}
+                            onChange={(e) => setImageInfoCard({...imageInfoCard, 'description': e.target.value})}
                         />
                         <FormControl>
                             <InputLabel id="sexInput">Sex:</InputLabel>
                             <Select
                                 labelId="sex"
                                 id="sex"
-                                onChange={(e) => setImageInfoCard({... imageInfoCard, ['sex']: e.target.value})}
+                                onChange={(e) => setImageInfoCard({...imageInfoCard, 'sex': e.target.value})}
                                 value={imageInfoCard['sex']}
                                 >
                                 <MenuItem value={'M'}>Male</MenuItem>

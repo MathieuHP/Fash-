@@ -22,7 +22,6 @@ import Modal from '@material-ui/core/Modal';
 import { Button } from '@material-ui/core';
 import Slider from '@material-ui/core/Slider';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { withTheme } from 'styled-components';
 import Fade from '@material-ui/core/Fade';
 
 function Client(props) {
@@ -112,12 +111,10 @@ function Client(props) {
     // STATE, EFFECT
     const [imageSrc, setImageSrc] = useState('')
     const [imageList, setImageList] = useState([])
-    const [name, setName] = useState('')
     const [typeCloth, setTypeCloth] = useState('')
     const [materialCloth, setMaterialCloth] = useState('')
     const [productionMethod, setProductionMethod] = useState('')
     const [price, setPrice] = useState('')
-    const [sex, setSex] = useState('')
     const [description, setDescription] = useState('')
     const [open, setOpen] = React.useState(false);
     const [noMoreCloth, setNoMoreCloth] = useState(false)
@@ -141,7 +138,7 @@ function Client(props) {
         } else {
             getListImages();
         }
-    }, []);
+    }, [token, history]);
 
     const sexList= [
         'M',
@@ -234,12 +231,10 @@ function Client(props) {
     };
 
     const showImage = async (imageInfo) => {
-        setName(imageInfo["name"])
         setTypeCloth(imageInfo["typeCloth"])
         setMaterialCloth(imageInfo["productionMethod"])
         setProductionMethod(imageInfo["productionMethod"])
         setPrice(imageInfo["price"])
-        setSex(imageInfo["sex"])
         setDescription(imageInfo["description"])
 
         const options = {
@@ -461,7 +456,9 @@ function Client(props) {
                         </div>
                     </>
                     :
-                    <Typography variant="subtitle1" align="center" color="textSecondary" component="p">{noMoreCloth ? 'No more clothes for now. Try again later or change your filters.' :  <CircularProgress />}</Typography>
+                    <div>
+                        {noMoreCloth ? <Typography variant="subtitle1" align="center" color="textSecondary" component="p">'No more clothes for now. Try again later or change your filters.'</Typography> : <CircularProgress />}
+                    </div>
                 }
                 <Button onClick={handleOpen}>
                     Filters

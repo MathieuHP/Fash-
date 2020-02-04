@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Typography from '@material-ui/core/Typography';
 import { Button } from '@material-ui/core';
-import Input from '@material-ui/core/Input';
 import Container from '@material-ui/core/Container';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
@@ -31,7 +30,7 @@ function NotFound() {
     const [infoMsg, setInfoMsg] = useState();
 
     const sendLink = () => {
-        if (email > 0) {
+        if (email.length > 0) {
             const options = {
                 method: 'POST',
                 body: JSON.stringify({ email: email}),
@@ -39,7 +38,6 @@ function NotFound() {
             fetch(`http://127.0.0.1:5000/re_verify`, options)
             .then((response) => {
                 response.json().then(function(res) {
-                    console.log(res);
                     if ('msg' in res){
                         setInfoMsg(
                             <Typography className={classes.secondTitle} variant="subtitle1" color="textSecondary" component="h6">
@@ -81,6 +79,7 @@ function NotFound() {
                 <Button className={classes.button}  variant="contained" color="primary" onClick={sendLink}>
                     Get new confirmation link
                 </Button>
+                {infoMsg}
             </Container>
         </div>
     )

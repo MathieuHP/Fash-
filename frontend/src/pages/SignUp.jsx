@@ -93,7 +93,7 @@ function SignUp() {
         if(token){
             history.push("/client")
         }
-    }, []);
+    }, [token, history]);
 
     // FUNCTIONS
 

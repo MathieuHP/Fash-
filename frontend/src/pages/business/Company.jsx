@@ -80,7 +80,7 @@ function Company(props) {
         } else {
             checkToken()
         }
-    }, []);
+    }, [history, token]);
 
     // FUNCTIONS
 

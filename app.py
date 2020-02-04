@@ -246,7 +246,6 @@ def re_verify():
     if not result:
         return jsonify({'msg' : 'This email does not exists, try to register again !'})
 
-
     verify_email(email)
     return jsonify({'success' : 'verification email sent'})
 
