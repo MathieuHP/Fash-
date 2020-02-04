@@ -120,6 +120,10 @@ def less_rated_pictures_selection(candidates, alread_rated_pics):
         counter += 1
 
     shuffle(bag)
+    try:
+        bag = bag [:15]
+    except:
+        None
     return bag
 
 
