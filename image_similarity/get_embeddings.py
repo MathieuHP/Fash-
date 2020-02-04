@@ -27,41 +27,41 @@ def get_embeddings():
     mainDir = os.getcwd() + "/image_similarity"
 
     # Make paths
-    print(os.getcwd())
+    #print(os.getcwd())
     if os.path.isdir(mainDir + '/data'):
         if os.path.isdir(mainDir + '/data/train'):
             if not os.path.isdir(os.getcwd() + "/imagesOnDb"):
                 os.mkdir(os.getcwd() + "/imagesOnDb")
-                print("imagesOnDb directory has been created")
+                #print("imagesOnDb directory has been created")
             dataTrainDir = os.path.join(mainDir, "data", "train")    
         else:
             os.mkdir(mainDir + '/data/train')
-            print("Train directory has been created")
+            #print("Train directory has been created")
             return None
     else:
         os.mkdir(mainDir + '/data')
         os.mkdir(mainDir + '/data/train')
         os.mkdir(os.getcwd() + "/imagesOnDb")
-        print("Data, train, imagesOnDb directories have been created")
+        #print("Data, train, imagesOnDb directories have been created")
         return None
     
     # Read images
     extensions = [".jpg", ".jpeg", ".png"]
-    print("Reading train images from '{}'...".format(dataTrainDir))
+    #print("Reading train images from '{}'...".format(dataTrainDir))
     imgs_and_filenames_train = read_imgs_dir(dataTrainDir, extensions, parallel=parallel)
     imgs_train = imgs_and_filenames_train[0]
     filenames_train = np.array(imgs_and_filenames_train[1])
     if filenames_train.size == 0 or len(imgs_train) == 0:
-        print("Train file is empty")
+        #print("Train file is empty")
         return None
     # shape_img = imgs_train[0].shape
     shape_img = (244, 244, 3)
-    print("Image shape = {}".format(shape_img))
+    #print("Image shape = {}".format(shape_img))
 
     # Load pre-trained VGG19 model + higher level layers
-    print("Loading vgg19 pre-trained model...")
+    #print("Loading vgg19 pre-trained model...")
     model = tf.keras.applications.VGG19(weights='imagenet', include_top=False, input_shape=shape_img)
-    model.summary()
+    # model.summary()
 
     shape_img_resize = tuple([int(x) for x in model.input.shape[1:]])
     input_shape_model = tuple([int(x) for x in model.input.shape[1:]])
@@ -69,29 +69,29 @@ def get_embeddings():
     n_epochs = None
 
     # Print some model info
-    print("input_shape_model = {}".format(input_shape_model))
-    print("output_shape_model = {}".format(output_shape_model))
+    #print("input_shape_model = {}".format(input_shape_model))
+    #print("output_shape_model = {}".format(output_shape_model))
 
     transformer = ImageTransformer(shape_img_resize)
-    print("Applying image transformer to training images...")
+    #print("Applying image transformer to training images...")
     imgs_train_transformed = apply_transformer(imgs_train, transformer, parallel=parallel)
 
     # Convert images to numpy array
     X_train = np.array(imgs_train_transformed).reshape((-1,) + input_shape_model)
-    print(" -> X_train.shape = {}".format(X_train.shape))
+    #print(" -> X_train.shape = {}".format(X_train.shape))
 
     # Create embeddings using model
-    print("Inferencing embeddings using pre-trained model...")
+    #print("Inferencing embeddings using pre-trained model...")
     E_train = model.predict(X_train)
     E_train_flatten = E_train.reshape((-1, np.prod(output_shape_model)))
-    print(" -> E_train.shape = {}".format(E_train.shape))
-    print(" -> E_train_flatten.shape = {}".format(E_train_flatten.shape))
+    #print(" -> E_train.shape = {}".format(E_train.shape))
+    #print(" -> E_train_flatten.shape = {}".format(E_train_flatten.shape))
     
     if not os.path.isdir(mainDir + '/outfile'):
         os.mkdir(mainDir + '/outfile')
     
     if os.path.isfile(mainDir + '/outfile/filenames.npy') and os.path.isfile(mainDir + '/outfile/embs.npy'):
-        print("Outfiles already exist")
+        #print("Outfiles already exist")
         
         train_filenames = np.load(mainDir + '/outfile/filenames.npy')
         train_embs = np.load(mainDir + '/outfile/embs.npy')
@@ -103,7 +103,7 @@ def get_embeddings():
         np.save(mainDir + '/outfile/filenames.npy', train_filenames_append)
         np.save(mainDir + '/outfile/nbrFiles.npy', train_filenames_append.size)
     else:
-        print("Creating outfiles...") 
+        #print("Creating outfiles...") 
         np.save(mainDir + '/outfile/embs.npy', E_train_flatten)
         np.save(mainDir + '/outfile/filenames.npy', filenames_train)
         np.save(mainDir + '/outfile/nbrFiles.npy', filenames_train.size)
