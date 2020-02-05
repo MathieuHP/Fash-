@@ -146,21 +146,23 @@ function Client(props) {
     ];
 
     const typeList= [
-        'Type 1',
-        'Type 2',
-        'Type 3'
+        "jeans",
+        "sweater",
+        "dress",
     ];
 
     const materialList= [
-        'Material 1',
-        'Material 2',
-        'Material 3',
+        "cotton",
+        "wool",
+        "synthetic",
+        "silk",
     ];
     
     const productionList= [
-        'Production 1',
-        'Production 2',
-        'Production 3'
+        "local",
+        "made in bangladesh",
+        "sustainable",
+        "industrial",
     ];
 
     let sliderValue = [0,999]
@@ -232,7 +234,7 @@ function Client(props) {
 
     const showImage = async (imageInfo) => {
         setTypeCloth(imageInfo["typeCloth"])
-        setMaterialCloth(imageInfo["productionMethod"])
+        setMaterialCloth(imageInfo["materialCloth"])
         setProductionMethod(imageInfo["productionMethod"])
         setPrice(imageInfo["price"])
         setDescription(imageInfo["description"])

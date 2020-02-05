@@ -102,7 +102,9 @@ function SignUp() {
 	                handleOpen()
 	            } else if (response.data === "already exists"){
 	                setConnectionMessage(<Text>This email address already exists</Text>)
-	            } else {
+	            } else if (response.data === "email invalid"){
+                    setConnectionMessage(<Text>This email address is not valid</Text>)
+                } else {
 	                setConnectionMessage(<Text>An error occured. Try again later please.</Text>)
 	                history.push("/signup")
 	            }

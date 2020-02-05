@@ -13,6 +13,7 @@ import {
 	Modal,
 	Card,
 	Spinner,
+	Input
 } from '@ui-kitten/components';
 
 
@@ -56,8 +57,7 @@ function Client(props) {
 	const [clothe_type, setClothe_type] = useState([])
 	const [clothe_material, setClothe_material] = useState([])
 	const [clothe_production, setClothe_production] = useState([])
-	const [clothe_price_range_min, setClothe_price_range_min] = useState(0)
-	const [clothe_price_range_max, setClothe_price_range_max] = useState(999)
+	// const [clothe_price_range, setClothe_price_range] = useState([]);
 
 	const [fadeAnim] = useState(new Animated.Value(0))
 
@@ -70,21 +70,23 @@ function Client(props) {
     ];
 
     const typeList= [
-		{ text: 'Type 1' },
-		{ text: 'Type 2' },
-		{ text: 'Type 3' },
+		{ text: 'jeans' },
+		{ text: 'sweater' },
+		{ text: 'dress' },
     ];
 
     const materialList= [
-		{ text: 'Material 1' },
-		{ text: 'Material 2' },
-		{ text: 'Material 3' },
+		{ text: 'cotton' },
+		{ text: 'wool' },
+		{ text: 'synthetic' },
+		{ text: 'silk' },
     ];
     
     const productionList= [
-		{ text: 'Production 1' },
-		{ text: 'Production 2' },
-		{ text: 'Production 3' },
+		{ text: 'local' },
+		{ text: 'made in bangladesh' },
+		{ text: 'sustainable' },
+		{ text: 'industrial' },
 	];
 	
 	const config = {
@@ -107,8 +109,8 @@ function Client(props) {
         }
 		asyncFuncForAsyncStorage(mounted);
 		return () => mounted = false;
-    }, []);
-
+	}, []);
+	
 	// FUNCTIONS
 
 	const getListImages = async (token, update = false) => {
@@ -130,8 +132,6 @@ function Client(props) {
 						history.push("/")
 						return;
 					}
-					setClothe_price_range_min(listImageFromBackend['filters']['clothe_price_range'][0])
-					setClothe_price_range_max(listImageFromBackend['filters']['clothe_price_range'][1])
 					setFiltersObj(listImageFromBackend['filters'])
 					if ("no_more_pictures" in listImageFromBackend){
 						props.setTokenState(token)
@@ -168,7 +168,7 @@ function Client(props) {
 
 	const showImage = async (imageInfo) => {
 		setTypeCloth(imageInfo["typeCloth"])
-		setMaterialCloth(imageInfo["productionMethod"])
+		setMaterialCloth(imageInfo["materialCloth"])
 		setProductionMethod(imageInfo["productionMethod"])
 		setPrice(imageInfo["price"])
 		setDescription(imageInfo["description"])
@@ -229,14 +229,16 @@ function Client(props) {
 		}
 	};
 
-	const updateFilters = async () => {
+	const updateFilters = () => {
+
 		let newFilters = {
 			clothe_sex : clothe_sex.map(function(item){ return item.text }),
 			clothe_type: clothe_type.map(function(item){ return item.text }),
 			clothe_material: clothe_material.map(function(item){ return item.text }),
 			clothe_production: clothe_production.map(function(item){ return item.text }),
-			clothe_price_range: [clothe_price_range_min === '' ? 0 : parseInt(clothe_price_range_min), clothe_price_range_max === '' ? 0 : parseInt(clothe_price_range_max)]
+			// clothe_price_range: [clothe_price_range[0] ? clothe_price_range[0] : 0, clothe_price_range[1] ? clothe_price_range[1] : 999 ]
 		}
+
         const options = {
             method: 'POST',
             body: JSON.stringify(newFilters),
@@ -277,14 +279,9 @@ function Client(props) {
 			setClothe_type([])
 			setClothe_material([])
 			setClothe_production([])
+			// setClothe_price_range([])
 		}
 		setVisible(!visible);
-	};
-
-	const handleChangePrice = (val, setStateFunc) => {
-		if((!isNaN(val)) && val >= 0){
-			setStateFunc(val)
-		}
 	};
 	
 	const renderModalElement = () => (
@@ -292,7 +289,7 @@ function Client(props) {
 			style={styles.modalContainer}
 		>
 			<Layout style={styles.containerSelect}>
-				<Text appearance='hint' >Sex: ({filtersObj['clothe_sex'].map(element => element + ', ')})</Text>
+				<Text appearance='hint' >Sex: </Text><Text>({filtersObj['clothe_sex'].map(element => element + ', ')})</Text>
 				<Select
 					style={styles.labelSelect}
 					data={sexList}
@@ -300,7 +297,7 @@ function Client(props) {
 					selectedOption={clothe_sex}
 					onSelect={e => setClothe_sex(e)}
 				/>
-				<Text appearance='hint' >Type of cloth: ({filtersObj['clothe_type'].map(element => element + ', ')})</Text>
+				<Text appearance='hint' >Type of cloth: </Text><Text>({filtersObj['clothe_type'].map(element => element + ', ')})</Text>
 				<Select
 					style={styles.labelSelect}
 					data={typeList}
@@ -308,7 +305,7 @@ function Client(props) {
 					selectedOption={clothe_type}
 					onSelect={e => setClothe_type(e)}
 				/>
-				<Text appearance='hint' >Cloth material: ({filtersObj['clothe_material'].map(element => element + ', ')})</Text>
+				<Text appearance='hint' >Cloth material: </Text><Text>({filtersObj['clothe_material'].map(element => element + ', ')})</Text>
 				<Select
 					style={styles.labelSelect}
 					data={materialList}
@@ -316,7 +313,7 @@ function Client(props) {
 					selectedOption={clothe_material}
 					onSelect={e => setClothe_material(e)}
 				/>
-				<Text appearance='hint' >Production method: ({filtersObj['clothe_production'].map(element => element + ', ')})</Text>
+				<Text appearance='hint' >Production method: </Text><Text>({filtersObj['clothe_production'].map(element => element + ', ')})</Text>
 				<Select
 					style={styles.labelSelect}
 					data={productionList}
@@ -324,18 +321,24 @@ function Client(props) {
 					selectedOption={clothe_production}
 					onSelect={e => setClothe_production(e)}
 				/>
-				{/* <Text appearance='hint' >Price: (min, max)</Text>
+				{/* <Text appearance='hint' >Price: (min, max)</Text><Text>({filtersObj['clothe_price_range'][0]},  {filtersObj['clothe_price_range'][1]})</Text>
 				<Layout style={styles.containerPrice}>
 					<Input
 						style={styles.inputPrice}
-						value={clothe_price_range_min.toString()}
-						onChangeText={e => handleChangePrice(e, setClothe_price_range_min)}
+						value={clothe_price_range[0]}
+						onChangeText={e => {
+							const valMin = [e, clothe_price_range[1]]
+							setClothe_price_range(valMin)
+						}}
 						placeholder='Min'
 					/>
 					<Input
 						style={styles.inputPrice}
-						value={clothe_price_range_max.toString()}
-						onChangeText={e => handleChangePrice(e, setClothe_price_range_max)}
+						value={clothe_price_range[1]}
+						onChangeText={e => {
+							const valMax = [clothe_price_range[0], e]
+							setClothe_price_range(valMax)
+						}}
 						placeholder='Max'
 					/>
 				</Layout> */}
