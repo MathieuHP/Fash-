@@ -1,8 +1,19 @@
 # application : transportal-267109
 # version: 1
-runtime: python37
+# runtime: python37
 
 
 # handlers:
 # - url: auto
 #   script : main.app 
+
+runtime: python37
+env: flex
+
+manual_scaling:
+  instances: 1
+
+resources:
+  cpu: 2
+  memory_gb: 8
+  disk_size_gb: 10
