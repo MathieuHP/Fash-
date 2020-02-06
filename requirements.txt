@@ -75,7 +75,6 @@ Flask-Cors==3.0.8
 Flask-EmailVerifier==0.1.0
 Flask-JWT-Extended==3.24.1
 Flask-Mail==0.9.1
-fr-core-news-md==2.0.0
 future==0.18.2
 gast==0.2.2
 glob2==0.7
