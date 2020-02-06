@@ -37,7 +37,6 @@ chardet==3.0.4
 Click==7.0
 clint==0.5.1
 cloudpickle==1.2.2
-clyent==1.2.2
 coco==0.4.0
 colorama==0.4.1
 commonmark==0.9.1
