@@ -20,3 +20,4 @@ image_similarity/__pycache__/get_embeddings.cpython-37.pyc
 main.py
 
 config.py
+env/
