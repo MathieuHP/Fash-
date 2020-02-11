@@ -1,19 +1,24 @@
-# application : transportal-267109
-# version: 1
-# runtime: python37
-
-
-# handlers:
-# - url: auto
-#   script : main.app 
-
 runtime: python37
-# env: flex
+env: flex
 
-# manual_scaling:
-#   instances: 1
+manual_scaling:
+  instances: 1
 
-# resources:
-#   cpu: 2
-#   memory_gb: 8
-#   disk_size_gb: 10
+resources:
+  cpu: 1
+  memory_gb: 2
+  disk_size_gb: 10
+  
+liveness_check:
+   check_interval_sec: 120
+   timeout_sec: 40
+   failure_threshold: 5
+   success_threshold: 5
+   initial_delay_sec: 500
+
+readiness_check:
+  check_interval_sec: 120
+  timeout_sec: 40
+  failure_threshold: 5
+  success_threshold: 5
+  app_start_timeout_sec: 1500

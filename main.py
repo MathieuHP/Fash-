@@ -37,7 +37,6 @@ app.config.from_pyfile('config.py')
 app.config.update(config.mail_settings)
 mail = Mail(app)
 
-
 # app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
 
 app.config['JWT_HEADER_TYPE'] = None
@@ -60,8 +59,8 @@ def check_if_token_in_blacklist(decrypted_token):
 
 @app.route("/", methods= ["GET"])
 def testingBackend():
-    print("Backend is on")
-    return 'Backend is on'
+    print("Backend is on on fire !")
+    return 'Backend is on but not all of it !'
 
 
 
