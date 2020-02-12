@@ -155,8 +155,8 @@ def get_collaborative_recommended_picture(user_id, candidates):
 
 def create_picture_list(user_id, filt_dic, actual_list, already_rated_pics):
     """create list of picture to give to user
-    inputs:  user_id and filter dict
-    output: list of picture, or False if user as already seen all pictures"""
+    inputs:  user_id, filter dictionnary, actual list and picture already rated by user
+    output: list of picture name, or False if user as already seen all pictures"""
 
     print("--== CREATING PICTURE LIST ==--")
     #retreive already rated pictures and filtered pictures, 

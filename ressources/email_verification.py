@@ -6,12 +6,13 @@ from flask import url_for
 
 
 def generate_confirmation_token(email):
-    # serializer = URLSafeTimedSerializer(config['SECRET_KEY'])
+    """generates a confirmation token to validate email adress"""
     serializer = URLSafeTimedSerializer(config.SECRET_KEY)
     return serializer.dumps(email, salt=config.SECURITY_PASSWORD_SALT)
 
 
 def confirm_token(token, expiration=3600):
+    """from token, returns email to validate"""
     serializer = URLSafeTimedSerializer(config.SECRET_KEY)
     try:
         email = serializer.loads(
@@ -25,6 +26,7 @@ def confirm_token(token, expiration=3600):
 
 
 def send_email(subject, body, receiver):
+    """send email to validate user email"""
     # creates SMTP session 
     s = smtplib.SMTP('smtp.gmail.com', 587) 
 
@@ -47,6 +49,7 @@ def send_email(subject, body, receiver):
 
 
 def verify_email(receiver):
+    """full email-verification feature that generates token and send email"""
 
     token = generate_confirmation_token(receiver)
     confirm_url = url_for('confirm_email', token=token, _external=True)

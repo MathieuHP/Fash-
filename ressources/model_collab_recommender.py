@@ -9,6 +9,9 @@ from surprise.model_selection import cross_validate
 from ressources.config_db import db
 
 def check_minimum_data():
+    """collaborative reccomender needs a minimum amount of data to be efficient (to preserve 
+    matrix sparsity). This function checks if minimum is met"""
+
     # minimum data needed
     min_user = 10
     min_picture = 10
@@ -43,7 +46,7 @@ def filtering_out_users_and_ratings(df_ratings):
     """filter out user and images with too few 
     ratings to preserve matrix sparsity"""
 
-    min_picture_ratings = 5
+    min_picture_ratings = 10
     filter_picture = df_ratings['picture'].value_counts() > min_picture_ratings
     filter_picture = filter_picture[filter_picture].index.tolist()
 

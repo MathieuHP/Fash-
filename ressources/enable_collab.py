@@ -47,7 +47,7 @@ def train_collab():
 
 
 def run_thread():
-	""" multithreading to predict ratings with collaborative recommender filtering """
+	""" multithreading to predict ratings with collaborative recommender filtering"""
 	print ("starting...")
 	rt = RepeatedTimer(86400, train_collab) # 86400 sec = 24h
 	try:

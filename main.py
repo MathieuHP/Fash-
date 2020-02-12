@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, send_file, json, url_for, redirect, render_template, flash
-from flask_mail import Mail, Message
 from tensorflow.keras import backend
 import os
 import cv2
@@ -35,7 +34,6 @@ FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 app.config.from_pyfile('config.py')
 
 app.config.update(config.mail_settings)
-mail = Mail(app)
 
 
 # app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
@@ -60,8 +58,8 @@ def check_if_token_in_blacklist(decrypted_token):
 
 @app.route("/", methods= ["GET"])
 def testingBackend():
-    print("Backend is on")
-    return 'Backend is on'
+    print("Gcloud is on")
+    return 'image is on Gcloud and is on'
 
 
 
@@ -80,6 +78,7 @@ def check_token():
 @app.route("/upload_image", methods= ["POST"])
 @jwt_required
 def upload_image():
+    """upload an image and train annoy, for companies only"""
     current_user = get_jwt_identity()
     
     if current_user["userType"] != 'company' :
@@ -144,6 +143,7 @@ def upload_image():
 @app.route('/update_info', methods=["POST"])
 @jwt_required
 def update_info():
+    """If any user wants to change their login/personnal informations"""
     try:
         current_user = get_jwt_identity()
         user_id = ObjectId(current_user["_id"])
@@ -174,6 +174,7 @@ def update_info():
 @app.route('/update_image_info', methods=["POST"])
 @jwt_required
 def update_image_info():
+    """companies only: update information about a picture"""
     json_data = request.get_json(force = True)['image_info_card']
     
     try:
@@ -195,6 +196,7 @@ def update_image_info():
 @app.route('/update_filters', methods=["POST"])
 @jwt_required
 def update_filters():
+    """if user change their filter options"""
     try:
         current_user = get_jwt_identity()
         user_id = current_user["_id"]
@@ -217,6 +219,7 @@ def update_filters():
 @app.route('/change_pwd', methods=["POST"])
 @jwt_required
 def change_pwd():
+    """if user wants to change his password"""
     try:
         current_user = get_jwt_identity()
         user_id = ObjectId(current_user["_id"])
@@ -240,6 +243,7 @@ def change_pwd():
 
 @app.route('/re_verify', methods=["POST"])
 def re_verify():
+    """if user hasn't confirmed his mail and needs another confirmation email"""
     email = request.get_json(force = True)["email"]
     coll= db.user_info
     result = coll.find_one({"email":email})
@@ -253,6 +257,7 @@ def re_verify():
 
 @app.route('/new_company', methods=["POST"])
 def new_company():
+    """new campany register"""
     try:
         company = db.company_info
         company_name = request.get_json()['company_name']
@@ -294,6 +299,7 @@ def new_company():
 
 @app.route('/new_user', methods=["POST"])
 def new_user():
+    """new user register """
     try:
         user = db.user_info
         first_name = request.get_json()['first_name']
@@ -343,6 +349,7 @@ def new_user():
 
 @app.route('/confirm/<token>', methods=["GET"])
 def confirm_email(token):
+    """check confirmation token and validate user email"""
     try:
         email = confirm_token(token)
     except:
@@ -350,8 +357,7 @@ def confirm_email(token):
         email = None
 
     if email == None:
-            return redirect(URL + "/notconfirm", code=307)  # !!! TO DO : change toward login screen 
-                                                        # and add relevant message
+            return redirect(URL + "/notconfirm", code=307) 
 
     coll = db.user_info
 
@@ -383,6 +389,7 @@ def confirm_email(token):
 
 @app.route('/login', methods=['POST'])
 def login():
+    """user login """
     userType = request.get_json(force = True)['userType']
     user = db.user_info if userType == 'client' else db.company_info
     email = request.get_json(force = True)['email']
@@ -427,6 +434,7 @@ def login():
 @app.route('/getProfileInfo', methods=['POST'])
 @jwt_required
 def getProfileInfo():
+    """show user personnal informations"""
     current_user = get_jwt_identity()
     user_id = ObjectId(current_user["_id"])
     user = db.user_info if current_user["userType"] == 'client' else db.company_info
@@ -451,6 +459,7 @@ def logout():
 @app.route('/remove_account', methods=['POST'])
 @jwt_required
 def remove_account():
+    """ if user wants to remove his account"""
     current_user = get_jwt_identity()
     
     if current_user["userType"] != 'client' :
@@ -481,6 +490,7 @@ def remove_account():
 @app.route("/load_image_for_rating", methods=["POST"])
 @jwt_required
 def load_image_for_rating():
+    """main feature, loads an image so the user can rate it"""
     
     json_data = request.get_json(force = True)
     current_user = get_jwt_identity()
@@ -531,6 +541,7 @@ def load_image_for_rating():
 
 @app.route("/one_image_info", methods=["POST"])
 def one_image_info():
+    """if user clicks on an image, he can see picture's informations"""
     image_name = request.get_json(force = True)['image_name']
     coll = db["image_info"]
     get_info = coll.find_one({"name":image_name})
@@ -562,6 +573,7 @@ def show_image():
 @app.route("/rate_image", methods=["POST"])
 @jwt_required
 def rate_image():
+    """when user has rated an image"""
     json_data = request.get_json(force = True)
     current_user = get_jwt_identity()
     
@@ -607,6 +619,7 @@ def rate_image():
 @app.route("/cart", methods=["POST"])
 @jwt_required
 def cart():
+    """show all the picture an user liked or super-liked"""
     
     current_user = get_jwt_identity()
     
@@ -634,6 +647,7 @@ def cart():
 @app.route("/images_uploaded", methods=["POST"])
 @jwt_required
 def images_uploaded():
+    """company only: show all images uploaded by a company"""
     
     current_user = get_jwt_identity()
     if current_user["userType"] != 'company' :
